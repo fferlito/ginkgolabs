@@ -1,5 +1,8 @@
 /* CSS Variables - Design System */
 
+/* Font Imports - Centralized Management */
+@import url('https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,100;0,200;0,300;0,400;0,700;1,100;1,200;1,300;1,400&family=Barlow:ital,wght@0,400;0,500;0,600;0,700;1,400&family=Open+Sans:ital,wght@0,100;0,200;0,300;0,400;0,600;0,700;0,800;1,100;1,200;1,300;1,400;1,600;1,700;1,800&display=swap');
+
 :root {
   /* Primary Colors */
   --color-primary: #8bc34a;
@@ -36,8 +39,12 @@
   --gradient-text: linear-gradient(135deg, var(--color-text-primary) 0%, #e8f5e8 50%, var(--color-primary) 100%);
   --gradient-background: linear-gradient(135deg, var(--color-bg-primary) 0%, var(--color-bg-secondary) 50%, #0f2415 100%);
   
-  /* Typography */
-  --font-family-primary: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+  /* Typography - Cross Labs Font System */
+  --font-family-primary: 'Open Sans', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+  --font-family-logo: 'Open Sans', sans-serif;
+  --font-family-navigation: 'Barlow', 'Open Sans', sans-serif;
+  --font-family-headline: 'Playfair Display', 'Times New Roman', Georgia, serif;
+  --font-family-body: 'Open Sans', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
   --font-weight-light: 300;
   --font-weight-regular: 400;
   --font-weight-medium: 500;
