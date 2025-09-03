@@ -1,0 +1,61 @@
+{
+    "id": "senior-happiness-specialist",
+    "title": "Senior Dropje",
+    "department": "Wellness & Morale",
+    "location": {
+      "type": "Hybrid",
+      "city": "Anywhere with Good Vibes",
+      "country": "Global",
+      "remoteOk": true
+    },
+    "employmentType": "Full-time (with frequent nap breaks)",
+    "experienceLevel": "Senior-level",
+    "salaryRange": {
+      "min": 80000,
+      "max": 120000,
+      "currency": "USD",
+      "equity": "Unlimited belly rubs and head scritches"
+    },
+    "description": "We're seeking an exceptional Senior Dropje to join our team! This role combines culinary arts, emotional intelligence, and advanced pet care techniques to create the ultimate workplace wellness experience.",
+    "responsibilities": [
+      "Prepare delicious Italian cuisine for team lunches and special events",
+      "Provide professional-grade comfort and emotional support to team members",
+      "Manage office pet wellness programs and ensure maximum fluffiness levels",
+      "Design and implement happiness optimization strategies",
+      "Lead weekly pasta-making workshops and stress-relief sessions",
+      "Maintain optimal office ambiance through strategic deployment of warmth and coziness"
+    ],
+    "requirements": {
+      "education": "Culinary Arts degree, Psychology background, or equivalent life experience in spreading joy",
+      "experience": "5+ years of making people smile and creating memorable food experiences",
+      "skills": [
+        "Expert-level Italian cooking abilities (pasta mastery required)",
+        "Advanced interpersonal and emotional intelligence skills",
+        "Professional pet care and animal communication expertise",
+        "Ability to create warm, welcoming environments",
+        "Multilingual capabilities (Human, Cat, and Italian preferred)",
+        "Outstanding problem-solving skills for complex comfort scenarios"
+      ],
+      "preferred": [
+        "Experience with office morale management",
+        "Knowledge of feline psychology and optimal scratching techniques",
+        "Wine pairing expertise for team events",
+        "Certified in various massage and relaxation techniques"
+      ]
+    },
+    "benefits": [
+      "Competitive salary with performance bonuses (measured in smiles generated)",
+      "Comprehensive health, dental, and vision insurance",
+      "Unlimited ingredients budget for culinary experiments",
+      "Flexible schedule around optimal cuddle times",
+      "Professional development opportunities at Italian cooking schools",
+      "Pet insurance for all office animals",
+      "Dedicated relaxation space with premium blankets and pillows"
+    ],
+    "tags": ["Culinary Arts", "Wellness", "Pet Care", "Italian Cuisine", "Happiness"],
+    "featured": true,
+    "applicationDeadline": "2025-06-01",
+    "postedAt": "2025-01-15",
+    "updatedAt": "2025-01-15"
+  }
+  
