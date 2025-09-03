@@ -1304,9 +1304,16 @@ p, span, div, .content, .description,
 /* Hide progress bar completely */
 .hero-3d-background model-viewer #default-progress-bar,
 .hero-3d-background model-viewer .progress-bar,
-.hero-3d-background model-viewer [slot="progress-bar"] {
+.hero-3d-background model-viewer [slot="progress-bar"],
+.hero-3d-background model-viewer .default-progress-bar {
     display: none !important;
     visibility: hidden !important;
+    opacity: 0 !important;
+}
+
+/* Force transparent background on all devices */
+.hero-3d-background model-viewer::part(default-progress-bar) {
+    display: none !important;
 }
 
 /* Clean overlay for better contrast */
@@ -1352,16 +1359,25 @@ p, span, div, .content, .description,
 /* Responsive Design for 3D Background */
 @media (max-width: 768px) {
     .hero-3d-background {
-        opacity: 0.1;
-        filter: blur(2px);
+        opacity: 0;
+        filter: blur(1px);
+        transition: opacity 2s ease-in-out;
+    }
+    
+    .hero-3d-background.loaded {
+        opacity: 0.35;
+    }
+    
+    .hero-3d-background model-viewer {
+        --poster-color: transparent !important;
+        --progress-bar-color: transparent !important;
+        --progress-mask: transparent !important;
+        background: transparent !important;
+        environment-image: none !important;
     }
     
     .hero-3d-background::after {
-        background: radial-gradient(
-            ellipse at center,
-            rgba(0, 0, 0, 0.3) 0%,
-            rgba(0, 0, 0, 0.8) 100%
-        );
+        display: none;
     }
     
     .hero-content {

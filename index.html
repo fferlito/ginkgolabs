@@ -116,6 +116,12 @@
             
             // Graceful fade-in when model loads
             modelViewer.addEventListener('load', function() {
+                // Force transparent background on mobile
+                if (window.innerWidth <= 768) {
+                    modelViewer.style.background = 'transparent';
+                    modelViewer.style.setProperty('--poster-color', 'transparent');
+                }
+                
                 setTimeout(() => {
                     hero3DBackground.classList.add('loaded');
                 }, 50); // Small delay for smoother experience
