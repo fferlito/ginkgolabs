@@ -1,0 +1,55 @@
+{
+  "id": "product-manager-ai-ethics",
+  "title": "Product Manager - AI Ethics",
+  "department": "Product",
+  "location": {
+    "type": "Remote",
+    "city": "Global",
+    "country": "Various",
+    "remoteOk": true
+  },
+  "employmentType": "Full-time",
+  "experienceLevel": "Senior",
+  "salaryRange": {
+    "min": 140000,
+    "max": 190000,
+    "currency": "USD",
+    "equity": true
+  },
+  "description": "Guide ethical AI development practices and ensure responsible innovation across all products. Experience in AI ethics and product management essential.",
+  "responsibilities": [
+    "Develop and implement ethical AI guidelines across product portfolio",
+    "Lead cross-functional teams in ethical design and development practices",
+    "Conduct ethical impact assessments for AI products and features",
+    "Collaborate with legal, engineering, and research teams on compliance",
+    "Represent the company in industry ethics forums and standards bodies"
+  ],
+  "requirements": {
+    "education": "BS/MS in relevant field; advanced degree in ethics, philosophy, or law preferred",
+    "experience": "5+ years in product management with focus on AI/ML products",
+    "skills": [
+      "Deep understanding of AI ethics principles and frameworks",
+      "Strong product management and strategic thinking skills",
+      "Experience with regulatory compliance (GDPR, AI Act, etc.)",
+      "Excellent communication and stakeholder management",
+      "Technical literacy in AI/ML concepts"
+    ],
+    "preferred": [
+      "Background in philosophy, ethics, or related field",
+      "Experience in regulated industries",
+      "Publication or speaking experience in AI ethics"
+    ]
+  },
+  "benefits": [
+    "Competitive salary with significant equity upside",
+    "Comprehensive benefits package",
+    "Flexible remote work arrangement",
+    "Conference and professional development opportunities",
+    "Opportunity to shape industry standards"
+  ],
+  "tags": ["Product Management", "AI Ethics", "Strategy", "Remote"],
+  "featured": true,
+  "applicationDeadline": "2025-06-01",
+  "postedAt": "2025-03-05",
+  "updatedAt": "2025-03-15"
+}

@@ -1,0 +1,33 @@
+{
+  "id": "introducing-mushroom-radar",
+  "title": "Introducing Mushroom Radar: Predicting Fungal Growth with AI",
+  "excerpt": "Our latest breakthrough in agricultural technology combines machine learning with ecological understanding to revolutionize how we predict and manage fungal growth patterns.",
+  "author": {
+    "name": "Dr. Marcus Rodriguez",
+    "role": "Product Development Lead",
+    "avatar": "/assets/authors/marcus-rodriguez.jpg"
+  },
+  "publishedAt": "2025-03-08",
+  "category": "Technology",
+  "tags": ["Product Launch", "Machine Learning", "Agriculture", "Innovation"],
+  "readTime": "6 min read",
+  "featured": false,
+  "content": {
+    "introduction": "Today marks a significant milestone in agricultural technology with the launch of Mushroom Radar...",
+    "sections": [
+      {
+        "heading": "The Problem We're Solving",
+        "content": "Traditional fungal monitoring methods are reactive rather than predictive..."
+      },
+      {
+        "heading": "How Mushroom Radar Works",
+        "content": "Our system combines environmental sensors, satellite imagery, and advanced ML algorithms..."
+      }
+    ]
+  },
+  "seo": {
+    "metaTitle": "Mushroom Radar: AI-Powered Fungal Growth Prediction | GYNKOLABS",
+    "metaDescription": "Revolutionary agricultural technology using AI to predict fungal growth patterns. Learn about Mushroom Radar's breakthrough features.",
+    "keywords": ["mushroom radar", "fungal prediction", "agricultural AI", "machine learning agriculture"]
+  }
+}

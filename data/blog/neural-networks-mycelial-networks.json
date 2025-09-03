@@ -1,0 +1,33 @@
+{
+  "id": "neural-networks-mycelial-networks",
+  "title": "Neural Networks and Mycelial Networks: Finding Common Ground",
+  "excerpt": "Exploring the fascinating parallels between artificial neural networks and the natural intelligence found in fungal mycelial networks, and what this means for the future of AI development.",
+  "author": {
+    "name": "Dr. Sarah Chen",
+    "role": "Lead AI Researcher",
+    "avatar": "/assets/authors/sarah-chen.jpg"
+  },
+  "publishedAt": "2025-03-15",
+  "category": "Research",
+  "tags": ["AI", "Biomimetics", "Neural Networks", "Fungi", "Research"],
+  "readTime": "8 min read",
+  "featured": true,
+  "content": {
+    "introduction": "The intersection of artificial and natural intelligence has never been more fascinating than in the study of mycelial networks...",
+    "sections": [
+      {
+        "heading": "Understanding Mycelial Intelligence",
+        "content": "Fungi possess a remarkable form of distributed intelligence through their mycelial networks..."
+      },
+      {
+        "heading": "Parallels with Artificial Neural Networks",
+        "content": "Both systems share key characteristics: distributed processing, adaptive pathways, and emergent behavior..."
+      }
+    ]
+  },
+  "seo": {
+    "metaTitle": "Neural Networks vs Mycelial Networks | GYNKOLABS Research",
+    "metaDescription": "Discover the fascinating parallels between AI neural networks and natural mycelial networks in this comprehensive research analysis.",
+    "keywords": ["neural networks", "mycelial networks", "AI research", "biomimetics", "fungi intelligence"]
+  }
+}

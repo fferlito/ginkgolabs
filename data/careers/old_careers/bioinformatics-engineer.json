@@ -1,0 +1,55 @@
+{
+  "id": "bioinformatics-engineer",
+  "title": "Bioinformatics Engineer",
+  "department": "Engineering",
+  "location": {
+    "type": "On-site",
+    "city": "Boston",
+    "country": "USA",
+    "remoteOk": false
+  },
+  "employmentType": "Full-time",
+  "experienceLevel": "Mid-level",
+  "salaryRange": {
+    "min": 120000,
+    "max": 160000,
+    "currency": "USD",
+    "equity": true
+  },
+  "description": "Develop computational tools for analyzing biological networks and ecosystem data. Strong background in biology and software engineering required.",
+  "responsibilities": [
+    "Design and implement bioinformatics pipelines for large-scale data analysis",
+    "Develop tools for analyzing fungal genomic and transcriptomic data",
+    "Collaborate with biologists to translate research needs into software solutions",
+    "Maintain and optimize existing computational infrastructure",
+    "Contribute to open-source bioinformatics tools and libraries"
+  ],
+  "requirements": {
+    "education": "BS/MS in Bioinformatics, Computer Science, Biology, or related field",
+    "experience": "3-5 years of experience in bioinformatics or computational biology",
+    "skills": [
+      "Proficiency in Python, R, and shell scripting",
+      "Experience with genomics data formats (FASTA, FASTQ, VCF, etc.)",
+      "Knowledge of statistical analysis and data visualization",
+      "Familiarity with cloud computing platforms (AWS, GCP)",
+      "Understanding of molecular biology and genetics"
+    ],
+    "preferred": [
+      "Experience with mycology or fungal genomics",
+      "Knowledge of machine learning applied to biological data",
+      "Experience with workflow management systems (Nextflow, Snakemake)"
+    ]
+  },
+  "benefits": [
+    "Competitive salary with equity options",
+    "Health, dental, and vision insurance",
+    "Flexible working hours",
+    "Professional development budget",
+    "Access to cutting-edge research facilities"
+  ],
+  "tags": ["Bioinformatics", "Python", "Data Analysis", "Genomics"],
+  "featured": false,
+  "applicationDeadline": "2025-05-15",
+  "postedAt": "2025-02-20",
+  "updatedAt": "2025-03-10"
+}

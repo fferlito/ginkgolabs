@@ -1,0 +1,55 @@
+{
+  "id": "senior-ai-research-scientist",
+  "title": "Senior AI Research Scientist",
+  "department": "Research & Development",
+  "location": {
+    "type": "Remote/Hybrid",
+    "city": "San Francisco",
+    "country": "USA",
+    "remoteOk": true
+  },
+  "employmentType": "Full-time",
+  "experienceLevel": "Senior",
+  "salaryRange": {
+    "min": 180000,
+    "max": 250000,
+    "currency": "USD",
+    "equity": true
+  },
+  "description": "Lead research in biomimetic AI systems, focusing on neural-mycelial network parallels. PhD in AI/ML, Computer Science, or related field required.",
+  "responsibilities": [
+    "Lead cutting-edge research in biomimetic AI architectures",
+    "Develop novel algorithms inspired by natural intelligence systems",
+    "Publish research findings in top-tier conferences and journals",
+    "Mentor junior researchers and collaborate with interdisciplinary teams",
+    "Drive innovation in fungal-inspired machine learning models"
+  ],
+  "requirements": {
+    "education": "PhD in AI/ML, Computer Science, Neuroscience, or related field",
+    "experience": "5+ years of research experience in AI/ML",
+    "skills": [
+      "Deep expertise in neural network architectures",
+      "Experience with biomimetic or bio-inspired AI",
+      "Strong mathematical background in optimization and statistics",
+      "Proficiency in Python, PyTorch/TensorFlow",
+      "Publication record in top-tier venues"
+    ],
+    "preferred": [
+      "Background in mycology or fungal biology",
+      "Experience with distributed systems",
+      "Knowledge of ecological modeling"
+    ]
+  },
+  "benefits": [
+    "Competitive salary with equity participation",
+    "Comprehensive health, dental, and vision insurance",
+    "Unlimited PTO and sabbatical opportunities",
+    "Conference attendance and research budget",
+    "State-of-the-art research facilities and equipment"
+  ],
+  "tags": ["Machine Learning", "Research", "Biomimetics", "AI", "Senior"],
+  "featured": true,
+  "applicationDeadline": "2025-04-30",
+  "postedAt": "2025-03-01",
+  "updatedAt": "2025-03-15"
+}

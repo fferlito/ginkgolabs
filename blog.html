@@ -3,13 +3,14 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>GYNKOLABS - Radically Reimagining the Future of Intelligence</title>
+    <title>Blog - GYNKOLABS</title>
+    <link rel="stylesheet" href="css/variables.css">
     <link rel="stylesheet" href="styles.css">
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
 </head>
-<body class="landing-page">
+<body>
     <div class="container">
         <header class="header">
             <div class="logo">
@@ -26,45 +27,42 @@
                     </div>
                 </div>
                 <a href="contact.html" class="nav-link">Contact</a>
-                <a href="blog.html" class="nav-link">Blog</a>
+                <a href="blog.html" class="nav-link active">Blog</a>
                 <a href="careers.html" class="nav-link">Careers</a>
             </nav>
         </header>
 
-        <main class="hero-section">
-            <div class="hero-content">
-                <h1 class="hero-headline">
-                    Radically Reimagining<br>
-                    the Future of<br>
-                    Intelligence
-                </h1>
-                
-                <p class="hero-description">
-                    We're building innovative, compassionate, and ethical<br>
-                    AI technologies that support, elevate, and benefit<br>
-                    humanity.
-                </p>
+        <main class="page-content">
+            <div class="page-hero">
+                <h1 class="page-title">Blog & Insights</h1>
+                <p class="page-subtitle">Stay updated with our latest research, insights, and breakthroughs in AI technology.</p>
             </div>
-            
-            <!-- Decorative background elements -->
-            <div class="hero-background">
-                <div class="bg-element bg-1"></div>
-                <div class="bg-element bg-2"></div>
-                <div class="bg-element bg-3"></div>
-                <div class="bg-element bg-4"></div>
-                <div class="bg-element bg-5"></div>
-                <div class="bg-element bg-6"></div>
-            </div>
-        </main>
 
+            <section class="content-section" id="blog-container">
+                <div class="section-content">
+                    <div class="blog-grid">
+                        <!-- Blog posts will be dynamically loaded here -->
+                        <div class="loading-placeholder">
+                            <p>Loading blog posts...</p>
+                        </div>
+                    </div>
+
+                    <div class="blog-pagination">
+                        <button class="pagination-btn">← Previous</button>
+                        <span class="pagination-info">Page 1 of 3</span>
+                        <button class="pagination-btn">Next →</button>
+                    </div>
+                </div>
+            </section>
+        </main>
 
         <footer class="footer">
             <div class="footer-content">
                 <div class="footer-links">
                     <span class="footer-section">Company</span>
-                    <a href="#about" class="footer-link">About</a>
-                    <a href="#contact" class="footer-link">Contact</a>
-                    <a href="#careers" class="footer-link">Careers</a>
+                    <a href="about.html" class="footer-link">About</a>
+                    <a href="contact.html" class="footer-link">Contact</a>
+                    <a href="careers.html" class="footer-link">Careers</a>
                 </div>
                 <div class="footer-copyright">
                     <p>© GYNKOLABS 2025</p>
@@ -73,6 +71,7 @@
         </footer>
     </div>
 
+    <script src="js/data-loader.js"></script>
     <script src="main.js"></script>
 </body>
 </html>

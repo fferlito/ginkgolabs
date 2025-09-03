@@ -1,0 +1,130 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Contact - GYNKOLABS</title>
+    <link rel="stylesheet" href="styles.css">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+</head>
+<body>
+    <div class="container">
+        <header class="header">
+            <div class="logo">
+                <a href="index.html">
+                    <img src="assets/logo.png" alt="GYNKOLABS" class="logo-image">
+                </a>
+            </div>
+            <nav class="nav">
+                <a href="about.html" class="nav-link">About</a>
+                <div class="nav-dropdown">
+                    <a href="#products" class="nav-link">Products</a>
+                    <div class="dropdown-content">
+                        <a href="mushroom-radar.html" class="dropdown-link">Mushroom Radar</a>
+                    </div>
+                </div>
+                <a href="contact.html" class="nav-link active">Contact</a>
+                <a href="blog.html" class="nav-link">Blog</a>
+                <a href="careers.html" class="nav-link">Careers</a>
+            </nav>
+        </header>
+
+        <main class="page-content">
+            <div class="page-hero">
+                <h1 class="page-title">Contact Us</h1>
+                <p class="page-subtitle">Get in touch to learn more about our innovative AI technologies and potential collaborations.</p>
+            </div>
+
+            <section class="content-section">
+                <div class="section-content">
+                    <div class="contact-grid">
+                        <div class="contact-info">
+                            <h2>Get in Touch</h2>
+                            <p>Whether you're interested in our research, looking for partnership opportunities, or have questions about our technologies, we'd love to hear from you.</p>
+                            
+                            <div class="contact-methods">
+                                <div class="contact-method">
+                                    <h3>General Inquiries</h3>
+                                    <p>info@gynkolabs.com</p>
+                                </div>
+                                
+                                <div class="contact-method">
+                                    <h3>Research Partnerships</h3>
+                                    <p>research@gynkolabs.com</p>
+                                </div>
+                                
+                                <div class="contact-method">
+                                    <h3>Business Development</h3>
+                                    <p>business@gynkolabs.com</p>
+                                </div>
+                                
+                                <div class="contact-method">
+                                    <h3>Media & Press</h3>
+                                    <p>press@gynkolabs.com</p>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="contact-form">
+                            <h2>Send us a Message</h2>
+                            <form class="form">
+                                <div class="form-group">
+                                    <label for="name">Name *</label>
+                                    <input type="text" id="name" name="name" required>
+                                </div>
+                                
+                                <div class="form-group">
+                                    <label for="email">Email *</label>
+                                    <input type="email" id="email" name="email" required>
+                                </div>
+                                
+                                <div class="form-group">
+                                    <label for="company">Company/Organization</label>
+                                    <input type="text" id="company" name="company">
+                                </div>
+                                
+                                <div class="form-group">
+                                    <label for="subject">Subject *</label>
+                                    <select id="subject" name="subject" required>
+                                        <option value="">Select a subject</option>
+                                        <option value="general">General Inquiry</option>
+                                        <option value="partnership">Partnership Opportunity</option>
+                                        <option value="research">Research Collaboration</option>
+                                        <option value="press">Media/Press</option>
+                                        <option value="other">Other</option>
+                                    </select>
+                                </div>
+                                
+                                <div class="form-group">
+                                    <label for="message">Message *</label>
+                                    <textarea id="message" name="message" rows="6" required></textarea>
+                                </div>
+                                
+                                <button type="submit" class="form-submit">Send Message</button>
+                            </form>
+                        </div>
+                    </div>
+                </div>
+            </section>
+        </main>
+
+        <footer class="footer">
+            <div class="footer-content">
+                <div class="footer-links">
+                    <span class="footer-section">Company</span>
+                    <a href="about.html" class="footer-link">About</a>
+                    <a href="contact.html" class="footer-link">Contact</a>
+                    <a href="careers.html" class="footer-link">Careers</a>
+                </div>
+                <div class="footer-copyright">
+                    <p>© GYNKOLABS 2025</p>
+                </div>
+            </div>
+        </footer>
+    </div>
+
+    <script src="main.js"></script>
+</body>
+</html>
