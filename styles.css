@@ -1008,6 +1008,20 @@ p, span, div, .content, .description,
         font-size: 0.9rem;
     }
     
+    /* Hide dropdown on mobile and show direct link */
+    .nav-dropdown .dropdown-content {
+        display: none;
+    }
+    
+    .nav-dropdown > .nav-link::after {
+        display: none;
+    }
+    
+    /* Make products link direct on mobile */
+    .nav-dropdown > .nav-link {
+        pointer-events: auto;
+    }
+    
     /* Hero responsive */
     .hero-headline {
         font-size: clamp(2.5rem, 8vw, 4rem);
