@@ -1450,7 +1450,7 @@ body.mobile-menu-open {
     .hero-3d-background {
         opacity: 0;
         filter: blur(1px);
-        transition: opacity 0.1s ease-in-out;
+        transition: opacity 1s ease-in-out;
     }
     
     .hero-3d-background.loaded {
