@@ -1,0 +1,621 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Mushroom Radar Dashboard - GINKGOLABS</title>
+    <meta name="mapbox:telemetry" content="false">
+    <link rel="stylesheet" href="../styles.css">
+    <link rel="stylesheet" href="styles.css">
+    <link href="https://api.mapbox.com/mapbox-gl-js/v2.15.0/mapbox-gl.css" rel="stylesheet">
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/moment.js/2.29.4/moment.min.js"></script>
+    <script src="https://api.mapbox.com/mapbox-gl-js/v2.15.0/mapbox-gl.js"></script>
+    
+    <style>
+        /* Reset any potential CSS conflicts from main site */
+        .dashboard-main * {
+            box-sizing: border-box;
+        }
+        
+        /* Only apply resets to dashboard content, not header */
+        .dashboard-main {
+            position: relative !important;
+            z-index: 1 !important;
+        }
+        
+        /* Fix navigation vertical alignment */
+        .header {
+            display: flex !important;
+            align-items: center !important;
+            justify-content: space-between !important;
+        }
+        
+        .nav.desktop-nav {
+            display: flex !important;
+            align-items: center !important;
+            gap: 2rem !important;
+        }
+        
+        .nav-dropdown {
+            display: flex !important;
+            align-items: center !important;
+        }
+        
+        /* Dashboard specific styles */
+        .dashboard-main {
+            height: calc(100vh - 100px) !important;
+            display: flex !important;
+            flex-direction: column !important;
+            position: relative !important;
+        }
+        
+        .dashboard-header {
+            padding: 1rem 2rem !important;
+            background: #f8f9fa !important;
+            border-bottom: 1px solid #e9ecef !important;
+            flex-shrink: 0 !important;
+            text-align: center !important;
+        }
+        
+        .dashboard-header h1 {
+            margin: 0 !important;
+            font-size: 1.5rem !important;
+        }
+        
+        /* Map container takes remaining space */
+        .map-container {
+            flex: 1 !important;
+            width: 100% !important;
+            position: relative !important;
+        }
+        
+        /* Ensure the map element fills the container */
+        #map {
+            width: 100% !important;
+            height: 100% !important;
+            position: absolute !important;
+            top: 0 !important;
+            left: 0 !important;
+        }
+        
+        .calendar-wrapper {
+            position: absolute;
+            top: 20px;
+            left: 20px;
+            z-index: 1000;
+            background: white;
+            border-radius: 8px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+            padding: 1rem;
+            max-width: 300px;
+        }
+        
+        .calendar-scroll {
+            display: flex;
+            gap: 10px;
+            overflow-x: auto;
+        }
+        
+        .date-card {
+            flex-shrink: 0;
+            width: 80px;
+            padding: 10px;
+            text-align: center;
+            border: 2px solid #e9ecef;
+            border-radius: 8px;
+            cursor: pointer;
+            transition: all 0.2s ease;
+        }
+        
+        .date-card:hover {
+            border-color: #007bff;
+        }
+        
+        .date-card.active {
+            background: #007bff;
+            color: white;
+            border-color: #007bff;
+        }
+        
+        .legend-container {
+            position: absolute;
+            bottom: 20px;
+            left: 20px;
+            z-index: 1000;
+            background: white;
+            border-radius: 8px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+            padding: 1rem;
+            color: #000 !important;
+        }
+        
+        .legend-inline-wrapper {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+        
+        .legend-label {
+            color: #000 !important;
+            font-weight: 500;
+        }
+        
+        .legend-gradient {
+            width: 150px;
+            height: 20px;
+            background: linear-gradient(to right, #9F0500, #ba5c00, #c77500, #cfa100, #a1d600, #68bc00);
+            border-radius: 4px;
+        }
+        
+        .legend-values-inline {
+            display: flex;
+            justify-content: space-between;
+            font-size: 0.8rem;
+            margin-top: 5px;
+            color: #000 !important;
+        }
+        
+        .legend-values-inline span {
+            color: #000 !important;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <header class="header">
+            <div class="logo">
+                <a href="../index.html">
+                    <img src="../assets/logo.png" alt="GINKGOLABS" class="logo-image">
+                </a>
+            </div>
+            
+            <!-- Desktop Navigation -->
+            <nav class="nav desktop-nav">
+                <a href="../about.html" class="nav-link">About</a>
+                <div class="nav-dropdown">
+                    <a href="../mushroom-radar.html" class="nav-link">Products</a>
+                    <div class="dropdown-content">
+                        <a href="../mushroom-radar.html" class="dropdown-link">Mushroom Radar</a>
+                    </div>
+                </div>
+                <a href="../contact.html" class="nav-link">Contact</a>
+                <a href="../blog.html" class="nav-link">Blog</a>
+                <a href="../careers.html" class="nav-link">Careers</a>
+            </nav>
+            
+            <!-- Mobile Menu Button -->
+            <button class="mobile-menu-btn" id="mobileMenuBtn">
+                <span class="hamburger-line"></span>
+                <span class="hamburger-line"></span>
+                <span class="hamburger-line"></span>
+            </button>
+            
+            <!-- Mobile Navigation -->
+            <nav class="mobile-nav" id="mobileNav">
+                <div class="mobile-nav-content">
+                    <a href="../about.html" class="mobile-nav-link">About</a>
+                    <a href="../mushroom-radar.html" class="mobile-nav-link">Products</a>
+                    <a href="../contact.html" class="mobile-nav-link">Contact</a>
+                    <a href="../blog.html" class="mobile-nav-link">Blog</a>
+                    <a href="../careers.html" class="mobile-nav-link">Careers</a>
+                </div>
+            </nav>
+        </header>
+        
+        <main class="dashboard-main">
+            <div class="dashboard-header">
+                <h1 class="heading-1">Mushroom Radar Dashboard</h1>
+            </div>
+            
+            <div id="map" class="map-container"></div>
+            
+            <div id="calendar-wrapper" class="calendar-wrapper">
+                <div id="calendar-scroll" class="calendar-scroll"></div>
+            </div>
+        </main>
+        
+        <footer class="footer">
+            <div class="footer-content">
+                <div class="footer-links">
+                    <span class="footer-section">Company</span>
+                    <a href="../about.html" class="footer-link">About</a>
+                    <a href="../contact.html" class="footer-link">Contact</a>
+                    <a href="../blog.html" class="footer-link">Blog</a>
+                    <a href="../careers.html" class="footer-link">Careers</a>
+                </div>
+                <div class="footer-copyright">
+                    <p>© GINKGOLABS 2025</p>
+                </div>
+            </div>
+        </footer>
+    </div>
+    
+    <script>
+    mapboxgl.accessToken = 'pk.eyJ1IjoiZmVybGl4eHgiLCJhIjoiY2xvbXFvcm8xMnBkMTJrbjA4bXF4NnBhdyJ9.Jzb2pKR5fsS2Nj3OikRLJg';
+    
+    // Global error handlers for network issues
+    window.addEventListener('unhandledrejection', function(event) {
+      // Check if it's a network-related error we can ignore
+      if (event.reason && (
+        event.reason.message?.includes('events.mapbox.com') ||
+        event.reason.message?.includes('ERR_BLOCKED_BY_CLIENT') ||
+        event.reason.toString().includes('events.mapbox.com')
+      )) {
+        console.log('Ignoring blocked telemetry request');
+        event.preventDefault();
+      }
+    });
+    
+    // Disable Mapbox telemetry to avoid analytics errors
+    if (typeof mapboxgl !== 'undefined') {
+      if (mapboxgl.prewarm) {
+        mapboxgl.prewarm();
+      }
+      // Disable telemetry
+      if (mapboxgl.setRTLTextPlugin) {
+        // This helps prevent some initialization errors
+      }
+    }
+    
+    let map;
+   async function getTimestampId(pathId) {
+    try {
+      const baseUrl ="https://api.ellipsis-drive.com/v3"; // Replace with the correct base URL
+      // Request the folder list
+      const urlListFolder = `${baseUrl}/path/${pathId}/folder/list`;
+      const response = await fetch(urlListFolder);
+      if (!response.ok) {
+        console.warn("Failed to fetch timestamp data:", response.status);
+        return null;
+      }
+      const data = await response.json();
+      // Extract the first timestamp ID from the response
+      const timestamps = data.result;
+      for (const item of timestamps) {
+        const pathIdLayer = item.id; // If you need the pathIdLayer, you can use it here
+        const timestamp = item.vector.timestamps[0]; // Get the first timestamp
+        if (timestamp) {
+          return timestamp.id; // Return the timestamp ID
+        }
+      }
+      return null; // Return null if no timestamp found
+    } catch (error) {
+      console.warn("Error fetching timestamp ID:", error);
+      return null;
+    }
+  }
+  async function replaceTimestampIdWithFetchedUUID(url, pathId) {
+    const timestampId = await getTimestampId(pathId);
+    if (timestampId) {
+      // Replace the part after timestampId= with the fetched timestamp ID
+      return url.replace(/timestampId=[^&]+/, `timestampId=${timestampId}`);
+    } else {
+      console.error("Failed to fetch timestamp ID");
+      return url; // Return the original URL if no timestamp ID was found
+    }
+  }
+  // Example usage:
+  const tileURLs = {
+    today: 'https://api.ellipsis-drive.com/v3/ogc/mvt/49821b18-5a0f-4b5f-871d-6442d1c72d86/{z}/{x}/{y}?timestampId=f1033c35-2589-4e84-b110-b0705d6ea1c0&token=epat_HEBbajYglphtALIrw0rKI9PA0w3Dyssp9oUDymLFksir8coa89tw921Glvb5ZFah',
+    tomorrow: 'https://api.ellipsis-drive.com/v3/ogc/mvt/49821b19-5a0f-4b5f-871d-6442d1c72d86/{z}/{x}/{y}?timestampId=4f1e918b-3df4-4e59-b2e9-52547222c3d5&token=epat_VZGivZ6q1DNcq6lZybdZD9tjOooNlWpmz4Dff0T59m8VOBXQcQWhLFBs31PjKFWV',
+    later: 'https://api.ellipsis-drive.com/v3/ogc/mvt/49821b20-5a0f-4b5f-871d-6442d1c72d86/{z}/{x}/{y}?timestampId=4f1e918b-3df4-4e59-b2e9-52547222c3d5&token=epat_VZGivZ6q1DNcq6lZybdZD9tjOooNlWpmz4Dff0T59m8VOBXQcQWhLFBs31PjKFWV'
+  };
+  const pathId = 'b11909f0-3c51-4ab2-a57e-ffaa60335770'; // Example path ID
+  // Update URLs with the fetched timestamp ID
+  async function updateTileURLs() {
+    try {
+      const updatedToday = await replaceTimestampIdWithFetchedUUID(tileURLs.today, pathId);
+      const updatedTomorrow = await replaceTimestampIdWithFetchedUUID(tileURLs.tomorrow, pathId);
+      const updatedLater = await replaceTimestampIdWithFetchedUUID(tileURLs.later, pathId);
+      
+      // Only update if we got valid responses
+      if (updatedToday) tileURLs.today = updatedToday;
+      if (updatedTomorrow) tileURLs.tomorrow = updatedTomorrow;
+      if (updatedLater) tileURLs.later = updatedLater;
+      
+      console.log('Updated tile URLs:', tileURLs);
+    } catch (error) {
+      console.warn('Failed to update tile URLs:', error);
+      console.log('Using default tile URLs:', tileURLs);
+    }
+  }
+  // Call the update function
+  updateTileURLs();
+    const getLayerUrl = (selectedDate) => {
+      const today = moment().startOf('day');
+      const selected = moment(selectedDate);
+      if (selected.isSame(today, 'day')) return tileURLs.today;
+      if (selected.isSame(today.clone().add(1, 'day'), 'day')) return tileURLs.tomorrow;
+      return tileURLs.later;
+    };
+    const loadMushroomLayer = (url) => {
+      try {
+        if (!map || !url) {
+          console.warn('Map or URL not available for loading mushroom layer');
+          return;
+        }
+        
+        if (map.getSource('mushroom-polygons')) {
+          map.removeLayer('mushroom-fill');
+          map.removeSource('mushroom-polygons');
+        }
+        
+        map.addSource('mushroom-polygons', {
+          type: 'vector',
+          tiles: [url],
+          minzoom: 0,
+          maxzoom: 22
+        });
+        
+        map.addLayer({
+          id: 'mushroom-fill',
+          type: 'fill',
+          source: 'mushroom-polygons',
+          'source-layer': 'layer',
+          paint: {
+            'fill-color': [
+              'case',
+                ['has', 'species_prediction'],
+                ['interpolate', ['linear'], ['get', 'species_prediction'],
+                  0.0, '#9F0500',
+                  0.2, '#ba5c00',
+                  0.4, '#c77500',
+                  0.6, '#cfa100',
+                  0.8, '#a1d600',
+                  1.0, '#68bc00'
+                ],
+                '#c75b1c' // fallback if missing
+            ],
+            'fill-opacity': 0.6
+          }
+        });
+      } catch (error) {
+        console.warn('Error loading mushroom layer:', error);
+      }
+    };
+    document.addEventListener("DOMContentLoaded", () => {
+      try {
+        // Debug: Check all containers
+        const dashboardMain = document.querySelector('.dashboard-main');
+        const mapContainer = document.getElementById('map');
+        
+        console.log('=== DEBUGGING CONTAINER DIMENSIONS ===');
+        console.log('Dashboard main:', dashboardMain);
+        if (dashboardMain) {
+          console.log('Dashboard main dimensions:', {
+            width: dashboardMain.offsetWidth,
+            height: dashboardMain.offsetHeight,
+            clientWidth: dashboardMain.clientWidth,
+            clientHeight: dashboardMain.clientHeight,
+            computedStyle: window.getComputedStyle(dashboardMain).height
+          });
+        }
+        
+        console.log('Map container:', mapContainer);
+        if (!mapContainer) {
+          console.error('Map container not found');
+          return;
+        }
+        
+        console.log('Map container dimensions:', {
+          width: mapContainer.offsetWidth,
+          height: mapContainer.offsetHeight,
+          clientWidth: mapContainer.clientWidth,
+          clientHeight: mapContainer.clientHeight,
+          computedStyle: window.getComputedStyle(mapContainer).height
+        });
+      
+      map = new mapboxgl.Map({
+        container: 'map',
+        style: 'mapbox://styles/ferlixxx/cm8xkvecy000o01s6fy1h60qi',
+        center: [11.3285, 43.3188], // Siena, Italy coordinates
+        zoom: 10,
+        attributionControl: false,
+        logoPosition: 'bottom-right'
+      });
+      
+      console.log('Map initialized:', map);
+        
+        // Add error handling for map load failures
+        map.on('error', (e) => {
+          console.warn('Mapbox error (non-critical):', e.error);
+        });
+        
+              } catch (error) {
+        console.error('Failed to initialize map:', error);
+        // Show fallback message
+        const mapContainer = document.getElementById('map');
+        if (mapContainer) {
+          mapContainer.innerHTML = '<div style="display: flex; align-items: center; justify-content: center; height: 100%; background: #f5f5f5; color: #666; font-family: Arial, sans-serif;">Map temporarily unavailable. Please refresh the page.</div>';
+        }
+        return;
+      }
+      
+      // Force resize after a short delay to ensure proper rendering
+      setTimeout(() => {
+        if (map) {
+          map.resize();
+        }
+      }, 100);
+      const calendarScroll = document.querySelector("#calendar-scroll");
+      const cardWidth = 90;
+      const dates = [];
+      for (let i = 0; i < 3; i++) {
+        const date = moment().add(i, 'days');
+        dates.push(date);
+      }
+      let selectedDate = dates[0].format("YYYY-MM-DD");
+      const renderDates = () => {
+        dates.forEach((date, i) => {
+          const card = document.createElement("div");
+          card.className = "date-card";
+          card.dataset.fullDate = date.format("YYYY-MM-DD");
+          const dayText = document.createElement("div");
+          dayText.textContent = i === 0 ? "Today" : date.format("ddd");
+          const numberText = document.createElement("div");
+          numberText.textContent = date.format("D");
+          card.appendChild(dayText);
+          card.appendChild(numberText);
+          calendarScroll.appendChild(card);
+          if (i === 0) {
+            card.classList.add("active");
+            selectedDate = card.dataset.fullDate;
+          }
+          card.addEventListener("click", () => {
+            document.querySelectorAll(".date-card").forEach(c => c.classList.remove("active"));
+            card.classList.add("active");
+            selectedDate = card.dataset.fullDate;
+            const tileUrl = getLayerUrl(selectedDate);
+            loadMushroomLayer(tileUrl);
+          });
+        });
+      };
+      const updateMonthFromScroll = () => {
+        const scrollLeft = calendarScroll.scrollLeft;
+        const indexInView = Math.round(scrollLeft / cardWidth);
+        const visibleDate = dates[indexInView] || dates[0];
+        // You can update a visible month label here if needed
+      };
+      map.on('load', () => {
+        console.log('Map loaded successfully');
+        console.log('Map style loaded, canvas dimensions:', {
+          canvas: map.getCanvas(),
+          canvasWidth: map.getCanvas().width,
+          canvasHeight: map.getCanvas().height,
+          mapSize: map.getContainer().getBoundingClientRect()
+        });
+        
+        renderDates();
+        const tileUrl = getLayerUrl(selectedDate);
+        loadMushroomLayer(tileUrl);
+        
+        // Add map controls
+        map.addControl(new mapboxgl.NavigationControl({
+          showCompass: true,
+          showZoom: false
+        }), 'bottom-right');
+        
+        map.addControl(new mapboxgl.GeolocateControl({
+          positionOptions: {
+            enableHighAccuracy: true
+          },
+          trackUserLocation: true,
+          showAccuracyCircle: false
+        }), 'bottom-right');
+        
+        // Create legend after map is loaded
+        createLegend();
+        let activePopup;
+        let touchStartTime = null;
+        map.on('click', (e) => {
+          showPredictionPopup(e);
+        });
+        // Mobile tap handler
+        map.getCanvas().addEventListener('touchstart', () => {
+          touchStartTime = Date.now();
+        }, { passive: true });
+        map.getCanvas().addEventListener('touchend', (e) => {
+          const duration = Date.now() - touchStartTime;
+          if (duration < 300) {
+            const touch = e.changedTouches[0];
+            const rect = map.getCanvas().getBoundingClientRect();
+            const point = {
+              x: touch.clientX - rect.left,
+              y: touch.clientY - rect.top
+            };
+            const lngLat = map.unproject(point);
+            const mapEvent = { point, lngLat };
+            showPredictionPopup(mapEvent);
+          }
+        }, { passive: true });
+        function showPredictionPopup(e) {
+          const features = map.queryRenderedFeatures(e.point, {
+            layers: ['mushroom-fill']
+          });
+          const f = features[0];
+          if (f?.properties?.species_prediction !== undefined) {
+            const prediction = f.properties.species_prediction;
+            activePopup?.remove();
+            activePopup = new mapboxgl.Popup({ offset: 8, closeOnClick: true })
+              .setLngLat(e.lngLat)
+              .setText(`Probability: ${(prediction * 100).toFixed(1)} %`)
+              .addTo(map);
+          }
+        }
+      });
+      calendarScroll.addEventListener("scroll", () => {
+        requestAnimationFrame(updateMonthFromScroll);
+      });
+      
+      // Handle window resize
+      window.addEventListener('resize', () => {
+        if (map) {
+          map.resize();
+        }
+      });
+    });
+    function createLegend() {
+      // Check if legend already exists
+      if (document.querySelector('.legend-container')) {
+        return;
+      }
+      
+      const legend = document.createElement('div');
+      legend.className = 'legend-container';
+      legend.innerHTML =
+        `<div class="legend-inline-wrapper">
+          <span class="legend-label">Probability %</span>
+          <div class="legend-gradient">
+            <div class="legend-values-inline">
+              <span>0</span>
+              <span>50</span>
+              <span>100</span>
+            </div>
+          </div>
+        </div>`;
+      
+      // Append to map container
+      const mapContainer = document.getElementById('map');
+      if (mapContainer) {
+        mapContainer.appendChild(legend);
+      }
+    }
+  </script>
+    
+    <!-- Mobile Menu Functionality -->
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            const mobileMenuBtn = document.getElementById('mobileMenuBtn');
+            const mobileNav = document.getElementById('mobileNav');
+            const body = document.body;
+            
+            if (mobileMenuBtn && mobileNav) {
+                mobileMenuBtn.addEventListener('click', function() {
+                    mobileMenuBtn.classList.toggle('active');
+                    mobileNav.classList.toggle('open');
+                    body.classList.toggle('mobile-menu-open');
+                });
+                
+                // Close menu when clicking on a link
+                const mobileNavLinks = mobileNav.querySelectorAll('.mobile-nav-link');
+                mobileNavLinks.forEach(link => {
+                    link.addEventListener('click', function() {
+                        mobileMenuBtn.classList.remove('active');
+                        mobileNav.classList.remove('open');
+                        body.classList.remove('mobile-menu-open');
+                    });
+                });
+                
+                // Close menu when clicking outside
+                document.addEventListener('click', function(e) {
+                    if (!mobileNav.contains(e.target) && !mobileMenuBtn.contains(e.target)) {
+                        mobileMenuBtn.classList.remove('active');
+                        mobileNav.classList.remove('open');
+                        body.classList.remove('mobile-menu-open');
+                    }
+                });
+            }
+        });
+    </script>
+</body>
+</html>
