@@ -141,6 +141,8 @@ p, span, div, .content, .description,
 /* Dropdown */
 .nav-dropdown {
     position: relative;
+    display: flex;
+    align-items: center;
 }
 
 .dropdown-content {
