@@ -1295,7 +1295,18 @@ p, span, div, .content, .description,
     box-shadow: none;
     --min-hotspot-opacity: 0;
     --max-hotspot-opacity: 0;
+    --poster-color: transparent;
+    --progress-bar-color: transparent;
+    --progress-mask: transparent;
+    background: transparent !important;
+}
 
+/* Hide progress bar completely */
+.hero-3d-background model-viewer #default-progress-bar,
+.hero-3d-background model-viewer .progress-bar,
+.hero-3d-background model-viewer [slot="progress-bar"] {
+    display: none !important;
+    visibility: hidden !important;
 }
 
 /* Clean overlay for better contrast */
