@@ -104,6 +104,24 @@ class DataLoader {
         const blogGrid = container.querySelector('.blog-grid') || container;
         blogGrid.innerHTML = '';
 
+        if (this.blogPosts.length === 0) {
+            blogGrid.innerHTML = '<div class="loading-placeholder"><p>There are no blog posts available at the moment.</p></div>';
+            
+            // Hide pagination when no posts
+            const pagination = container.querySelector('.blog-pagination');
+            if (pagination) {
+                pagination.style.display = 'none';
+            }
+            
+            return;
+        }
+
+        // Show pagination when there are posts
+        const pagination = container.querySelector('.blog-pagination');
+        if (pagination) {
+            pagination.style.display = 'flex';
+        }
+
         this.blogPosts.forEach(post => {
             const postElement = this.createBlogPostElement(post);
             blogGrid.appendChild(postElement);

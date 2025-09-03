@@ -415,6 +415,21 @@ p, span, div, .content, .description,
     filter: drop-shadow(0 20px 40px rgba(0, 0, 0, 0.5));
 }
 
+/* Phone mockup centered between title and description */
+.phone-mockup-center {
+    display: flex;
+    justify-content: center;
+    margin: 3rem 0;
+    width: 100%;
+}
+
+.phone-mockup-center .phone-image {
+    width: 200px;
+    height: 400px;
+    object-fit: contain;
+    filter: drop-shadow(0 10px 30px rgba(0, 0, 0, 0.3));
+}
+
 @keyframes phoneFloat {
     0%, 100% { transform: translateY(-50%) translateX(0px); }
     50% { transform: translateY(-50%) translateX(-5px); }
@@ -658,6 +673,49 @@ p, span, div, .content, .description,
     grid-template-columns: repeat(auto-fit, minmax(350px, 1fr));
     gap: 2rem;
     margin-top: 3rem;
+}
+
+.no-posts-message {
+    text-align: center;
+    padding: var(--spacing-5xl) var(--spacing-2xl);
+    background: linear-gradient(135deg, rgba(139, 195, 74, 0.1), rgba(76, 175, 80, 0.05));
+    border-radius: var(--radius-xl);
+    border: 1px solid var(--color-border-accent);
+    margin-top: var(--spacing-2xl);
+}
+
+.no-posts-message h3 {
+    color: var(--color-primary);
+    font-size: var(--font-size-2xl);
+    margin-bottom: var(--spacing-lg);
+    font-weight: var(--font-weight-semibold);
+    font-family: var(--font-family-headline);
+}
+
+.no-posts-message p {
+    color: var(--color-text-secondary);
+    line-height: 1.6;
+    margin-bottom: var(--spacing-lg);
+    max-width: 600px;
+    margin-left: auto;
+    margin-right: auto;
+    font-family: var(--font-family-body);
+}
+
+.no-posts-message p:last-child {
+    margin-bottom: 0;
+}
+
+.no-posts-message a {
+    color: var(--color-primary);
+    text-decoration: none;
+    border-bottom: 1px solid transparent;
+    transition: var(--transition-base);
+    font-weight: var(--font-weight-medium);
+}
+
+.no-posts-message a:hover {
+    border-bottom-color: var(--color-primary);
 }
 
 .blog-post {
@@ -1033,14 +1091,39 @@ p, span, div, .content, .description,
     
     /* Main content responsive */
     .main-content {
-        grid-template-columns: 1fr;
+        display: flex;
+        flex-direction: column;
         gap: 2rem;
         text-align: center;
     }
     
+    /* Mobile layout order: title first, then visuals, then description */
+    .content-left {
+        order: 1;
+        display: flex;
+        flex-direction: column;
+    }
+    
+    .content-left .headline {
+        order: 1;
+        margin-top: 3rem;
+        margin-bottom: 2rem;
+    }
+    
+    .content-left .description {
+        order: 3;
+        margin-top: 2rem;
+    }
+    
+    .content-left .cta-button {
+        order: 4;
+        margin-top: 2rem;
+    }
+    
     .content-right {
         height: 400px;
-        order: -1;
+        order: 2;
+        position: relative;
     }
     
     .phone-mockup {
