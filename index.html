@@ -17,7 +17,9 @@
                     <img src="assets/logo.png" alt="GINKGOLABS" class="logo-image">
                 </a>
             </div>
-            <nav class="nav">
+            
+            <!-- Desktop Navigation -->
+            <nav class="nav desktop-nav">
                 <a href="about.html" class="nav-link">About</a>
                 <div class="nav-dropdown">
                     <a href="mushroom-radar.html" class="nav-link">Products</a>
@@ -28,6 +30,24 @@
                 <a href="contact.html" class="nav-link">Contact</a>
                 <a href="blog.html" class="nav-link">Blog</a>
                 <a href="careers.html" class="nav-link">Careers</a>
+            </nav>
+            
+            <!-- Mobile Menu Button -->
+            <button class="mobile-menu-btn" id="mobileMenuBtn">
+                <span class="hamburger-line"></span>
+                <span class="hamburger-line"></span>
+                <span class="hamburger-line"></span>
+            </button>
+            
+            <!-- Mobile Navigation -->
+            <nav class="mobile-nav" id="mobileNav">
+                <div class="mobile-nav-content">
+                    <a href="about.html" class="mobile-nav-link">About</a>
+                    <a href="mushroom-radar.html" class="mobile-nav-link">Products</a>
+                    <a href="contact.html" class="mobile-nav-link">Contact</a>
+                    <a href="blog.html" class="mobile-nav-link">Blog</a>
+                    <a href="careers.html" class="mobile-nav-link">Careers</a>
+                </div>
             </nav>
         </header>
 
@@ -122,17 +142,18 @@
                     modelViewer.style.setProperty('--poster-color', 'transparent');
                 }
                 
+                // Consistent delay for all devices
                 setTimeout(() => {
                     hero3DBackground.classList.add('loaded');
-                }, 50); // Small delay for smoother experience
+                }, 50);
             });
             
-            // Fallback: fade in after 3 seconds even if load event doesn't fire
+            // Fallback: fade in after timeout even if load event doesn't fire
             setTimeout(() => {
                 if (!hero3DBackground.classList.contains('loaded')) {
                     hero3DBackground.classList.add('loaded');
                 }
-            }, 3000);
+            }, 50);
             
             // Mouse movement tracking
             heroSection.addEventListener('mousemove', function(e) {
@@ -172,6 +193,40 @@
                 mouseX = 0;
                 mouseY = 0;
             });
+        });
+        
+        // Mobile Menu Functionality
+        document.addEventListener('DOMContentLoaded', function() {
+            const mobileMenuBtn = document.getElementById('mobileMenuBtn');
+            const mobileNav = document.getElementById('mobileNav');
+            const body = document.body;
+            
+            if (mobileMenuBtn && mobileNav) {
+                mobileMenuBtn.addEventListener('click', function() {
+                    mobileMenuBtn.classList.toggle('active');
+                    mobileNav.classList.toggle('open');
+                    body.classList.toggle('mobile-menu-open');
+                });
+                
+                // Close menu when clicking on a link
+                const mobileNavLinks = mobileNav.querySelectorAll('.mobile-nav-link');
+                mobileNavLinks.forEach(link => {
+                    link.addEventListener('click', function() {
+                        mobileMenuBtn.classList.remove('active');
+                        mobileNav.classList.remove('open');
+                        body.classList.remove('mobile-menu-open');
+                    });
+                });
+                
+                // Close menu when clicking outside
+                document.addEventListener('click', function(e) {
+                    if (!mobileNav.contains(e.target) && !mobileMenuBtn.contains(e.target)) {
+                        mobileMenuBtn.classList.remove('active');
+                        mobileNav.classList.remove('open');
+                        body.classList.remove('mobile-menu-open');
+                    }
+                });
+            }
         });
     </script>
 </body>
