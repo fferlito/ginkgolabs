@@ -164,8 +164,8 @@
             
             // Smooth animation function
             function animateModel() {
-                // Auto-rotation (very slow - 1 full rotation per 5 minutes)
-                autoRotation += 0.02; // 0.02 degrees per frame (at 60fps)
+                // Auto-rotation (slightly faster)
+                autoRotation += 0.06; // 0.03 degrees per frame (at 60fps)
                 
                 // Smooth interpolation for mouse movement
                 targetX += (mouseX - targetX) * 0.05;
