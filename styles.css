@@ -1269,3 +1269,91 @@ p, span, div, .content, .description,
 .mushroom-3 { animation: fadeInUp 1s ease-out 1.4s both, float 6s ease-in-out 1.4s infinite; }
 .mushroom-4 { animation: fadeInUp 1s ease-out 1.6s both, float 6s ease-in-out 1.6s infinite; }
 .mushroom-5 { animation: fadeInUp 1s ease-out 1.8s both, float 6s ease-in-out 1.8s infinite; }
+
+/* 3D Model Background */
+.hero-3d-background {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    z-index: 1;
+    pointer-events: none;
+    opacity: 0;
+    filter: blur(1px);
+    transition: opacity 2s ease-in-out;
+}
+
+.hero-3d-background.loaded {
+    opacity: 0.35;
+}
+
+.hero-3d-background model-viewer {
+    pointer-events: none;
+    border: none;
+    outline: none;
+    box-shadow: none;
+    --min-hotspot-opacity: 0;
+    --max-hotspot-opacity: 0;
+
+}
+
+/* Clean overlay for better contrast */
+.hero-3d-background::after {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+
+    z-index: 2;
+}
+
+/* Update hero content to be above 3D model */
+.hero-content {
+    position: relative;
+    z-index: 10;
+    padding: 60px 40px;
+}
+
+/* Enhanced text shadows for better readability */
+.hero-headline {
+    background: linear-gradient(135deg, #ffffff 0%, #e8f5e8 50%, #8bc34a 100%);
+    background-clip: text;
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    text-shadow: 0 0 30px rgba(139, 195, 74, 0.1);
+}
+
+.hero-description {
+    text-shadow: 
+        0 0 15px rgba(0, 0, 0, 0.8),
+        0 0 30px rgba(0, 0, 0, 0.5),
+        1px 1px 4px rgba(0, 0, 0, 0.8);
+}
+
+/* Update hero background elements to be above 3D model */
+.hero-background {
+    z-index: 3;
+}
+
+/* Responsive Design for 3D Background */
+@media (max-width: 768px) {
+    .hero-3d-background {
+        opacity: 0.1;
+        filter: blur(2px);
+    }
+    
+    .hero-3d-background::after {
+        background: radial-gradient(
+            ellipse at center,
+            rgba(0, 0, 0, 0.3) 0%,
+            rgba(0, 0, 0, 0.8) 100%
+        );
+    }
+    
+    .hero-content {
+        padding: 40px 20px;
+    }
+}

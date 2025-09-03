@@ -5,6 +5,8 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>GYNKOLABS - AI That Sees What You Can't</title>
     <link rel="stylesheet" href="styles.css">
+    <!-- Google Model Viewer -->
+    <script type="module" src="https://unpkg.com/@google/model-viewer/dist/model-viewer.min.js"></script>
 
 </head>
 <body class="landing-page">
@@ -44,6 +46,28 @@
                 </p>
             </div>
             
+            <!-- 3D Model Background -->
+            <div class="hero-3d-background">
+                <model-viewer 
+                    id="hero-3d-model"
+                    src="assets/ginkgo.glb" 
+                    alt="Ginkgo trees in autumn - Interactive 3D model showing AI environmental analysis"
+                    shadow-intensity="0"
+                    environment-image="legacy"
+                    exposure="0.3"
+                    shadow-softness="0"
+                    skybox-image=""
+                    camera-orbit="0deg 75deg 12m"
+                    min-camera-orbit="auto auto 8m"
+                    max-camera-orbit="auto auto 25m"
+                    disable-zoom
+                    disable-pan
+                    interaction-prompt="none"
+                    seamless
+                    style="width: 100%; height: 100%; position: absolute; top: 0; left: 0; z-index: 1; border: none; outline: none; background: transparent;">
+                </model-viewer>
+            </div>
+            
             <!-- Decorative background elements -->
             <div class="hero-background">
                 <div class="bg-element bg-1"></div>
@@ -73,5 +97,67 @@
     </div>
 
     <script src="main.js"></script>
+    
+    <!-- 3D Model Mouse Movement Script -->
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            const modelViewer = document.getElementById('hero-3d-model');
+            const heroSection = document.querySelector('.hero-section');
+            const hero3DBackground = document.querySelector('.hero-3d-background');
+            
+            if (!modelViewer || !heroSection || !hero3DBackground) return;
+            
+            let mouseX = 0;
+            let mouseY = 0;
+            let targetX = 0;
+            let targetY = 0;
+            
+            // Graceful fade-in when model loads
+            modelViewer.addEventListener('load', function() {
+                setTimeout(() => {
+                    hero3DBackground.classList.add('loaded');
+                }, 50); // Small delay for smoother experience
+            });
+            
+            // Fallback: fade in after 3 seconds even if load event doesn't fire
+            setTimeout(() => {
+                if (!hero3DBackground.classList.contains('loaded')) {
+                    hero3DBackground.classList.add('loaded');
+                }
+            }, 3000);
+            
+            // Mouse movement tracking
+            heroSection.addEventListener('mousemove', function(e) {
+                const rect = heroSection.getBoundingClientRect();
+                mouseX = ((e.clientX - rect.left) / rect.width) * 2 - 1; // -1 to 1
+                mouseY = ((e.clientY - rect.top) / rect.height) * 2 - 1; // -1 to 1
+            });
+            
+            // Smooth animation function
+            function animateModel() {
+                // Smooth interpolation
+                targetX += (mouseX - targetX) * 0.05;
+                targetY += (mouseY - targetY) * 0.05;
+                
+                // Convert to camera orbit values
+                const orbitX = targetX * 15; // Max 15 degrees left/right
+                const orbitY = 75 + (targetY * -10); // 65-85 degrees vertical range
+                
+                // Apply the camera orbit
+                modelViewer.cameraOrbit = `${orbitX}deg ${orbitY}deg 12m`;
+                
+                requestAnimationFrame(animateModel);
+            }
+            
+            // Start animation
+            animateModel();
+            
+            // Reset to center when mouse leaves
+            heroSection.addEventListener('mouseleave', function() {
+                mouseX = 0;
+                mouseY = 0;
+            });
+        });
+    </script>
 </body>
 </html>
