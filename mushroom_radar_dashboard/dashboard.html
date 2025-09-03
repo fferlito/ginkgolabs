@@ -397,8 +397,11 @@
         style: 'mapbox://styles/ferlixxx/cm8xkvecy000o01s6fy1h60qi',
         center: [11.3285, 43.3188], // Siena, Italy coordinates
         zoom: 9,
+        pitch: 45, // Enable 3D perspective
+        bearing: 0,
         attributionControl: false,
-        logoPosition: 'bottom-right'
+        logoPosition: 'bottom-right',
+        antialias: true // Enable antialiasing for smoother 3D rendering
       });
       
       console.log('Map initialized:', map);
@@ -472,14 +475,37 @@
           mapSize: map.getContainer().getBoundingClientRect()
         });
         
+        // Add 3D terrain
+        map.addSource('mapbox-dem', {
+          'type': 'raster-dem',
+          'url': 'mapbox://mapbox.mapbox-terrain-dem-v1',
+          'tileSize': 512,
+          'maxzoom': 14
+        });
+        
+        // Add the DEM source as a terrain layer with exaggerated height
+        map.setTerrain({ 'source': 'mapbox-dem', 'exaggeration': 1.5 });
+        
+        // Add a sky layer for better 3D effect
+        map.addLayer({
+          'id': 'sky',
+          'type': 'sky',
+          'paint': {
+            'sky-type': 'atmosphere',
+            'sky-atmosphere-sun': [0.0, 0.0],
+            'sky-atmosphere-sun-intensity': 15
+          }
+        });
+        
         renderDates();
         const tileUrl = getLayerUrl(selectedDate);
         loadMushroomLayer(tileUrl);
         
-        // Add map controls
+        // Add map controls with pitch/rotation for 3D
         map.addControl(new mapboxgl.NavigationControl({
           showCompass: true,
-          showZoom: false
+          showZoom: true,
+          visualizePitch: true
         }), 'bottom-right');
         
         map.addControl(new mapboxgl.GeolocateControl({
