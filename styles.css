@@ -1045,7 +1045,7 @@ p, span, div, .content, .description,
 
 /* Mobile Menu Button */
 .mobile-menu-btn {
-    display: none;
+    display: none !important;
     background: none;
     border: none;
     cursor: pointer;
@@ -1079,7 +1079,7 @@ p, span, div, .content, .description,
 
 /* Mobile Navigation */
 .mobile-nav {
-    display: none;
+    display: none !important;
     position: fixed;
     top: 0;
     right: -100%;
@@ -1155,18 +1155,19 @@ body.mobile-menu-open {
     }
     
     /* Hide desktop nav on mobile */
-    .desktop-nav {
-        display: none;
+    .desktop-nav,
+    .nav:not(.mobile-nav) {
+        display: none !important;
     }
     
     /* Show mobile menu button */
     .mobile-menu-btn {
-        display: flex;
+        display: flex !important;
     }
     
     /* Show mobile nav */
     .mobile-nav {
-        display: block;
+        display: block !important;
     }
     
     /* Hero responsive */
