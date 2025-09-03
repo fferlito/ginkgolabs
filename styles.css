@@ -115,6 +115,16 @@ p, span, div, .content, .description,
     gap: 2rem;
 }
 
+/* Default state - desktop nav visible, mobile hidden */
+.desktop-nav {
+    display: flex;
+}
+
+.mobile-menu-btn,
+.mobile-nav {
+    display: none;
+}
+
 .nav-link {
     color: #ffffff;
     text-decoration: none;
@@ -1045,7 +1055,6 @@ p, span, div, .content, .description,
 
 /* Mobile Menu Button */
 .mobile-menu-btn {
-    display: none !important;
     background: none;
     border: none;
     cursor: pointer;
@@ -1079,7 +1088,6 @@ p, span, div, .content, .description,
 
 /* Mobile Navigation */
 .mobile-nav {
-    display: none !important;
     position: fixed;
     top: 0;
     right: -100%;
@@ -1140,7 +1148,22 @@ body.mobile-menu-open {
     overflow: hidden;
 }
 
-/* Responsive design */
+/* Desktop-first - ensure mobile elements are hidden */
+@media (min-width: 769px) {
+    .mobile-menu-btn {
+        display: none !important;
+    }
+    
+    .mobile-nav {
+        display: none !important;
+    }
+    
+    .desktop-nav {
+        display: flex !important;
+    }
+}
+
+/* Mobile responsive */
 @media (max-width: 768px) {
     .container {
         padding: 0 1rem;
@@ -1154,9 +1177,9 @@ body.mobile-menu-open {
         padding: 1rem 0;
     }
     
-    /* Hide desktop nav on mobile */
-    .desktop-nav,
-    .nav:not(.mobile-nav) {
+    /* Hide ALL nav elements that aren't mobile */
+    .nav.desktop-nav,
+    nav:not(.mobile-nav) {
         display: none !important;
     }
     
@@ -1165,7 +1188,7 @@ body.mobile-menu-open {
         display: flex !important;
     }
     
-    /* Show mobile nav */
+    /* Enable mobile nav (but keep it hidden until opened) */
     .mobile-nav {
         display: block !important;
     }
