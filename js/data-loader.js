@@ -56,11 +56,40 @@ class DataLoader {
 
     // Load career positions from JSON files
     async loadCareerPositions() {
-        const careerFiles = [
-            'senior-ai-research-scientist.json',
-            'bioinformatics-engineer.json',
-            'product-manager-ai-ethics.json'
-        ];
+        // Try to load from a manifest file first, fall back to known files
+        let careerFiles = [];
+        
+        try {
+            // Try to load a manifest file that lists all available careers
+            const manifestResponse = await fetch('data/careers/manifest.json');
+            if (manifestResponse.ok) {
+                const manifest = await manifestResponse.json();
+                careerFiles = manifest.files || [];
+                console.log('Loaded career files from manifest:', careerFiles);
+            }
+        } catch (error) {
+            console.log('No manifest file found, using default file list');
+        }
+        
+        // If no manifest, fall back to known files and try additional ones
+        if (careerFiles.length === 0) {
+            // Known files that definitely exist
+            const knownFiles = [
+                'senior-ai-research-scientist.json',
+                'bioinformatics-engineer.json',
+                'product-manager-ai-ethics.json'
+            ];
+            
+            // Additional files to try (including your new one)
+            const possibleFiles = [
+                'senior-droppie.json',
+                'senior-developer.json',
+                'junior-researcher.json',
+                'data-scientist.json'
+            ];
+            
+            careerFiles = [...knownFiles, ...possibleFiles];
+        }
 
         try {
             const promises = careerFiles.map(file => 
