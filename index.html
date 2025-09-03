@@ -112,6 +112,7 @@
             let mouseY = 0;
             let targetX = 0;
             let targetY = 0;
+            let autoRotation = 0;
             
             // Graceful fade-in when model loads
             modelViewer.addEventListener('load', function() {
@@ -136,16 +137,23 @@
             
             // Smooth animation function
             function animateModel() {
-                // Smooth interpolation
+                // Auto-rotation (very slow - 1 full rotation per 5 minutes)
+                autoRotation += 0.02; // 0.02 degrees per frame (at 60fps)
+                
+                // Smooth interpolation for mouse movement
                 targetX += (mouseX - targetX) * 0.05;
                 targetY += (mouseY - targetY) * 0.05;
                 
                 // Convert to camera orbit values
-                const orbitX = targetX * 15; // Max 15 degrees left/right
-                const orbitY = 75 + (targetY * -10); // 65-85 degrees vertical range
+                const mouseOrbitX = targetX * 15; // Max 15 degrees left/right from mouse
+                const mouseOrbitY = 75 + (targetY * -10); // 65-85 degrees vertical range from mouse
+                
+                // Combine auto-rotation with mouse movement
+                const finalOrbitX = autoRotation + mouseOrbitX;
+                const finalOrbitY = mouseOrbitY;
                 
                 // Apply the camera orbit
-                modelViewer.cameraOrbit = `${orbitX}deg ${orbitY}deg 12m`;
+                modelViewer.cameraOrbit = `${finalOrbitX}deg ${finalOrbitY}deg 12m`;
                 
                 requestAnimationFrame(animateModel);
             }
