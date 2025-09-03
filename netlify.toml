@@ -1,0 +1,46 @@
+[build]
+  # Build command (none needed for static site)
+  command = "echo 'Static site - no build needed'"
+  
+  # Publish directory
+  publish = "."
+
+[build.environment]
+  # Node version for any build tools
+  NODE_VERSION = "18"
+
+[[headers]]
+  # Cache static assets
+  for = "/*.css"
+  [headers.values]
+    Cache-Control = "public, max-age=31536000"
+
+[[headers]]
+  for = "/*.js"
+  [headers.values]
+    Cache-Control = "public, max-age=31536000"
+
+[[headers]]
+  # Security headers
+  for = "/*"
+  [headers.values]
+    X-Frame-Options = "DENY"
+    X-XSS-Protection = "1; mode=block"
+    X-Content-Type-Options = "nosniff"
+    Referrer-Policy = "strict-origin-when-cross-origin"
+
+# Redirect rules for SPA behavior (if needed later)
+[[redirects]]
+  from = "/dashboard"
+  to = "/index.html"
+  status = 200
+
+[[redirects]]
+  from = "/api/*"
+  to = "/.netlify/functions/:splat"
+  status = 200
+
+# Form handling (for future contact forms)
+[functions]
+  # Directory for serverless functions
+  directory = "netlify/functions"
