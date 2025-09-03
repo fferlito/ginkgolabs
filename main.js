@@ -93,7 +93,7 @@ document.addEventListener('DOMContentLoaded', function() {
     
     // Console welcome message
     console.log(`
-    🌟 Welcome to GYNKOLABS! 🌟
+    🌟 Welcome to GINKGOLABS! 🌟
     
     Radically reimagining the future of intelligence
     with innovative AI technologies.

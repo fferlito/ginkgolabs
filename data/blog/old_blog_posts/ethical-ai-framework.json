@@ -1,7 +1,7 @@
 {
   "id": "ethical-ai-framework",
   "title": "Ethical AI Development: Our Framework for Responsible Innovation",
-  "excerpt": "At GYNKOLABS, we believe that ethical considerations should be at the core of every AI development project. Here's how we approach responsible innovation.",
+  "excerpt": "At GINKGOLABS, we believe that ethical considerations should be at the core of every AI development project. Here's how we approach responsible innovation.",
   "author": {
     "name": "Dr. Amara Okafor",
     "role": "Ethics & Governance Lead",
@@ -26,8 +26,8 @@
     ]
   },
   "seo": {
-    "metaTitle": "Ethical AI Framework for Responsible Innovation | GYNKOLABS",
-    "metaDescription": "Learn about GYNKOLABS' comprehensive ethical AI framework that ensures responsible innovation in artificial intelligence development.",
+    "metaTitle": "Ethical AI Framework for Responsible Innovation | GINKGOLABS",
+    "metaDescription": "Learn about GINKGOLABS' comprehensive ethical AI framework that ensures responsible innovation in artificial intelligence development.",
     "keywords": ["ethical AI", "responsible innovation", "AI governance", "AI ethics framework"]
   }
 }
