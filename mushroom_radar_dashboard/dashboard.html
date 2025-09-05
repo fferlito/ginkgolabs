@@ -123,6 +123,60 @@
             color: #000 !important;
         }
         
+        /* Base map toggle button */
+        .basemap-toggle {
+            position: fixed;
+            top: 80px;
+            right: 20px;
+            z-index: 1001;
+            background: white;
+            border: 2px solid #e9ecef;
+            border-radius: 8px;
+            padding: 8px 16px;
+            cursor: pointer;
+            font-size: 14px;
+            font-weight: 500;
+            color: #333;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+            transition: all 0.2s ease;
+            user-select: none;
+        }
+        
+        .basemap-toggle:hover {
+            background: #f8f9fa;
+            border-color: #007bff;
+        }
+        
+        .basemap-toggle.active {
+            background: #007bff;
+            color: white;
+            border-color: #007bff;
+        }
+        
+        /* Layer checkbox - positioned with legend */
+        .layer-checkbox-wrapper {
+            display: flex;
+            align-items: center;
+            margin-right: 15px;
+            cursor: pointer;
+            user-select: none;
+        }
+        
+        .layer-checkbox {
+            width: 18px;
+            height: 18px;
+            margin-right: 8px;
+            cursor: pointer;
+            accent-color: #28a745;
+        }
+        
+        .layer-checkbox-label {
+            font-size: 12px;
+            font-weight: 500;
+            color: #333;
+            cursor: pointer;
+        }
+        
         /* Override container for full-screen dashboard */
         .container {
             margin: 0 !important;
@@ -199,6 +253,8 @@
             <div id="calendar-wrapper" class="calendar-wrapper">
                 <div id="calendar-scroll" class="calendar-scroll"></div>
             </div>
+            
+            <button id="basemap-toggle" class="basemap-toggle">Satellite</button>
         </main>
         
         <footer class="footer">
@@ -245,6 +301,15 @@
     }
     
     let map;
+    let currentMapStyle = 'custom'; // Track current map style
+    let layerVisible = true; // Track layer visibility (default: on)
+    
+    // Map styles configuration
+    const mapStyles = {
+        custom: 'mapbox://styles/ferlixxx/cm8xkvecy000o01s6fy1h60qi',
+        satellite: 'mapbox://styles/mapbox/satellite-v9'
+    };
+    
    async function getTimestampId(pathId) {
     try {
       const baseUrl ="https://api.ellipsis-drive.com/v3"; // Replace with the correct base URL
@@ -518,6 +583,13 @@
         
         // Create legend after map is loaded
         createLegend();
+        
+        // Setup basemap toggle functionality
+        setupBasemapToggle();
+        
+        // Setup layer toggle functionality
+        setupLayerToggle();
+        
         let activePopup;
         let touchStartTime = null;
         map.on('click', (e) => {
@@ -548,10 +620,19 @@
           const f = features[0];
           if (f?.properties?.species_prediction !== undefined) {
             const prediction = f.properties.species_prediction;
+            const lat = e.lngLat.lat.toFixed(6);
+            const lng = e.lngLat.lng.toFixed(6);
+            const googleMapsUrl = `https://www.google.com/maps?q=${lat},${lng}`;
+            
             activePopup?.remove();
             activePopup = new mapboxgl.Popup({ offset: 8, closeOnClick: true })
               .setLngLat(e.lngLat)
-              .setText(`Probability: ${(prediction * 100).toFixed(1)} %`)
+              .setHTML(`
+                <div style="font-family: Arial, sans-serif;">
+                  Probability: ${(prediction * 100).toFixed(1)}%<br>
+                  <a href="${googleMapsUrl}" target="_blank" style="color: #007bff; text-decoration: none; font-size: 0.9em;">(Open in Maps)</a>
+                </div>
+              `)
               .addTo(map);
           }
         }
@@ -577,6 +658,10 @@
       legend.className = 'legend-container';
       legend.innerHTML =
         `<div class="legend-inline-wrapper">
+          <div class="layer-checkbox-wrapper">
+            <input type="checkbox" id="layer-checkbox" class="layer-checkbox" checked>
+            <label for="layer-checkbox" class="layer-checkbox-label"></label>
+          </div>
           <span class="legend-label">Probability %</span>
           <div class="legend-gradient">
             <div class="legend-values-inline">
@@ -591,6 +676,141 @@
       const mapContainer = document.getElementById('map');
       if (mapContainer) {
         mapContainer.appendChild(legend);
+      }
+    }
+    
+    function setupBasemapToggle() {
+      const basemapToggle = document.getElementById('basemap-toggle');
+      if (!basemapToggle) return;
+      
+      basemapToggle.addEventListener('click', () => {
+        // Toggle between custom and satellite
+        if (currentMapStyle === 'custom') {
+          switchToSatelliteMap();
+          basemapToggle.textContent = 'Custom';
+          basemapToggle.classList.add('active');
+          currentMapStyle = 'satellite';
+        } else {
+          switchToCustomMap();
+          basemapToggle.textContent = 'Satellite';
+          basemapToggle.classList.remove('active');
+          currentMapStyle = 'custom';
+        }
+      });
+    }
+    
+    function switchToSatelliteMap() {
+      if (!map) return;
+      
+      // Switch to satellite style
+      map.setStyle(mapStyles.satellite);
+      
+      // Re-add terrain and mushroom layer after style loads
+      map.once('style.load', () => {
+        addTerrainTo3D();
+        // Re-add the current mushroom layer
+        reloadCurrentMushroomLayer();
+      });
+    }
+    
+    function switchToCustomMap() {
+      if (!map) return;
+      
+      // Switch back to custom style
+      map.setStyle(mapStyles.custom);
+      
+      // Re-add layers after style loads
+      map.once('style.load', () => {
+        addTerrainTo3D();
+        // Re-add the current mushroom layer
+        reloadCurrentMushroomLayer();
+      });
+    }
+    
+    function reloadCurrentMushroomLayer() {
+      // Only reload if layer should be visible
+      if (!layerVisible) return;
+      
+      // Get the currently selected date from the active calendar card
+      const activeCard = document.querySelector('.date-card.active');
+      if (activeCard && activeCard.dataset.fullDate) {
+        const currentSelectedDate = activeCard.dataset.fullDate;
+        const tileUrl = getLayerUrl(currentSelectedDate);
+        loadMushroomLayer(tileUrl);
+      }
+    }
+    
+    function setupLayerToggle() {
+      const layerCheckbox = document.getElementById('layer-checkbox');
+      if (!layerCheckbox) return;
+      
+      layerCheckbox.addEventListener('change', () => {
+        if (layerCheckbox.checked) {
+          // Show the layer
+          showMushroomLayer();
+          layerVisible = true;
+        } else {
+          // Hide the layer
+          hideMushroomLayer();
+          layerVisible = false;
+        }
+      });
+    }
+    
+    function hideMushroomLayer() {
+      if (!map) return;
+      
+      try {
+        if (map.getLayer('mushroom-fill')) {
+          map.setLayoutProperty('mushroom-fill', 'visibility', 'none');
+        }
+      } catch (error) {
+        console.warn('Error hiding mushroom layer:', error);
+      }
+    }
+    
+    function showMushroomLayer() {
+      if (!map) return;
+      
+      try {
+        if (map.getLayer('mushroom-fill')) {
+          map.setLayoutProperty('mushroom-fill', 'visibility', 'visible');
+        } else {
+          // If layer doesn't exist, reload it
+          reloadCurrentMushroomLayer();
+        }
+      } catch (error) {
+        console.warn('Error showing mushroom layer:', error);
+      }
+    }
+    
+    function addTerrainTo3D() {
+      if (!map) return;
+      
+      try {
+        // Add 3D terrain
+        map.addSource('mapbox-dem', {
+          'type': 'raster-dem',
+          'url': 'mapbox://mapbox.mapbox-terrain-dem-v1',
+          'tileSize': 512,
+          'maxzoom': 14
+        });
+        
+        // Add the DEM source as a terrain layer with exaggerated height
+        map.setTerrain({ 'source': 'mapbox-dem', 'exaggeration': 1.5 });
+        
+        // Add a sky layer for better 3D effect
+        map.addLayer({
+          'id': 'sky',
+          'type': 'sky',
+          'paint': {
+            'sky-type': 'atmosphere',
+            'sky-atmosphere-sun': [0.0, 0.0],
+            'sky-atmosphere-sun-intensity': 15
+          }
+        });
+      } catch (error) {
+        console.warn('Error adding 3D terrain:', error);
       }
     }
   </script>
