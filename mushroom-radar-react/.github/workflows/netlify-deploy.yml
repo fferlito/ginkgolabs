@@ -1,0 +1,59 @@
+name: Deploy to Netlify
+
+on:
+  push:
+    branches: [ main ]
+  pull_request:
+    branches: [ main ]
+
+jobs:
+  build-and-deploy:
+    runs-on: ubuntu-latest
+    
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v3
+      
+    - name: Setup Node.js
+      uses: actions/setup-node@v3
+      with:
+        node-version: '18'
+        cache: 'npm'
+        cache-dependency-path: 'mushroom-radar-react/package-lock.json'
+        
+    - name: Change to project directory
+      run: cd mushroom-radar-react
+      
+    - name: Install dependencies
+      run: |
+        cd mushroom-radar-react
+        npm ci
+        
+    - name: Run linting
+      run: |
+        cd mushroom-radar-react
+        npm run lint
+        
+    - name: Build project
+      run: |
+        cd mushroom-radar-react
+        npm run build
+      env:
+        VITE_MAPBOX_TOKEN: ${{ secrets.VITE_MAPBOX_TOKEN }}
+        VITE_ELLIPSIS_API_BASE: ${{ secrets.VITE_ELLIPSIS_API_BASE }}
+        VITE_ELLIPSIS_PATH_ID: ${{ secrets.VITE_ELLIPSIS_PATH_ID }}
+        
+    - name: Deploy to Netlify
+      uses: nwtgck/actions-netlify@v2.0
+      with:
+        publish-dir: 'mushroom-radar-react/dist'
+        production-branch: main
+        github-token: ${{ secrets.GITHUB_TOKEN }}
+        deploy-message: "Deploy from GitHub Actions"
+        enable-pull-request-comment: false
+        enable-commit-comment: true
+        overwrites-pull-request-comment: true
+      env:
+        NETLIFY_AUTH_TOKEN: ${{ secrets.NETLIFY_AUTH_TOKEN }}
+        NETLIFY_SITE_ID: ${{ secrets.NETLIFY_SITE_ID }}
+      timeout-minutes: 10

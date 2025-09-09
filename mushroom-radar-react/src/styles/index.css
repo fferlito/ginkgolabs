@@ -1,0 +1,55 @@
+/* Font imports */
+@font-face {
+  font-family: Satoshi;
+  src: url('../../assets/fonts/Satoshi-Regular.otf') format("opentype");
+  font-weight: 400;
+  font-style: normal;
+  font-display: swap;
+}
+
+@font-face {
+  font-family: Satoshi;
+  src: url('../../assets/fonts/Satoshi-Medium.otf') format("opentype");
+  font-weight: 500;
+  font-style: normal;
+  font-display: swap;
+}
+
+@font-face {
+  font-family: Satoshi;
+  src: url('../../assets/fonts/Satoshi-Bold.otf') format("opentype");
+  font-weight: 700;
+  font-style: normal;
+  font-display: swap;
+}
+
+/* CSS Variables */
+:root {
+  --black: black;
+  --dark-olive-green: #405f3b;
+  --main-green: #7a922a;
+  --cornsilk: #fefae0;
+  --pale-goldenrod: #ccd5ae;
+  --green-selected: #3c4715;
+}
+
+/* Reset and base styles */
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+
+body {
+  color: #b6b6b6;
+  background-color: #161616;
+  font-family: Satoshi, sans-serif;
+  font-size: 1rem;
+  line-height: 1.5;
+  overflow: hidden;
+}
+
+/* Disable map telemetry errors */
+.mapboxgl-missing-css {
+  display: none;
+}

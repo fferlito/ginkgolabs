@@ -1,0 +1,29 @@
+.dashboard {
+    width: 100vw;
+    height: 100vh;
+    overflow: hidden;
+  }
+  
+  .dashboard-main {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100vw;
+    height: 100vh;
+    z-index: 1;
+  }
+  
+  .dashboard-controls {
+    position: fixed;
+    top: 80px;
+    left: 20px;
+    right: 20px;
+    z-index: 1001;
+    display: flex;
+    justify-content: space-between;
+    pointer-events: none;
+  }
+  
+  .dashboard-controls > * {
+    pointer-events: auto;
+  }
