@@ -2,7 +2,17 @@
 publish = "."
 command = "cd mushroom-radar-react && npm install && npm run build && cd .. && mkdir -p dashboard && cp -r mushroom-radar-react/dist/* dashboard/"
 
+[build.environment]
+NODE_VERSION = "18"
+
 [[redirects]]
 from = "/dashboard/*"
 to = "/dashboard/index.html"
 status = 200
+
+[[headers]]
+for = "/dashboard/*"
+[headers.values]
+X-Frame-Options = "DENY"
+X-XSS-Protection = "1; mode=block"
+X-Content-Type-Options = "nosniff"
