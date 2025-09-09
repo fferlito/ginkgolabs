@@ -15,11 +15,16 @@ const BasemapToggle = () => {
 
   return (
     <button
-      className={`basemap-toggle ${isActive ? 'active' : ''}`}
+      className={`basemap-toggle-round ${isActive ? 'active' : ''}`}
       onClick={handleToggle}
       aria-label={`Switch to ${buttonText} view`}
+      title={`Switch to ${buttonText} view`}
     >
-      {buttonText}
+      <img 
+        src="/dashboard/assets/map_icon.png" 
+        alt="Map toggle" 
+        className="map-icon"
+      />
     </button>
   )
 }

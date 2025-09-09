@@ -1,52 +1,67 @@
 .legend-container {
   position: fixed;
-  bottom: 20px;
-  left: 20px;
-  z-index: 1001;
-  background: white;
-  border-radius: 8px;
-  box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
-  padding: 1rem;
-  color: #000;
+  bottom: var(--spacing-xl);
+  left: var(--spacing-xl);
+  z-index: var(--z-map-ui);
+  background: var(--color-bg-glass);
+  backdrop-filter: blur(10px);
+  border: 1px solid var(--color-border-light);
+  border-radius: var(--radius-md);
+  box-shadow: var(--shadow-md);
+  padding: var(--spacing-lg);
+  color: var(--color-text-dark);
 }
 
 .legend-inline-wrapper {
   display: flex;
   align-items: center;
-  gap: 10px;
+  gap: var(--spacing-sm);
 }
 
 .legend-label {
-  color: #000;
-  font-weight: 500;
+  color: var(--color-text-dark);
+  font-family: var(--font-family-navigation);
+  font-weight: var(--font-weight-medium);
+  font-size: var(--font-size-sm);
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
 }
 
 .legend-gradient {
   width: 150px;
   height: 20px;
-  background: linear-gradient(to right, #9F0500, #ba5c00, #c77500, #cfa100, #a1d600, #68bc00);
-  border-radius: 4px;
+  background: linear-gradient(to right, 
+    var(--mushroom-probability-0), 
+    var(--mushroom-probability-20), 
+    var(--mushroom-probability-40), 
+    var(--mushroom-probability-60), 
+    var(--mushroom-probability-80), 
+    var(--mushroom-probability-100)
+  );
+  border-radius: var(--radius-sm);
   position: relative;
 }
 
 .legend-values-inline {
   display: flex;
   justify-content: space-between;
-  font-size: 0.8rem;
-  margin-top: 5px;
-  color: #000;
+  font-family: var(--font-family-body);
+  font-size: var(--font-size-xs);
+  font-weight: var(--font-weight-medium);
+  margin-top: var(--spacing-xs);
+  color: var(--color-text-dark-secondary);
   width: 150px;
 }
 
 .legend-values-inline span {
-  color: #000;
+  color: var(--color-text-dark-secondary);
 }
 
 /* Layer checkbox */
 .layer-checkbox-wrapper {
   display: flex;
   align-items: center;
-  margin-right: 15px;
+  margin-right: var(--spacing-lg);
   cursor: pointer;
   user-select: none;
 }
@@ -54,14 +69,16 @@
 .layer-checkbox {
   width: 18px;
   height: 18px;
-  margin-right: 8px;
+  margin-right: var(--spacing-sm);
   cursor: pointer;
-  accent-color: #28a745;
+  accent-color: var(--color-primary);
 }
 
 .layer-checkbox-label {
-  font-size: 12px;
-  font-weight: 500;
-  color: #333;
+  font-family: var(--font-family-navigation);
+  font-size: var(--font-size-xs);
+  font-weight: var(--font-weight-medium);
+  color: var(--color-text-dark);
   cursor: pointer;
 }
+

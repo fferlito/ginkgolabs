@@ -1,16 +1,16 @@
-/* Header styles - copied from original */
+/* Header styles - GINKGOLABS Design System */
 .header {
   position: fixed;
   top: 0;
   left: 0;
   right: 0;
   width: 100%;
-  z-index: 1000;
-  background: rgba(26, 26, 26, 0.95);
+  z-index: var(--z-map-controls);
+  background: var(--color-bg-overlay);
   backdrop-filter: blur(20px);
-  border-bottom: 1px solid rgba(255, 255, 255, 0.1);
-  box-shadow: 0 2px 20px rgba(0, 0, 0, 0.3);
-  padding: 1rem 2rem;
+  border-bottom: 1px solid var(--color-border-primary);
+  box-shadow: var(--shadow-lg);
+  padding: var(--spacing-xl) var(--spacing-2xl);
   display: flex;
   justify-content: space-between;
   align-items: center;
@@ -33,14 +33,18 @@
 }
 
 .nav-link {
-  color: #fff;
+  color: var(--color-text-primary);
   text-decoration: none;
-  font-weight: 400;
-  transition: color 0.2s ease;
+  font-family: var(--font-family-navigation);
+  font-weight: var(--font-weight-medium);
+  font-size: var(--font-size-sm);
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  transition: var(--transition-base);
 }
 
 .nav-link:hover {
-  color: var(--main-green);
+  color: var(--color-primary);
 }
 
 .nav-dropdown {

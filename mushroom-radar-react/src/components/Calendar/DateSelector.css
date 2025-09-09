@@ -1,45 +1,66 @@
 .calendar-wrapper {
-  background: white;
-  border-radius: 8px;
-  box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
-  padding: 1rem;
-  max-width: 300px;
+  background: var(--color-bg-glass);
+  backdrop-filter: blur(10px);
+  border-radius: var(--radius-md);
+  box-shadow: var(--shadow-md);
+  border: 1px solid var(--color-border-light);
+  padding: var(--spacing-md);
+  max-width: var(--dashboard-calendar-width);
 }
 
 .calendar-scroll {
   display: flex;
-  gap: 10px;
+  gap: var(--spacing-sm);
   overflow-x: auto;
 }
 
 .date-card {
   flex-shrink: 0;
-  width: 80px;
-  padding: 10px;
+  width: var(--dashboard-calendar-card-width);
+  padding: var(--spacing-sm);
   text-align: center;
-  border: 2px solid #e9ecef;
-  border-radius: 8px;
+  border: 2px solid var(--color-border-light);
+  border-radius: var(--radius-md);
   cursor: pointer;
-  transition: all 0.2s ease;
-  background: white;
+  transition: var(--transition-base);
+  background: var(--color-bg-glass);
+  backdrop-filter: blur(5px);
 }
 
 .date-card:hover {
-  border-color: #007bff;
+  border-color: var(--color-border-light-hover);
+  transform: translateY(-1px);
+  box-shadow: var(--shadow-base);
 }
 
 .date-card.active {
-  background: #007bff;
-  color: white;
-  border-color: #007bff;
+  background: var(--color-primary);
+  color: var(--color-text-primary);
+  border-color: var(--color-primary);
+  box-shadow: var(--shadow-accent);
 }
 
 .date-card-day {
-  font-size: 0.8rem;
-  margin-bottom: 4px;
+  font-family: var(--font-family-navigation);
+  font-size: var(--font-size-xs);
+  font-weight: var(--font-weight-medium);
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  margin-bottom: var(--spacing-xs);
+  color: var(--color-text-dark-secondary);
+}
+
+.date-card.active .date-card-day {
+  color: var(--color-text-primary);
 }
 
 .date-card-number {
-  font-size: 1.2rem;
-  font-weight: 500;
+  font-family: var(--font-family-headline);
+  font-size: var(--font-size-lg);
+  font-weight: var(--font-weight-regular);
+  color: var(--color-text-dark);
+}
+
+.date-card.active .date-card-number {
+  color: var(--color-text-primary);
 }

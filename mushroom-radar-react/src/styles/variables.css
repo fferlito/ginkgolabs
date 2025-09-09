@@ -1,0 +1,147 @@
+/* CSS Variables - GINKGOLABS Design System */
+
+/* Font Imports - Match main website */
+@import url('https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,100;0,200;0,300;0,400;0,700;1,100;1,200;1,300;1,400&family=Barlow:ital,wght@0,400;0,500;0,600;0,700;1,400&family=Open+Sans:ital,wght@0,100;0,200;0,300;0,400;0,600;0,700;0,800;1,100;1,200;1,300;1,400;1,600;1,700;1,800&display=swap');
+
+:root {
+  /* Primary Colors - GINKGOLABS Brand */
+  --color-primary: #8bc34a;
+  --color-primary-light: #9ccc65;
+  --color-primary-dark: #689f38;
+  --color-primary-darker: #558b2f;
+  
+  /* Background Colors */
+  --color-bg-primary: #0a0a0a;
+  --color-bg-secondary: #1a1a1a;
+  --color-bg-tertiary: #2a2a2a;
+  --color-bg-card: rgba(26, 26, 26, 0.8);
+  --color-bg-overlay: rgba(26, 26, 26, 0.95);
+  --color-bg-glass: rgba(255, 255, 255, 0.9);
+  --color-bg-glass-dark: rgba(26, 26, 26, 0.9);
+  
+  /* Text Colors */
+  --color-text-primary: #ffffff;
+  --color-text-secondary: #e0e0e0;
+  --color-text-muted: #b0b0b0;
+  --color-text-disabled: #666666;
+  --color-text-dark: #333333;
+  --color-text-dark-secondary: #666666;
+  
+  /* Border Colors */
+  --color-border-primary: rgba(255, 255, 255, 0.1);
+  --color-border-secondary: rgba(255, 255, 255, 0.05);
+  --color-border-accent: rgba(139, 195, 74, 0.3);
+  --color-border-hover: rgba(139, 195, 74, 0.5);
+  --color-border-light: rgba(233, 236, 239, 1);
+  --color-border-light-hover: rgba(0, 123, 255, 0.5);
+  
+  /* Status Colors */
+  --color-success: #28a745;
+  --color-warning: #ffc107;
+  --color-error: #dc3545;
+  --color-info: #007bff;
+  
+  /* Shadow Colors */
+  --color-shadow-primary: rgba(0, 0, 0, 0.3);
+  --color-shadow-accent: rgba(139, 195, 74, 0.3);
+  --color-shadow-hover: rgba(139, 195, 74, 0.4);
+  --color-shadow-light: rgba(0, 0, 0, 0.1);
+  --color-shadow-medium: rgba(0, 0, 0, 0.15);
+  --color-shadow-strong: rgba(0, 0, 0, 0.2);
+  
+  /* Gradient Colors */
+  --gradient-primary: linear-gradient(135deg, var(--color-primary-dark) 0%, var(--color-primary) 100%);
+  --gradient-text: linear-gradient(135deg, var(--color-text-primary) 0%, #e8f5e8 50%, var(--color-primary) 100%);
+  --gradient-background: linear-gradient(135deg, var(--color-bg-primary) 0%, var(--color-bg-secondary) 50%, #0f2415 100%);
+  
+  /* Typography - GINKGOLABS Font System */
+  --font-family-primary: 'Open Sans', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+  --font-family-logo: 'Open Sans', sans-serif;
+  --font-family-navigation: 'Barlow', 'Open Sans', sans-serif;
+  --font-family-headline: 'Playfair Display', 'Times New Roman', Georgia, serif;
+  --font-family-body: 'Open Sans', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+  --font-weight-light: 300;
+  --font-weight-regular: 400;
+  --font-weight-medium: 500;
+  --font-weight-semibold: 600;
+  --font-weight-bold: 700;
+  
+  /* Font Sizes */
+  --font-size-xs: 0.75rem;
+  --font-size-sm: 0.875rem;
+  --font-size-base: 1rem;
+  --font-size-lg: 1.125rem;
+  --font-size-xl: 1.25rem;
+  --font-size-2xl: 1.5rem;
+  --font-size-3xl: 1.875rem;
+  --font-size-4xl: 2.25rem;
+  --font-size-5xl: 3rem;
+  --font-size-6xl: 4rem;
+  
+  /* Spacing */
+  --spacing-xs: 0.25rem;
+  --spacing-sm: 0.5rem;
+  --spacing-md: 0.75rem;
+  --spacing-lg: 1rem;
+  --spacing-xl: 1.5rem;
+  --spacing-2xl: 2rem;
+  --spacing-3xl: 3rem;
+  --spacing-4xl: 4rem;
+  --spacing-5xl: 6rem;
+  
+  /* Border Radius */
+  --radius-sm: 4px;
+  --radius-md: 8px;
+  --radius-lg: 12px;
+  --radius-xl: 16px;
+  --radius-2xl: 24px;
+  --radius-full: 50%;
+  
+  /* Transitions */
+  --transition-fast: 0.15s ease;
+  --transition-base: 0.3s ease;
+  --transition-slow: 0.6s ease;
+  
+  /* Z-Index Scale */
+  --z-dropdown: 10;
+  --z-sticky: 20;
+  --z-fixed: 30;
+  --z-modal-backdrop: 40;
+  --z-modal: 50;
+  --z-popover: 60;
+  --z-tooltip: 70;
+  --z-map-controls: 1000;
+  --z-map-ui: 1001;
+  
+  /* Box Shadows */
+  --shadow-sm: 0 1px 2px 0 var(--color-shadow-light);
+  --shadow-base: 0 4px 6px -1px var(--color-shadow-light);
+  --shadow-md: 0 10px 15px -3px var(--color-shadow-medium);
+  --shadow-lg: 0 20px 25px -5px var(--color-shadow-medium);
+  --shadow-xl: 0 25px 50px -12px var(--color-shadow-strong);
+  --shadow-accent: 0 8px 30px var(--color-shadow-accent);
+  --shadow-glow: 0 0 20px var(--color-primary);
+  
+  /* Component Specific - Dashboard */
+  --dashboard-control-size: 48px;
+  --dashboard-control-size-small: 34px;
+  --dashboard-calendar-width: 210px;
+  --dashboard-calendar-card-width: 56px;
+  
+  /* Mushroom Prediction Colors */
+  --mushroom-probability-0: #9F0500;
+  --mushroom-probability-20: #ba5c00;
+  --mushroom-probability-40: #c77500;
+  --mushroom-probability-60: #cfa100;
+  --mushroom-probability-80: #a1d600;
+  --mushroom-probability-100: #68bc00;
+}
+
+/* Reduced motion preferences */
+@media (prefers-reduced-motion: reduce) {
+  :root {
+    --transition-fast: 0s;
+    --transition-base: 0s;
+    --transition-slow: 0s;
+  }
+}
