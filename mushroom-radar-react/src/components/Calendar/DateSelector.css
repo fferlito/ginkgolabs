@@ -1,100 +1,131 @@
 .calendar-wrapper {
-  background: var(--color-bg-glass);
-  backdrop-filter: blur(10px);
-  border-radius: var(--radius-md);
-  box-shadow: var(--shadow-md);
-  border: 1px solid var(--color-border-light);
-  padding: var(--spacing-md);
-  max-width: var(--dashboard-calendar-width);
+  background: transparent;
+  backdrop-filter: none;
+  border-radius: 0;
+  box-shadow: none;
+  border: none;
+  padding: 0;
+  max-width: none;
+  width: 100%;
+  position: relative;
 }
+
 
 /* Mobile responsive styles */
 @media (max-width: 768px) {
   .calendar-wrapper {
-    max-width: var(--dashboard-calendar-width-mobile);
-    padding: var(--spacing-sm);
+    max-width: none;
+    padding: 0;
   }
 }
 
 .calendar-scroll {
   display: flex;
-  gap: var(--spacing-sm);
+  gap: 0;
   overflow-x: auto;
+  overflow-y: hidden;
+  justify-content: space-between;
+  align-items: stretch;
+  position: relative;
+  height: 100%;
+  width: 100%;
 }
+
 
 @media (max-width: 768px) {
   .calendar-scroll {
-    gap: var(--spacing-xs);
+    gap: 0;
+    justify-content: space-between;
+    padding: 0 var(--spacing-sm);
   }
 }
 
 .date-card {
-  flex-shrink: 0;
-  width: var(--dashboard-calendar-card-width);
-  padding: var(--spacing-sm);
+  flex: 1;
+  padding: 4px var(--spacing-sm);
   text-align: center;
-  border: 2px solid var(--color-border-light);
-  border-radius: var(--radius-md);
+  border: none;
+  border-radius: 0;
   cursor: pointer;
   transition: var(--transition-base);
-  background: var(--color-bg-glass);
-  backdrop-filter: blur(5px);
+  background: transparent;
+  backdrop-filter: none;
+  color: white;
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  height: 100%;
+  min-height: 32px;
 }
 
 @media (max-width: 768px) {
   .date-card {
-    width: var(--dashboard-calendar-card-width-mobile);
-    padding: var(--spacing-xs);
+    flex: 1;
+    padding: 4px var(--spacing-xs);
+    min-height: 32px;
   }
 }
 
 .date-card:hover {
-  border-color: var(--color-border-light-hover);
+  background: rgba(255, 255, 255, 0.1);
   transform: translateY(-1px);
-  box-shadow: var(--shadow-base);
 }
 
 .date-card.active {
-  background: var(--color-primary);
-  color: var(--color-text-primary);
-  border-color: var(--color-primary);
-  box-shadow: var(--shadow-accent);
+  background: rgba(255, 255, 255, 0.2);
+  color: white;
+  position: relative;
+}
+
+.date-card.active::after {
+  content: '';
+  position: absolute;
+  bottom: -8px;
+  left: 50%;
+  transform: translateX(-50%);
+  width: 2px;
+  height: 8px;
+  background: #ff6b6b;
 }
 
 .date-card-day {
   font-family: var(--font-family-navigation);
-  font-size: var(--font-size-xs);
+  font-size: 11px;
   font-weight: var(--font-weight-medium);
   text-transform: uppercase;
   letter-spacing: 0.05em;
-  margin-bottom: var(--spacing-xs);
-  color: var(--color-text-dark-secondary);
+  margin-bottom: 2px;
+  color: rgba(255, 255, 255, 0.8);
+  line-height: 1.1;
 }
 
 @media (max-width: 768px) {
   .date-card-day {
-    font-size: 0.65rem;
-    margin-bottom: 2px;
+    font-size: 10px;
+    margin-bottom: 1px;
   }
 }
 
 .date-card.active .date-card-day {
-  color: var(--color-text-primary);
+  color: white;
 }
 
 .date-card-number {
-  font-family: var(--font-family-headline);
-  font-size: var(--font-size-lg);
-  font-weight: var(--font-weight-regular);
-  color: var(--color-text-dark);
+  font-family: var(--font-family-navigation);
+  font-size: 14px;
+  font-weight: var(--font-weight-medium);
+  color: white;
+  line-height: 1.1;
 }
 
 @media (max-width: 768px) {
   .date-card-number {
-    font-size: var(--font-size-base);
+    font-size: 12px;
   }
 }
 
 .date-card.active .date-card-number {
-  color: var(--color-text-primary);
+  color: white;
 }

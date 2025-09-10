@@ -1,41 +1,34 @@
 .legend-container {
-  position: fixed;
-  bottom: var(--spacing-xl);
-  left: var(--spacing-xl);
-  z-index: var(--z-map-ui);
-  background: var(--color-bg-glass);
-  backdrop-filter: blur(10px);
-  border: 1px solid var(--color-border-light);
-  border-radius: var(--radius-md);
-  box-shadow: var(--shadow-md);
-  padding: var(--spacing-lg);
-  color: var(--color-text-dark);
+  position: relative;
+  bottom: auto;
+  left: auto;
+  z-index: auto;
+  background: transparent;
+  backdrop-filter: none;
+  border: none;
+  border-radius: 0;
+  box-shadow: none;
+  padding: 0;
+  color: white;
+  width: 100%;
 }
 
-/* Mobile: Fixed bottom bar */
+/* Mobile responsive */
 @media (max-width: 768px) {
   .legend-container {
-    position: fixed;
-    bottom: 0;
-    left: 0;
-    right: 0;
-    width: 100vw;
+    position: relative;
+    bottom: auto;
+    left: auto;
+    right: auto;
+    width: 100%;
     transform: none;
-    padding: 8px 16px;
-    padding-bottom: calc(8px + env(safe-area-inset-bottom));
+    padding: 0;
     border-radius: 0;
     border: none;
-    background: linear-gradient(to right, 
-      var(--mushroom-probability-0), 
-      var(--mushroom-probability-20), 
-      var(--mushroom-probability-40), 
-      var(--mushroom-probability-60), 
-      var(--mushroom-probability-80), 
-      var(--mushroom-probability-100)
-    );
-    box-shadow: 0 -2px 10px rgba(0, 0, 0, 0.1);
+    background: transparent;
+    box-shadow: none;
     margin: 0;
-    z-index: var(--z-map-ui);
+    z-index: auto;
     min-height: fit-content;
   }
 }
@@ -43,7 +36,10 @@
 .legend-inline-wrapper {
   display: flex;
   align-items: center;
-  gap: var(--spacing-lg);
+  justify-content: center;
+  gap: 5px;
+  width: 100%;
+  flex-direction: column;
 }
 
 @media (max-width: 768px) {
@@ -61,27 +57,31 @@
 .legend-content {
   display: flex;
   flex-direction: column;
-  gap: var(--spacing-sm);
+  align-items: center;
+  gap: 5px;
+  width: 100%;
+  justify-content: center;
 }
 
 .legend-label {
+  display: none;
   font-family: var(--font-family-navigation);
   font-size: var(--font-size-sm);
   font-weight: var(--font-weight-semibold);
   text-transform: uppercase;
-  color: var(--color-text-dark);
+  color: white;
   letter-spacing: 0.5px;
   margin: 0;
+  text-shadow: 1px 1px 2px rgba(0, 0, 0, 0.7);
 }
 
 @media (max-width: 768px) {
   .legend-content {
     width: 100%;
     align-items: center;
-  }
-  
-  .legend-label {
-    display: none;
+    justify-content: center;
+    flex-direction: column;
+    gap: 4px;
   }
 }
 
@@ -89,11 +89,14 @@
   position: relative;
   display: flex;
   flex-direction: column;
-  gap: var(--spacing-xs);
+  align-items: center;
+  gap: 5px;
+  flex: 1;
+  width: 100%;
 }
 
 .legend-gradient {
-  width: 150px;
+  flex: 1;
   height: 20px;
   background: linear-gradient(to right, 
     var(--mushroom-probability-0), 
@@ -110,10 +113,15 @@
 @media (max-width: 768px) {
   .legend-gradient-container {
     width: 100%;
+    max-width: none;
+    flex-direction: column;
+    gap: 5px;
   }
   
   .legend-gradient {
-    display: none;
+    display: block;
+    flex: 1;
+    height: 20px;
   }
 }
 
@@ -130,7 +138,7 @@
   font-weight: var(--font-weight-semibold);
   color: white;
   text-shadow: 2px 2px 4px rgba(0,0,0,0.8);
-  padding: 0 6px;
+  padding: 0 4px;
   pointer-events: none;
 }
 
@@ -138,11 +146,11 @@
 @media (max-width: 768px) {
   .legend-values-inline {
     width: 100%;
-    font-size: 0.8rem;
+    font-size: 14px;
     margin-top: 0;
     color: white;
     justify-content: space-between;
-    padding: 0 16px;
+    padding: 0 4px;
     align-items: center;
     -webkit-font-smoothing: antialiased;
     -moz-osx-font-smoothing: grayscale;
@@ -150,8 +158,8 @@
   
   .legend-values-inline span {
     color: white;
-    font-weight: var(--font-weight-semibold);
-    text-shadow: 1px 1px 2px rgba(0, 0, 0, 0.7);
+    font-weight: var(--font-weight-bold);
+    text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.8);
     -webkit-font-smoothing: antialiased;
     -moz-osx-font-smoothing: grayscale;
   }
@@ -172,7 +180,7 @@
 
 /* Layer checkbox */
 .layer-checkbox-wrapper {
-  display: flex;
+  display: none;
   align-items: center;
   margin-right: var(--spacing-lg);
   cursor: pointer;
