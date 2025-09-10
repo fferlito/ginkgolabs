@@ -1,0 +1,57 @@
+/* Map Controls styles - GINKGOLABS Design System */
+.map-controls {
+  display: flex;
+  flex-direction: column;
+  gap: var(--spacing-sm);
+}
+
+.map-control-button {
+  width: var(--dashboard-control-size);
+  height: var(--dashboard-control-size);
+  border-radius: var(--radius-full);
+  background: var(--color-bg-glass);
+  border: 2px solid var(--color-border-light);
+  backdrop-filter: blur(10px);
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  box-shadow: var(--shadow-md);
+  transition: var(--transition-base);
+  user-select: none;
+  padding: 0;
+  color: var(--color-text-dark);
+}
+
+.map-control-button:hover {
+  background: var(--color-bg-glass);
+  border-color: var(--color-primary);
+  transform: scale(1.05);
+  box-shadow: var(--shadow-lg);
+  color: var(--color-primary);
+}
+
+.map-control-button:active {
+  transform: scale(0.95);
+  background: var(--color-primary);
+  border-color: var(--color-primary);
+  color: white;
+}
+
+.map-control-icon {
+  width: 24px;
+  height: 24px;
+  transition: all 0.3s ease;
+  filter: drop-shadow(0 1px 2px rgba(0, 0, 0, 0.1));
+  object-fit: contain;
+  image-rendering: -webkit-optimize-contrast;
+  image-rendering: crisp-edges;
+}
+
+.map-control-button:hover .map-control-icon {
+  transform: scale(1.1);
+}
+
+.map-control-button:active .map-control-icon {
+  filter: brightness(0) invert(1) drop-shadow(0 1px 2px rgba(0, 0, 0, 0.2));
+}

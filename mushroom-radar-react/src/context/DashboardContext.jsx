@@ -9,6 +9,7 @@ const initialState = {
   selectedDate: moment().format('YYYY-MM-DD'),
   currentMapStyle: 'custom',
   layerVisible: true,
+  showMushroomLayer: true,
   tileUrls: {
     today: 'https://api.ellipsis-drive.com/v3/ogc/mvt/49821b18-5a0f-4b5f-871d-6442d1c72d86/{z}/{x}/{y}?timestampId=f1033c35-2589-4e84-b110-b0705d6ea1c0&token=epat_HEBbajYglphtALIrw0rKI9PA0w3Dyssp9oUDymLFksir8coa89tw921Glvb5ZFah',
     tomorrow: 'https://api.ellipsis-drive.com/v3/ogc/mvt/49821b19-5a0f-4b5f-871d-6442d1c72d86/{z}/{x}/{y}?timestampId=4f1e918b-3df4-4e59-b2e9-52547222c3d5&token=epat_VZGivZ6q1DNcq6lZybdZD9tjOooNlWpmz4Dff0T59m8VOBXQcQWhLFBs31PjKFWV',
@@ -61,6 +62,16 @@ const dashboardReducer = (state, action) => {
       return { 
         ...state, 
         isLoadingTileUrls: action.payload 
+      }
+    case 'TOGGLE_MUSHROOM_LAYER':
+      return { 
+        ...state, 
+        showMushroomLayer: !state.showMushroomLayer 
+      }
+    case 'SET_MUSHROOM_LAYER':
+      return { 
+        ...state, 
+        showMushroomLayer: action.payload 
       }
     default:
       return state

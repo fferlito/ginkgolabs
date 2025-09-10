@@ -1,0 +1,87 @@
+/* Mushroom toggle styles - GINKGOLABS Design System */
+.mushroom-toggle {
+  min-width: 200px;
+  height: var(--dashboard-control-size);
+  border-radius: var(--radius-lg);
+  background: var(--color-bg-glass);
+  border: 2px solid var(--color-border-light);
+  backdrop-filter: blur(10px);
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  gap: var(--spacing-md);
+  box-shadow: var(--shadow-md);
+  transition: var(--transition-base);
+  user-select: none;
+  padding: var(--spacing-sm) var(--spacing-lg);
+}
+
+.mushroom-toggle:hover {
+  background: var(--color-bg-glass);
+  border-color: var(--color-primary);
+  transform: scale(1.05);
+  box-shadow: var(--shadow-lg);
+}
+
+.mushroom-toggle.active {
+  background: var(--color-primary);
+  border-color: var(--color-primary);
+  backdrop-filter: blur(10px);
+  box-shadow: var(--shadow-accent);
+}
+
+.mushroom-toggle.active:hover {
+  background: var(--color-primary-dark);
+  border-color: var(--color-primary-dark);
+}
+
+.mushroom-icon {
+  width: 20px;
+  height: 20px;
+  transition: all 0.3s ease;
+  filter: drop-shadow(0 1px 2px rgba(0, 0, 0, 0.1));
+}
+
+.mushroom-toggle.active .mushroom-icon {
+  filter: brightness(0) invert(1) drop-shadow(0 1px 2px rgba(0, 0, 0, 0.2));
+}
+
+.mushroom-toggle:hover .mushroom-icon {
+  transform: scale(1.1);
+}
+
+.mushroom-icon-container {
+  width: 32px;
+  height: 32px;
+  background: var(--color-bg-tertiary);
+  border-radius: var(--radius-md);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+}
+
+.mushroom-text {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 2px;
+  flex: 1;
+}
+
+.mushroom-name {
+  color: var(--color-text-primary);
+  font-family: var(--font-family-navigation);
+  font-size: var(--font-size-base);
+  font-weight: var(--font-weight-semibold);
+  line-height: 1.2;
+}
+
+.mushroom-scientific {
+  color: var(--color-text-secondary);
+  font-family: var(--font-family-navigation);
+  font-size: var(--font-size-sm);
+  font-weight: var(--font-weight-regular);
+  font-style: italic;
+  line-height: 1.2;
+}

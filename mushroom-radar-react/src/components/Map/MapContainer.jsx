@@ -1,5 +1,5 @@
 import React, { useRef, useCallback, useEffect } from 'react'
-import Map, { Source, Layer, NavigationControl, GeolocateControl } from 'react-map-gl'
+import Map, { Source, Layer } from 'react-map-gl'
 import mapboxgl from 'mapbox-gl'
 import { useDashboard } from '../../context/DashboardContext'
 import MushroomPopup from './MushroomPopup'
@@ -119,21 +119,6 @@ const MapContainer = () => {
           </Source>
         )}
 
-        {/* Navigation Controls */}
-        <NavigationControl
-          position="bottom-right"
-          showCompass={true}
-          showZoom={true}
-          visualizePitch={true}
-        />
-
-        {/* Geolocate Control */}
-        <GeolocateControl
-          position="bottom-right"
-          positionOptions={{ enableHighAccuracy: true }}
-          trackUserLocation={true}
-          showAccuracyCircle={false}
-        />
 
         {/* Popup */}
         {popupInfo && (
