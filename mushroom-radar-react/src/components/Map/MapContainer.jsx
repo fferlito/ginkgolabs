@@ -46,6 +46,12 @@ const MapContainer = () => {
   const onClick = useCallback((event) => {
     const { features, lngLat } = event
     
+    // Only handle clicks if mushroom layer is visible
+    if (!state.showMushroomLayer || !state.layerVisible) {
+      setPopupInfo(null)
+      return
+    }
+    
     // Check if clicked on mushroom layer
     const mushroomFeature = features?.find(f => f.layer?.id === 'mushroom-fill')
     
@@ -60,7 +66,14 @@ const MapContainer = () => {
       // Close popup when clicking on areas without mushroom data
       setPopupInfo(null)
     }
-  }, [])
+  }, [state.showMushroomLayer, state.layerVisible])
+
+  // Close popup when mushroom layer is toggled off
+  useEffect(() => {
+    if (!state.showMushroomLayer || !state.layerVisible) {
+      setPopupInfo(null)
+    }
+  }, [state.showMushroomLayer, state.layerVisible])
 
   // Get current tile URL
   const currentTileUrl = getCurrentTileUrl(state.selectedDate)
@@ -104,7 +117,7 @@ const MapContainer = () => {
         antialias={true}
       >
         {/* Mushroom data source and layer */}
-        {state.layerVisible && currentTileUrl && (
+        {state.showMushroomLayer && state.layerVisible && currentTileUrl && (
           <Source
             id="mushroom-polygons"
             type="vector"

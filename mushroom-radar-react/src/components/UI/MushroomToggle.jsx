@@ -6,8 +6,10 @@ const MushroomToggle = () => {
   const { state, dispatch } = useDashboard()
 
   const handleClick = () => {
+    console.log('MushroomToggle clicked - current state:', state.showMushroomLayer)
     // Toggle mushroom layer visibility
     dispatch({ type: 'TOGGLE_MUSHROOM_LAYER' })
+    console.log('MushroomToggle dispatched TOGGLE_MUSHROOM_LAYER')
   }
 
   const isActive = state.showMushroomLayer !== false // Default to true

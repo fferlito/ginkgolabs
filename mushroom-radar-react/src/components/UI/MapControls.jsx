@@ -6,9 +6,11 @@ const MapControls = () => {
   const { state } = useDashboard()
 
   const handleGeolocate = () => {
+    console.log('Geolocate button clicked - map instance:', !!state.map, 'geolocation available:', !!navigator.geolocation)
     if (state.map && navigator.geolocation) {
       navigator.geolocation.getCurrentPosition(
         (position) => {
+          console.log('Geolocation successful:', position.coords)
           const { longitude, latitude } = position.coords
           state.map.flyTo({
             center: [longitude, latitude],
@@ -25,16 +27,22 @@ const MapControls = () => {
           maximumAge: 60000
         }
       )
+    } else {
+      console.warn('Geolocation not available - map:', !!state.map, 'geolocation:', !!navigator.geolocation)
     }
   }
 
   const handleCompass = () => {
+    console.log('Compass button clicked - map instance:', !!state.map)
     if (state.map) {
+      console.log('Flying to north bearing')
       state.map.flyTo({
         bearing: 0,
         pitch: 45,
         essential: true
       })
+    } else {
+      console.warn('Compass clicked but no map instance available')
     }
   }
 

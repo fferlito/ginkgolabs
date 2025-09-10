@@ -6,7 +6,9 @@ const Legend = () => {
   const { state, dispatch } = useDashboard()
 
   const handleLayerToggle = () => {
+    console.log('Legend checkbox clicked - current layerVisible state:', state.layerVisible)
     dispatch({ type: 'TOGGLE_LAYER_VISIBILITY' })
+    console.log('Legend dispatched TOGGLE_LAYER_VISIBILITY')
   }
 
   return (
@@ -24,12 +26,15 @@ const Legend = () => {
             {/* Layer toggle label can be added here if needed */}
           </label>
         </div>
-        <span className="legend-label">Probability %</span>
-        <div className="legend-gradient">
-          <div className="legend-values-inline">
-            <span>0</span>
-            <span>50</span>
-            <span>100</span>
+        <div className="legend-content">
+          <div className="legend-label">PROBABILITY %</div>
+          <div className="legend-gradient-container">
+            <div className="legend-gradient"></div>
+            <div className="legend-values-inline">
+              <span>0</span>
+              <span>50</span>
+              <span>100</span>
+            </div>
           </div>
         </div>
       </div>
