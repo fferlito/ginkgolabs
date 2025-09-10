@@ -50,12 +50,14 @@ const MapContainer = () => {
     const mushroomFeature = features?.find(f => f.layer?.id === 'mushroom-fill')
     
     if (mushroomFeature?.properties?.species_prediction !== undefined) {
+      // Always create new popup info to ensure it updates
       setPopupInfo({
         longitude: lngLat.lng,
         latitude: lngLat.lat,
         prediction: mushroomFeature.properties.species_prediction
       })
     } else {
+      // Close popup when clicking on areas without mushroom data
       setPopupInfo(null)
     }
   }, [])
@@ -123,6 +125,7 @@ const MapContainer = () => {
         {/* Popup */}
         {popupInfo && (
           <MushroomPopup
+            key={`${popupInfo.longitude}-${popupInfo.latitude}`}
             longitude={popupInfo.longitude}
             latitude={popupInfo.latitude}
             prediction={popupInfo.prediction}

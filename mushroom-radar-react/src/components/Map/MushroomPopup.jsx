@@ -15,17 +15,15 @@ const MushroomPopup = ({ longitude, latitude, prediction, onClose }) => {
       closeOnClick={true}
       className="mushroom-popup"
     >
-      <div style={{ fontFamily: 'Arial, sans-serif' }}>
-        Probability: {(prediction * 100).toFixed(1)}%<br />
+      <div className="popup-content">
+        <div className="probability-text">
+          Probability: {(prediction * 100).toFixed(1)}%
+        </div>
         <a 
           href={googleMapsUrl} 
           target="_blank" 
           rel="noopener noreferrer"
-          style={{ 
-            color: '#007bff', 
-            textDecoration: 'none', 
-            fontSize: '0.9em' 
-          }}
+          className="maps-link"
         >
           (Open in Maps)
         </a>

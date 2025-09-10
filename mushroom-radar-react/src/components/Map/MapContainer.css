@@ -8,14 +8,41 @@
 
 /* Popup styles */
 .mushroom-popup .mapboxgl-popup-content {
-  background: white;
-  border-radius: 8px;
-  box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
-  padding: 12px;
-  font-family: Arial, sans-serif;
+  background: var(--color-bg-glass);
+  backdrop-filter: blur(10px);
+  border-radius: var(--radius-lg);
+  box-shadow: var(--shadow-lg);
+  padding: var(--spacing-lg);
+  border: 1px solid var(--color-border-light);
 }
 
 .mushroom-popup .mapboxgl-popup-close-button {
-  color: #333;
+  color: var(--color-text-dark);
   font-size: 16px;
+  font-weight: var(--font-weight-medium);
+}
+
+.popup-content {
+  font-family: var(--font-family-navigation);
+  color: var(--color-text-dark);
+}
+
+.probability-text {
+  font-size: var(--font-size-base);
+  font-weight: var(--font-weight-semibold);
+  color: var(--color-text-dark);
+  margin-bottom: var(--spacing-sm);
+}
+
+.maps-link {
+  color: var(--color-primary);
+  text-decoration: none;
+  font-size: var(--font-size-sm);
+  font-weight: var(--font-weight-medium);
+  transition: var(--transition-base);
+}
+
+.maps-link:hover {
+  color: var(--color-primary-dark);
+  text-decoration: underline;
 }
