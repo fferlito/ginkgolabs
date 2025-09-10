@@ -24,6 +24,12 @@
     pointer-events: none;
   }
   
+  @media screen and (max-width: 768px) {
+    .dashboard-controls-left {
+      top: 45px;
+    }
+  }
+  
   .dashboard-controls-left > * {
     pointer-events: auto;
   }
@@ -37,6 +43,12 @@
     flex-direction: column;
     gap: var(--spacing-md);
     pointer-events: none;
+  }
+  
+  @media screen and (max-width: 768px) {
+    .dashboard-controls-right {
+      top: 45px;
+    }
   }
   
   .dashboard-controls-right > * {
