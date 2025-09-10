@@ -21,7 +21,7 @@ const BasemapToggle = () => {
       title={`Switch to ${buttonText} view`}
     >
       <img 
-        src="/dashboard/assets/map_icon.png" 
+        src="./assets/map_icon.png" 
         alt="Map toggle" 
         className="map-icon"
       />

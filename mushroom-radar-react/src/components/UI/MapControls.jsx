@@ -47,7 +47,7 @@ const MapControls = () => {
         title="Find my location"
       >
         <img 
-          src="/assets/location.png" 
+          src="./assets/location.png" 
           alt="Find my location" 
           className="map-control-icon"
         />
@@ -60,7 +60,7 @@ const MapControls = () => {
         title="Point north"
       >
         <img 
-          src="/assets/compass.png" 
+          src="./assets/compass.png" 
           alt="Point north" 
           className="map-control-icon"
         />

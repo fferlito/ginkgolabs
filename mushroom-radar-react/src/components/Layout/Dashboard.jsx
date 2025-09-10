@@ -11,7 +11,7 @@ import './Dashboard.css'
 const Dashboard = () => {
   return (
     <div className="dashboard">
-      <Header />
+      <Header showNavigation={false} />
       <main className="dashboard-main">
         <MapContainer />
         <div className="dashboard-controls-left">

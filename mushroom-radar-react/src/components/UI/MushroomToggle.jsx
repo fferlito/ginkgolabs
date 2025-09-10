@@ -21,7 +21,7 @@ const MushroomToggle = () => {
     >
       <div className="mushroom-icon-container">
         <img 
-          src="/assets/mushroom.png" 
+          src="./assets/mushroom.png" 
           alt="Mushroom predictions" 
           className="mushroom-icon"
         />
