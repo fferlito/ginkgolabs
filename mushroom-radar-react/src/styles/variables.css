@@ -134,12 +134,12 @@
   --dashboard-control-size-mobile: 40px;
   
   /* Mushroom Prediction Colors */
-  --mushroom-probability-0: #9F0500;
-  --mushroom-probability-20: #ba5c00;
-  --mushroom-probability-40: #c77500;
-  --mushroom-probability-60: #cfa100;
-  --mushroom-probability-80: #a1d600;
-  --mushroom-probability-100: #68bc00;
+  --mushroom-probability-0: #5E0000;
+  --mushroom-probability-20: #ED8200;
+  --mushroom-probability-40: #FFE500;
+  --mushroom-probability-60: #FFE500;
+  --mushroom-probability-80: #00DE1A;
+  --mushroom-probability-100: #004D1B;
 }
 
 /* Reduced motion preferences */
