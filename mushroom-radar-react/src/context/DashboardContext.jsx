@@ -103,7 +103,7 @@ export const DashboardProvider = ({ children }) => {
   // Map styles configuration
   const mapStyles = {
     custom: 'mapbox://styles/ferlixxx/cm8xkvecy000o01s6fy1h60qi',
-    satellite: 'mapbox://styles/mapbox/satellite-v9'
+    satellite: 'mapbox://styles/mapbox/satellite-streets-v12'
   }
 
   // Get current tile URL based on selected date
