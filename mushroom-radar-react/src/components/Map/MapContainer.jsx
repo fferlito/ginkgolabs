@@ -116,9 +116,11 @@ const MapContainer = () => {
       'interpolate',
       ['linear'],
       ['get', 'species_prediction'],
-      0.0, '#FF0000', // Red
-      0.5, '#FFF200', // Yellow
-      1.0, '#1E9600'  // Green
+      0.0, '#5E0000', // Red
+      0.4, '#ED8200', // Red
+      0.6, '#FFE500', // Yellow
+      0.9, '#00DE1A',  // Green
+      1.0, '#004D1B'  // Green
     ],
     'fill-opacity': 0.6
   };
