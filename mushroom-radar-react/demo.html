@@ -23,31 +23,26 @@
     <script src="https://cdnjs.cloudflare.com/ajax/libs/moment.js/2.29.4/moment.min.js"></script>
 
     <style>
-        /* Basic styles for demo */
         * {
             margin: 0;
             padding: 0;
             box-sizing: border-box;
         }
-
         body {
             font-family: Arial, sans-serif;
             background: #161616;
             color: #b6b6b6;
             overflow: hidden;
         }
-
         .demo-dashboard {
             width: 100vw;
             height: 100vh;
             position: relative;
         }
-
         .demo-map {
             width: 100%;
             height: 100%;
         }
-
         .demo-controls {
             position: fixed;
             top: 20px;
@@ -58,7 +53,6 @@
             border-radius: 8px;
             box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
         }
-
         .demo-message {
             position: fixed;
             top: 50%;
@@ -71,7 +65,6 @@
             text-align: center;
             z-index: 2000;
         }
-
         .demo-button {
             background: #007bff;
             color: white;
@@ -81,7 +74,6 @@
             cursor: pointer;
             margin-top: 1rem;
         }
-
         .demo-button:hover {
             background: #0056b3;
         }
@@ -91,9 +83,8 @@
     <div id="root"></div>
 
     <script type="text/babel">
-        const { useState, useEffect, createContext, useContext, useReducer } = React;
+        const { useState, useEffect } = React;
 
-        // Simple demo component
         const DemoApp = () => {
             const [showDemo, setShowDemo] = useState(true);
 
@@ -102,12 +93,6 @@
                     <div className="demo-message">
                         <h2>Mushroom Radar Dashboard - React Version</h2>
                         <p>This is a demonstration of the React refactored dashboard.</p>
-                        <p>To run the full version, you need to:</p>
-                        <ol style={{textAlign: 'left', marginTop: '1rem'}}>
-                            <li>Install Node.js</li>
-                            <li>Run `npm install` in the project directory</li>
-                            <li>Run `npm run dev` to start the development server</li>
-                        </ol>
                         <button 
                             className="demo-button"
                             onClick={() => setShowDemo(false)}
@@ -122,29 +107,26 @@
         };
 
         const BasicMapDemo = () => {
-            const [map, setMap] = useState(null);
-
             useEffect(() => {
                 mapboxgl.accessToken = 'pk.eyJ1IjoiZmVybGl4eHgiLCJhIjoiY2xvbXFvcm8xMnBkMTJrbjA4bXF4NnBhdyJ9.Jzb2pKR5fsS2Nj3OikRLJg';
                 
                 const mapInstance = new mapboxgl.Map({
                     container: 'map-container',
                     style: 'mapbox://styles/ferlixxx/cm8xkvecy000o01s6fy1h60qi',
-                    center: [11.3285, 43.3188],
-                    zoom: 9,
+                    center: [11.34, 43.32],
+                    zoom: 8,
                     pitch: 45,
                     bearing: 0
                 });
 
                 mapInstance.on('load', () => {
-                    // Add 3D terrain
+                    // Terrain
                     mapInstance.addSource('mapbox-dem', {
                         'type': 'raster-dem',
                         'url': 'mapbox://mapbox.mapbox-terrain-dem-v1',
                         'tileSize': 512,
                         'maxzoom': 14
                     });
-
                     mapInstance.setTerrain({ 'source': 'mapbox-dem', 'exaggeration': 1.5 });
 
                     mapInstance.addLayer({
@@ -156,9 +138,41 @@
                             'sky-atmosphere-sun-intensity': 15
                         }
                     });
-                });
 
-                setMap(mapInstance);
+                    // Vector tile source from GCS
+                    mapInstance.addSource('mushroom-tiles', {
+                        'type': 'vector',
+                        'tiles': [
+                            'https://storage.googleapis.com/mushroom-radar-tiles/tiles/{z}/{x}/{y}.pbf?nocache=1'
+                        ],
+                        'minzoom': 0,
+                        'maxzoom': 14
+                    });
+
+                    // Fill polygons
+                    mapInstance.addLayer({
+                        'id': 'mushroom-fill',
+                        'type': 'fill',
+                        'source': 'mushroom-tiles',
+                        'source-layer': 'grid_tuscany_with_topography_predictions',
+                        'paint': {
+                            'fill-color': '#FF0000',
+                            'fill-opacity': 0.4
+                        }
+                    });
+
+                    // Optional polygon outlines
+                    mapInstance.addLayer({
+                        'id': 'mushroom-outline',
+                        'type': 'line',
+                        'source': 'mushroom-tiles',
+                        'source-layer': 'grid_tuscany_with_topography_predictions',
+                        'paint': {
+                            'line-color': '#000000',
+                            'line-width': 1
+                        }
+                    });
+                });
 
                 return () => mapInstance.remove();
             }, []);
@@ -168,14 +182,12 @@
                     <div id="map-container" className="demo-map"></div>
                     <div className="demo-controls">
                         <h3>React Dashboard Demo</h3>
-                        <p>Basic 3D map with terrain</p>
-                        <p>Full React components available in development mode</p>
+                        <p>3D terrain + polygon tiles</p>
                     </div>
                 </div>
             );
         };
 
-        // Render the app
         const root = ReactDOM.createRoot(document.getElementById('root'));
         root.render(<DemoApp />);
     </script>

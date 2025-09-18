@@ -11,9 +11,9 @@ const initialState = {
   layerVisible: true,
   showMushroomLayer: true,
   tileUrls: {
-    today: 'https://api.ellipsis-drive.com/v3/ogc/mvt/49821b18-5a0f-4b5f-871d-6442d1c72d86/{z}/{x}/{y}?timestampId=f1033c35-2589-4e84-b110-b0705d6ea1c0&token=epat_HEBbajYglphtALIrw0rKI9PA0w3Dyssp9oUDymLFksir8coa89tw921Glvb5ZFah',
-    tomorrow: 'https://api.ellipsis-drive.com/v3/ogc/mvt/49821b19-5a0f-4b5f-871d-6442d1c72d86/{z}/{x}/{y}?timestampId=4f1e918b-3df4-4e59-b2e9-52547222c3d5&token=epat_VZGivZ6q1DNcq6lZybdZD9tjOooNlWpmz4Dff0T59m8VOBXQcQWhLFBs31PjKFWV',
-    later: 'https://api.ellipsis-drive.com/v3/ogc/mvt/49821b20-5a0f-4b5f-871d-6442d1c72d86/{z}/{x}/{y}?timestampId=4f1e918b-3df4-4e59-b2e9-52547222c3d5&token=epat_VZGivZ6q1DNcq6lZybdZD9tjOooNlWpmz4Dff0T59m8VOBXQcQWhLFBs31PjKFWV'
+    today: 'https://storage.googleapis.com/mushroom-radar-tiles/tiles/{z}/{x}/{y}.pbf?nocache=1',
+    tomorrow: 'https://storage.googleapis.com/mushroom-radar-tiles/tiles/{z}/{x}/{y}.pbf?nocache=1',
+    later: 'https://storage.googleapis.com/mushroom-radar-tiles/tiles/{z}/{x}/{y}.pbf?nocache=1'
   },
   map: null,
   isMapLoaded: false,
@@ -98,6 +98,7 @@ export const DashboardProvider = ({ children }) => {
 
     loadTileUrls()
   }, [])
+
 
   // Map styles configuration
   const mapStyles = {

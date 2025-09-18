@@ -13,6 +13,38 @@ const MapContainer = () => {
   const { state, dispatch, mapStyles, getCurrentTileUrl } = useDashboard()
   const [popupInfo, setPopupInfo] = React.useState(null)
 
+  // Define a reusable function to enable 3D terrain
+  const enable3DTerrain = useCallback((map) => {
+    if (!map) return;
+    
+    try {
+      if (!map.getSource('mapbox-dem')) {
+        map.addSource('mapbox-dem', {
+          'type': 'raster-dem',
+          'url': 'mapbox://mapbox.mapbox-terrain-dem-v1',
+          'tileSize': 512,
+          'maxzoom': 14
+        });
+      }
+      
+      map.setTerrain({ 'source': 'mapbox-dem', 'exaggeration': 1.5 });
+      
+      if (!map.getLayer('sky')) {
+        map.addLayer({
+          'id': 'sky',
+          'type': 'sky',
+          'paint': {
+            'sky-type': 'atmosphere',
+            'sky-atmosphere-sun': [0.0, 0.0],
+            'sky-atmosphere-sun-intensity': 15
+          }
+        });
+      }
+    } catch (error) {
+      console.warn('Error enabling 3D terrain:', error);
+    }
+  }, []);
+
   const onMapLoad = useCallback((event) => {
     const map = event.target
     
@@ -20,53 +52,53 @@ const MapContainer = () => {
     dispatch({ type: 'SET_MAP', payload: map })
     dispatch({ type: 'SET_MAP_LOADED', payload: true })
 
-    // Add 3D terrain
-    map.addSource('mapbox-dem', {
-      'type': 'raster-dem',
-      'url': 'mapbox://mapbox.mapbox-terrain-dem-v1',
-      'tileSize': 512,
-      'maxzoom': 14
-    })
+    // Enable 3D terrain on initial load
+    enable3DTerrain(map);
+  }, [dispatch, enable3DTerrain])
 
-    // Add the DEM source as a terrain layer with exaggerated height
-    map.setTerrain({ 'source': 'mapbox-dem', 'exaggeration': 1.5 })
+  // Effect to re-apply 3D terrain whenever the map style changes
+  useEffect(() => {
+    // We get the map instance from the context state
+    const map = state.map;
+    if (!map) return;
 
-    // Add a sky layer for better 3D effect
-    map.addLayer({
-      'id': 'sky',
-      'type': 'sky',
-      'paint': {
-        'sky-type': 'atmosphere',
-        'sky-atmosphere-sun': [0.0, 0.0],
-        'sky-atmosphere-sun-intensity': 15
-      }
-    })
-  }, [dispatch])
+    // The 'style.load' event fires whenever the map's style changes
+    const onStyleLoad = () => {
+      enable3DTerrain(map);
+    };
+
+    map.on('style.load', onStyleLoad);
+
+    // Cleanup function to remove the event listener
+    return () => {
+      map.off('style.load', onStyleLoad);
+    };
+  }, [state.map, enable3DTerrain]);
 
   const onClick = useCallback((event) => {
-    const { features, lngLat } = event
-    
+    const { features, lngLat } = event;
+
     // Only handle clicks if mushroom layer is visible
     if (!state.showMushroomLayer || !state.layerVisible) {
-      setPopupInfo(null)
-      return
+      setPopupInfo(null);
+      return;
     }
-    
+
     // Check if clicked on mushroom layer
-    const mushroomFeature = features?.find(f => f.layer?.id === 'mushroom-fill')
-    
+    const mushroomFeature = features?.find(f => f.layer?.id === 'mushroom-fill');
+
     if (mushroomFeature?.properties?.species_prediction !== undefined) {
       // Always create new popup info to ensure it updates
       setPopupInfo({
         longitude: lngLat.lng,
         latitude: lngLat.lat,
         prediction: mushroomFeature.properties.species_prediction
-      })
+      });
     } else {
       // Close popup when clicking on areas without mushroom data
-      setPopupInfo(null)
+      setPopupInfo(null);
     }
-  }, [state.showMushroomLayer, state.layerVisible])
+  }, [state.showMushroomLayer, state.layerVisible]);
 
   // Close popup when mushroom layer is toggled off
   useEffect(() => {
@@ -81,20 +113,14 @@ const MapContainer = () => {
   // Layer paint configuration
   const mushroomLayerPaint = {
     'fill-color': [
-      'case',
-      ['has', 'species_prediction'],
-      ['interpolate', ['linear'], ['get', 'species_prediction'],
-        0.0, '#9F0500',
-        0.2, '#ba5c00',
-        0.4, '#c77500',
-        0.6, '#cfa100',
-        0.8, '#a1d600',
-        1.0, '#68bc00'
-      ],
-      '#c75b1c' // fallback if missing
+      'interpolate',
+      ['linear'],
+      ['get', 'species_prediction'],
+      0.0, '#9F0500', // Red
+      1.0, '#68bc00'  // Green
     ],
     'fill-opacity': 0.6
-  }
+  };
 
   return (
     <div className="map-container">
@@ -111,7 +137,7 @@ const MapContainer = () => {
         mapStyle={mapStyles[state.currentMapStyle]}
         onLoad={onMapLoad}
         onClick={onClick}
-        interactiveLayerIds={['mushroom-fill']}
+        interactiveLayerIds={['mushroom-fill', 'mushroom-outline']}
         attributionControl={false}
         logoPosition="bottom-right"
         antialias={true}
@@ -123,14 +149,25 @@ const MapContainer = () => {
             type="vector"
             tiles={[currentTileUrl]}
             minzoom={0}
-            maxzoom={22}
+            maxzoom={14}
           >
             <Layer
               id="mushroom-fill"
               type="fill"
-              source-layer="layer"
+              source-layer="grid_tuscany_with_topography_predictions"
               paint={mushroomLayerPaint}
             />
+            <Layer
+              id="mushroom-outline"
+              type="line"
+              source-layer="grid_tuscany_with_topography_predictions"
+              paint={{
+                'line-color': '#000',
+                'line-width': 1,
+                'line-opacity': 0.1
+              }}
+            />
+
           </Source>
         )}
 
