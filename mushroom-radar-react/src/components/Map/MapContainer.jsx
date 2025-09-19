@@ -132,7 +132,7 @@ const MapContainer = () => {
         initialViewState={{
           longitude: 11.3285,
           latitude: 43.3188,
-          zoom: 13,
+          zoom: 11,
           pitch: 45,
           bearing: 0
         }}
@@ -151,7 +151,7 @@ const MapContainer = () => {
             id="mushroom-polygons"
             type="vector"
             tiles={[currentTileUrl]}
-            minzoom={12}
+            minzoom={10}
             maxzoom={14}
           >
             <Layer
