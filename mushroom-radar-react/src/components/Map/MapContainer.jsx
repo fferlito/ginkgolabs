@@ -132,7 +132,7 @@ const MapContainer = () => {
         initialViewState={{
           longitude: 11.3285,
           latitude: 43.3188,
-          zoom: 9,
+          zoom: 13,
           pitch: 45,
           bearing: 0
         }}
@@ -143,7 +143,7 @@ const MapContainer = () => {
         interactiveLayerIds={['mushroom-fill', 'mushroom-outline']}
         attributionControl={false}
         logoPosition="bottom-right"
-        antialias={true}
+        antialias={false}
       >
         {/* Mushroom data source and layer */}
         {state.showMushroomLayer && state.layerVisible && currentTileUrl && (
@@ -151,7 +151,7 @@ const MapContainer = () => {
             id="mushroom-polygons"
             type="vector"
             tiles={[currentTileUrl]}
-            minzoom={0}
+            minzoom={12}
             maxzoom={14}
           >
             <Layer
