@@ -28,14 +28,6 @@ const MushroomPopup = ({ longitude, latitude, prediction, onClose }) => {
         >
           (Open in Maps)
         </a>
-        <button
-          onClick={(e) => {
-            e.stopPropagation();
-          }}
-          className="mushroom-button"
-        >
-          Boletus edulis
-        </button>
       </div>
     </Popup>
   );
