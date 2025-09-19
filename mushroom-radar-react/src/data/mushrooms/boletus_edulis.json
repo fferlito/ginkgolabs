@@ -1,0 +1,12 @@
+{
+    "name": "Porcini",
+    "scientificName": "Boletus edulis",
+    "icon": "./assets/mushroom.png",
+    "default": true,
+    "tileUrls": {
+      "today": "https://storage.googleapis.com/mushroom-radar-tiles/tiles/{z}/{x}/{y}.pbf?nocache=1",
+      "tomorrow": "https://storage.googleapis.com/mushroom-radar-tiles/tiles/{z}/{x}/{y}.pbf?nocache=1",
+      "later": "https://storage.googleapis.com/mushroom-radar-tiles/tiles/{z}/{x}/{y}.pbf?nocache=1"
+    }
+  }
+  

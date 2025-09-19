@@ -1,17 +1,17 @@
-import React, { useRef, useCallback, useEffect } from 'react'
-import Map, { Source, Layer } from 'react-map-gl'
-import mapboxgl from 'mapbox-gl'
-import { useDashboard } from '../../context/DashboardContext'
-import MushroomPopup from './MushroomPopup'
-import './MapContainer.css'
+import React, { useRef, useCallback, useEffect, useState } from 'react';
+import Map, { Source, Layer } from 'react-map-gl';
+import mapboxgl from 'mapbox-gl';
+import { useDashboard } from '../../context/DashboardContext';
+import MushroomPopup from './MushroomPopup';
+import './MapContainer.css';
 
 // Set Mapbox access token (from environment variable or fallback)
-mapboxgl.accessToken = import.meta.env.VITE_MAPBOX_TOKEN || 'pk.eyJ1IjoiZmVybGl4eHgiLCJhIjoiY2xvbXFvcm8xMnBkMTJrbjA4bXF4NnBhdyJ9.Jzb2pKR5fsS2Nj3OikRLJg'
+mapboxgl.accessToken = import.meta.env.VITE_MAPBOX_TOKEN || 'pk.eyJ1IjoiZmVybGl4eHgiLCJhIjoiY2xvbXFvcm8xMnBkMTJrbjA4bXF4NnBhdyJ9.Jzb2pKR5fsS2Nj3OikRLJg';
 
 const MapContainer = () => {
-  const mapRef = useRef()
-  const { state, dispatch, mapStyles, getCurrentTileUrl } = useDashboard()
-  const [popupInfo, setPopupInfo] = React.useState(null)
+  const mapRef = useRef();
+  const { state, dispatch, mapStyles, getCurrentTileUrl } = useDashboard();
+  const [popupInfo, setPopupInfo] = useState(null);
 
   // Define a reusable function to enable 3D terrain
   const enable3DTerrain = useCallback((map) => {

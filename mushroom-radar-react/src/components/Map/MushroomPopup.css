@@ -1,0 +1,52 @@
+.mushroom-popup .mapboxgl-popup-content {
+    background-color: #fff;
+    border-radius: 8px;
+    padding: 12px;
+    font-family: 'Arial', sans-serif;
+    color: #333;
+    font-size: 14px;
+    line-height: 1.5;
+    max-width: 250px;
+    box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+  }
+  
+  .mushroom-popup .mapboxgl-popup-close-button {
+    display: none;
+  }
+  
+  .popup-content {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+  }
+  
+  .probability-text {
+    font-weight: bold;
+    margin-bottom: 4px;
+    font-size: 16px;
+  }
+  
+  .maps-link {
+    color: #007bff;
+    text-decoration: none;
+    font-size: 12px;
+  }
+  
+  .maps-link:hover {
+    text-decoration: underline;
+  }
+  
+  .mushroom-button {
+    background-color: #4CAF50;
+    border: none;
+    color: white;
+    padding: 10px 20px;
+    text-align: center;
+    text-decoration: none;
+    display: inline-block;
+    font-size: 16px;
+    margin-top: 10px;
+    cursor: pointer;
+    border-radius: 4px;
+  }
+  

@@ -1,8 +1,9 @@
-import React, { createContext, useContext, useReducer, useEffect } from 'react'
-import moment from 'moment'
-import { initializeTileURLs } from '../services/ellipsisApi'
+import React, { createContext, useContext, useReducer, useEffect } from 'react';
+import moment from 'moment';
+import { initializeTileURLs } from '../services/ellipsisApi';
+import { loadMushroomData } from '../services/mushroomService';
 
-const DashboardContext = createContext()
+const DashboardContext = createContext();
 
 // Initial state
 const initialState = {
@@ -10,24 +11,48 @@ const initialState = {
   currentMapStyle: 'custom',
   layerVisible: true,
   showMushroomLayer: true,
+  showMushroomSelection: false,
+  mushrooms: [],
+  selectedMushroom: null,
   tileUrls: {
-    today: 'https://storage.googleapis.com/mushroom-radar-tiles/tiles/{z}/{x}/{y}.pbf?nocache=1',
-    tomorrow: 'https://storage.googleapis.com/mushroom-radar-tiles/tiles/{z}/{x}/{y}.pbf?nocache=1',
-    later: 'https://storage.googleapis.com/mushroom-radar-tiles/tiles/{z}/{x}/{y}.pbf?nocache=1'
+    today: '',
+    tomorrow: '',
+    later: '',
   },
   map: null,
   isMapLoaded: false,
-  isLoadingTileUrls: false
-}
+  isLoadingTileUrls: false,
+  isLoadingMushroomData: true,
+};
 
 // Reducer
 const dashboardReducer = (state, action) => {
   switch (action.type) {
+    case 'TOGGLE_MUSHROOM_SELECTION':
+      return {
+        ...state,
+        showMushroomSelection: !state.showMushroomSelection,
+      };
+    case 'SET_MUSHROOM_DATA':
+      return {
+        ...state,
+        mushrooms: action.payload.allMushrooms,
+        selectedMushroom: action.payload.defaultMushroom,
+        tileUrls: action.payload.defaultMushroom.tileUrls,
+        isLoadingMushroomData: false,
+      };
+    case 'SET_SELECTED_MUSHROOM':
+      return {
+        ...state,
+        selectedMushroom: action.payload,
+        tileUrls: action.payload.tileUrls,
+        showMushroomSelection: false, // Close the popup after selection
+      };
     case 'SET_SELECTED_DATE':
-      return { 
-        ...state, 
-        selectedDate: action.payload 
-      }
+      return {
+        ...state,
+        selectedDate: action.payload,
+      };
     case 'SET_MAP_STYLE':
       return { 
         ...state, 
@@ -64,9 +89,9 @@ const dashboardReducer = (state, action) => {
         isLoadingTileUrls: action.payload 
       }
     case 'TOGGLE_MUSHROOM_LAYER':
-      return { 
-        ...state, 
-        showMushroomLayer: !state.showMushroomLayer 
+      return {
+        ...state,
+        showMushroomLayer: !state.showMushroomLayer
       }
     case 'SET_MUSHROOM_LAYER':
       return { 
@@ -80,24 +105,22 @@ const dashboardReducer = (state, action) => {
 
 // Provider component
 export const DashboardProvider = ({ children }) => {
-  const [state, dispatch] = useReducer(dashboardReducer, initialState)
+  const [state, dispatch] = useReducer(dashboardReducer, initialState);
 
-  // Initialize tile URLs on mount
+  // Initialize mushroom data and tile URLs on mount
   useEffect(() => {
-    const loadTileUrls = async () => {
-      dispatch({ type: 'SET_LOADING_TILE_URLS', payload: true })
+    const loadData = async () => {
       try {
-        const updatedUrls = await initializeTileURLs()
-        dispatch({ type: 'UPDATE_TILE_URLS', payload: updatedUrls })
+        const { allMushrooms, defaultMushroom } = await loadMushroomData();
+        dispatch({ type: 'SET_MUSHROOM_DATA', payload: { allMushrooms, defaultMushroom } });
       } catch (error) {
-        console.warn('Failed to initialize tile URLs:', error)
-      } finally {
-        dispatch({ type: 'SET_LOADING_TILE_URLS', payload: false })
+        console.error('Failed to load mushroom data:', error);
+        // Handle error, maybe set a default state or show an error message
       }
-    }
+    };
 
-    loadTileUrls()
-  }, [])
+    loadData();
+  }, []);
 
 
   // Map styles configuration
