@@ -1,0 +1,12 @@
+{
+    "name": "Funghi allucinogeni",
+    "scientificName": "Psilocybe cubensis",
+    "icon": "./assets/Psilocybe.png",
+    "default": false,
+    "tileUrls": {
+      "today": "https://storage.googleapis.com/mushroom-radar-tiles/tiles/{z}/{x}/{y}.pbf?nocache=1",
+      "tomorrow": "https://storage.googleapis.com/mushroom-radar-tiles/tiles/{z}/{x}/{y}.pbf?nocache=1",
+      "later": "https://storage.googleapis.com/mushroom-radar-tiles/tiles/{z}/{x}/{y}.pbf?nocache=1"
+    }
+  }
+  
