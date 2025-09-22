@@ -5,11 +5,13 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>GINKGOLABS - AI That Sees What You Can't</title>
     <link rel="stylesheet" href="styles.css">
+    <link rel="stylesheet" href="css/prismatic-burst.css">
     <!-- Google Model Viewer -->
     <script type="module" src="https://unpkg.com/@google/model-viewer/dist/model-viewer.min.js"></script>
 
 </head>
 <body class="landing-page">
+    <div id="aurora-background"></div>
     <div class="container">
         <header class="header">
             <div class="logo">
@@ -66,50 +68,11 @@
                 </p>
             </div>
             
-            <!-- 3D Model Background -->
-            <div class="hero-3d-background">
-                <model-viewer 
-                    id="hero-3d-model"
-                    src="assets/ginkgo.glb" 
-                    alt="Ginkgo trees in autumn - Interactive 3D model showing AI environmental analysis"
-                    shadow-intensity="0"
-                    environment-image=""
-                    exposure="0.2"
-                    shadow-intensity="0"
-                    shadow-softness="0"
-                    camera-orbit="0deg 75deg 12m"
-                    min-camera-orbit="auto auto 8m"
-                    max-camera-orbit="auto auto 25m"
-                    disable-zoom
-                    disable-pan
-                    interaction-prompt="none"
-                    seamless
-                    style="width: 100%; height: 100%; position: absolute; top: 0; left: 0; z-index: 1; border: none; outline: none; background: transparent;"
-                    loading="eager">
-                </model-viewer>
-            </div>
-            
-            <!-- Decorative background elements -->
-            <div class="hero-background">
-                <div class="bg-element bg-1"></div>
-                <div class="bg-element bg-2"></div>
-                <div class="bg-element bg-3"></div>
-                <div class="bg-element bg-4"></div>
-                <div class="bg-element bg-5"></div>
-                <div class="bg-element bg-6"></div>
-            </div>
-        </main>
 
+        </main>
 
         <footer class="footer">
             <div class="footer-content">
-                <div class="footer-links">
-                    <span class="footer-section">Company</span>
-                    <a href="about.html" class="footer-link">About</a>
-                    <a href="contact.html" class="footer-link">Contact</a>
-                    <a href="blog.html" class="footer-link">Blog</a>
-                    <a href="careers.html" class="footer-link">Careers</a>
-                </div>
                 <div class="footer-copyright">
                     <p>© GINKGOLABS 2025</p>
                 </div>
@@ -117,117 +80,6 @@
         </footer>
     </div>
 
-    <script src="main.js"></script>
-    
-    <!-- 3D Model Mouse Movement Script -->
-    <script>
-        document.addEventListener('DOMContentLoaded', function() {
-            const modelViewer = document.getElementById('hero-3d-model');
-            const heroSection = document.querySelector('.hero-section');
-            const hero3DBackground = document.querySelector('.hero-3d-background');
-            
-            if (!modelViewer || !heroSection || !hero3DBackground) return;
-            
-            let mouseX = 0;
-            let mouseY = 0;
-            let targetX = 0;
-            let targetY = 0;
-            let autoRotation = 0;
-            
-            // Graceful fade-in when model loads
-            modelViewer.addEventListener('load', function() {
-                // Force transparent background on mobile
-                if (window.innerWidth <= 768) {
-                    modelViewer.style.background = 'transparent';
-                    modelViewer.style.setProperty('--poster-color', 'transparent');
-                }
-                
-                // Consistent delay for all devices
-                setTimeout(() => {
-                    hero3DBackground.classList.add('loaded');
-                }, 50);
-            });
-            
-            // Fallback: fade in after timeout even if load event doesn't fire
-            setTimeout(() => {
-                if (!hero3DBackground.classList.contains('loaded')) {
-                    hero3DBackground.classList.add('loaded');
-                }
-            }, 50);
-            
-            // Mouse movement tracking
-            heroSection.addEventListener('mousemove', function(e) {
-                const rect = heroSection.getBoundingClientRect();
-                mouseX = ((e.clientX - rect.left) / rect.width) * 2 - 1; // -1 to 1
-                mouseY = ((e.clientY - rect.top) / rect.height) * 2 - 1; // -1 to 1
-            });
-            
-            // Smooth animation function
-            function animateModel() {
-                // Auto-rotation (slightly faster)
-                autoRotation += 0.06; // 0.03 degrees per frame (at 60fps)
-                
-                // Smooth interpolation for mouse movement
-                targetX += (mouseX - targetX) * 0.05;
-                targetY += (mouseY - targetY) * 0.05;
-                
-                // Convert to camera orbit values
-                const mouseOrbitX = targetX * 15; // Max 15 degrees left/right from mouse
-                const mouseOrbitY = 75 + (targetY * -10); // 65-85 degrees vertical range from mouse
-                
-                // Combine auto-rotation with mouse movement
-                const finalOrbitX = autoRotation + mouseOrbitX;
-                const finalOrbitY = mouseOrbitY;
-                
-                // Apply the camera orbit
-                modelViewer.cameraOrbit = `${finalOrbitX}deg ${finalOrbitY}deg 12m`;
-                
-                requestAnimationFrame(animateModel);
-            }
-            
-            // Start animation
-            animateModel();
-            
-            // Reset to center when mouse leaves
-            heroSection.addEventListener('mouseleave', function() {
-                mouseX = 0;
-                mouseY = 0;
-            });
-        });
-        
-        // Mobile Menu Functionality
-        document.addEventListener('DOMContentLoaded', function() {
-            const mobileMenuBtn = document.getElementById('mobileMenuBtn');
-            const mobileNav = document.getElementById('mobileNav');
-            const body = document.body;
-            
-            if (mobileMenuBtn && mobileNav) {
-                mobileMenuBtn.addEventListener('click', function() {
-                    mobileMenuBtn.classList.toggle('active');
-                    mobileNav.classList.toggle('open');
-                    body.classList.toggle('mobile-menu-open');
-                });
-                
-                // Close menu when clicking on a link
-                const mobileNavLinks = mobileNav.querySelectorAll('.mobile-nav-link');
-                mobileNavLinks.forEach(link => {
-                    link.addEventListener('click', function() {
-                        mobileMenuBtn.classList.remove('active');
-                        mobileNav.classList.remove('open');
-                        body.classList.remove('mobile-menu-open');
-                    });
-                });
-                
-                // Close menu when clicking outside
-                document.addEventListener('click', function(e) {
-                    if (!mobileNav.contains(e.target) && !mobileMenuBtn.contains(e.target)) {
-                        mobileMenuBtn.classList.remove('active');
-                        mobileNav.classList.remove('open');
-                        body.classList.remove('mobile-menu-open');
-                    }
-                });
-            }
-        });
-    </script>
+    <script type="module" src="main.js"></script>
 </body>
 </html>
