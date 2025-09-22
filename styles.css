@@ -19,6 +19,12 @@ body {
     overflow-x: hidden;
 }
 
+#content-wrapper {
+    min-height: 100vh;
+    display: flex;
+    flex-direction: column;
+}
+
 /* Typography System - Cross Labs Font System */
 /* Logo - Open Sans, clean and readable */
 .logo-image,
@@ -84,6 +90,9 @@ p, span, div, .content, .description,
 
 /* Header */
 .header {
+  position: sticky;
+  top: 1rem;
+  z-index: 1000;
   display: flex;
   justify-content: space-between;
   align-items: center;
@@ -94,6 +103,7 @@ p, span, div, .content, .description,
   background: transparent;
   max-width: 90%;
   margin: 1rem auto;
+  transition: background 0.3s ease, backdrop-filter 0.3s ease;
 }
 
 .logo {
