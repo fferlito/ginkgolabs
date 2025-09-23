@@ -109,6 +109,7 @@ const MapContainer = () => {
 
   // Get current tile URL
   const currentTileUrl = getCurrentTileUrl(state.selectedDate)
+  console.log('Current tile URLs:', currentTileUrl);
 
   // Layer paint configuration
   const mushroomLayerPaint = {
@@ -146,31 +147,30 @@ const MapContainer = () => {
         antialias={false}
       >
         {/* Mushroom data source and layer */}
-        {state.showMushroomLayer && state.layerVisible && currentTileUrl && (
+        {state.showMushroomLayer && state.layerVisible && currentTileUrl && currentTileUrl.length > 0 && (
           <Source
             id="mushroom-polygons"
             type="vector"
-            tiles={[currentTileUrl]}
+            tiles={currentTileUrl}
             minzoom={10}
             maxzoom={14}
           >
             <Layer
               id="mushroom-fill"
               type="fill"
-              source-layer="grid_tuscany_with_topography_predictions"
+              source-layer="predictions"
               paint={mushroomLayerPaint}
             />
             <Layer
               id="mushroom-outline"
               type="line"
-              source-layer="grid_tuscany_with_topography_predictions"
+              source-layer="predictions"
               paint={{
                 'line-color': '#000',
                 'line-width': 1,
                 'line-opacity': 0.1
               }}
             />
-
           </Source>
         )}
 

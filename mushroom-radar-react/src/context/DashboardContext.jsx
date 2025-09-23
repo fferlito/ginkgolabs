@@ -15,9 +15,9 @@ const initialState = {
   mushrooms: [],
   selectedMushroom: null,
   tileUrls: {
-    today: '',
-    tomorrow: '',
-    later: '',
+    today: [],
+    tomorrow: [],
+    later: [],
   },
   map: null,
   isMapLoaded: false,
