@@ -85,7 +85,7 @@ const MapContainer = () => {
     }
 
     // Check if clicked on mushroom layer
-    const mushroomFeature = features?.find(f => f.layer?.id === 'mushroom-fill');
+    const mushroomFeature = features?.find(f => f.layer?.id.startsWith('mushroom-fill'));
 
     if (mushroomFeature?.properties?.species_prediction !== undefined) {
       // Always create new popup info to ensure it updates
@@ -126,6 +126,8 @@ const MapContainer = () => {
     'fill-opacity': 0.6
   };
 
+  const interactiveLayerIds = currentTileUrl ? currentTileUrl.map((_, idx) => `mushroom-fill-${idx}`) : [];
+
   return (
     <div className="map-container">
       <Map
@@ -141,37 +143,42 @@ const MapContainer = () => {
         mapStyle={mapStyles[state.currentMapStyle]}
         onLoad={onMapLoad}
         onClick={onClick}
-        interactiveLayerIds={['mushroom-fill', 'mushroom-outline']}
+        interactiveLayerIds={interactiveLayerIds}
         attributionControl={false}
         logoPosition="bottom-right"
         antialias={false}
       >
         {/* Mushroom data source and layer */}
         {state.showMushroomLayer && state.layerVisible && currentTileUrl && currentTileUrl.length > 0 && (
-          <Source
-            id="mushroom-polygons"
-            type="vector"
-            tiles={currentTileUrl}
-            minzoom={10}
-            maxzoom={14}
-          >
-            <Layer
-              id="mushroom-fill"
-              type="fill"
-              source-layer="predictions"
-              paint={mushroomLayerPaint}
-            />
-            <Layer
-              id="mushroom-outline"
-              type="line"
-              source-layer="predictions"
-              paint={{
-                'line-color': '#000',
-                'line-width': 1,
-                'line-opacity': 0.1
-              }}
-            />
-          </Source>
+          <>
+            {currentTileUrl.map((url, idx) => (
+              <Source
+                key={`mushroom-polygons-${idx}`}
+                id={`mushroom-polygons-${idx}`}
+                type="vector"
+                tiles={[url]}
+                minzoom={10}
+                maxzoom={14}
+              >
+                <Layer
+                  id={`mushroom-fill-${idx}`}
+                  type="fill"
+                  source-layer="predictions"
+                  paint={mushroomLayerPaint}
+                />
+                <Layer
+                  id={`mushroom-outline-${idx}`}
+                  type="line"
+                  source-layer="predictions"
+                  paint={{
+                    'line-color': '#000',
+                    'line-width': 1,
+                    'line-opacity': 0.1
+                  }}
+                />
+              </Source>
+            ))}
+          </>
         )}
 
 
