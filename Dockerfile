@@ -3,6 +3,10 @@ FROM node:20-alpine AS builder
 
 WORKDIR /app
 
+# Vite env vars (baked in at build time) – pass via docker build --build-arg
+ARG VITE_CLERK_PUBLISHABLE_KEY
+ENV VITE_CLERK_PUBLISHABLE_KEY=$VITE_CLERK_PUBLISHABLE_KEY
+
 # Install dependencies
 COPY package.json package-lock.json* pnpm-lock.yaml* ./
 RUN corepack enable pnpm 2>/dev/null || true && \
