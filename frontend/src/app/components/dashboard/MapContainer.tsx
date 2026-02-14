@@ -147,18 +147,18 @@ export function MapContainer() {
             <Layer
               id="mushroom-fill"
               type="fill"
-              sourceLayer="predictions"
               paint={mushroomLayerPaint}
+              {...{ "source-layer": "predictions" }}
             />
             <Layer
               id="mushroom-outline"
               type="line"
-              sourceLayer="predictions"
               paint={{
                 "line-color": "#000",
                 "line-width": 1,
                 "line-opacity": 0.1,
               }}
+              {...{ "source-layer": "predictions" }}
             />
           </Source>
         )}
