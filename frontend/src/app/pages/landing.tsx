@@ -1,15 +1,9 @@
 import { Button } from "../components/ui/button";
 import { Card } from "../components/ui/card";
-import { Cloud, Droplets, Mountain, TrendingUp, MapPin, Trees } from "lucide-react";
+import { Cloud, Droplets, Trees } from "lucide-react";
 import { Link } from "react-router";
 
 export function LandingPage() {
-  const probabilityData = [
-    { species: "Boletus edulis", probability: 89, region: "Black Forest" },
-    { species: "Cantharellus cibarius", probability: 76, region: "Vosges" },
-    { species: "Morchella esculenta", probability: 92, region: "Alps" },
-  ];
-
   return (
     <div className="min-h-screen">
       {/* Hero Section - Split Screen */}
@@ -74,38 +68,6 @@ export function LandingPage() {
             <div className="absolute top-4 left-1/2 -translate-x-1/2 px-6 py-3 rounded-full backdrop-blur-md bg-[#0A0E0C]/60 border border-[#2D5F3F]/40">
               <span className="text-sm text-[#F5F5F0]">Real-Time ML Analysis</span>
             </div>
-          </div>
-        </div>
-      </section>
-
-      {/* Live Probability Ticker */}
-      <section className="py-8 border-y border-[#2D5F3F]/30 bg-[#0F1812]">
-        <div className="container mx-auto px-6">
-          <div className="flex items-center gap-2 mb-4">
-            <TrendingUp className="w-5 h-5 text-[#4A7C5D]" />
-            <h3 className="text-sm uppercase tracking-wider text-[#4A7C5D]">Live Probability Feed</h3>
-          </div>
-          <div className="grid md:grid-cols-3 gap-6">
-            {probabilityData.map((item, idx) => (
-              <Card key={idx} className="p-6 bg-[#1B3022]/40 border-[#2D5F3F]/30 backdrop-blur-sm">
-                <div className="flex justify-between items-start mb-3">
-                  <div>
-                    <div className="text-sm text-[#9CA89F] mb-1">{item.species}</div>
-                    <div className="flex items-center gap-2 text-xs text-[#9CA89F]">
-                      <MapPin className="w-3 h-3" />
-                      {item.region}
-                    </div>
-                  </div>
-                  <div className="text-3xl text-[#D4AF37]">{item.probability}%</div>
-                </div>
-                <div className="h-2 bg-[#0A0E0C] rounded-full overflow-hidden">
-                  <div 
-                    className="h-full bg-gradient-to-r from-[#2D5F3F] to-[#4A7C5D]"
-                    style={{ width: `${item.probability}%` }}
-                  />
-                </div>
-              </Card>
-            ))}
           </div>
         </div>
       </section>
