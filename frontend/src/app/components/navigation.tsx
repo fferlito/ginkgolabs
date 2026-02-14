@@ -43,8 +43,8 @@ export function Navigation() {
             ))}
           </div>
 
-          {/* Go to app */}
-          <Link to="/app">
+          {/* Go to app (redirects to login if not signed in) */}
+          <Link to="/app/dashboard">
             <Button className="bg-[#2D5F3F] hover:bg-[#4A7C5D] text-[#F5F5F0]">
               Go to app
             </Button>

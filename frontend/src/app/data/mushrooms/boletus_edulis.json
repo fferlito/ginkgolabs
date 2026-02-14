@@ -1,0 +1,20 @@
+{
+  "name": "Porcini",
+  "scientificName": "Boletus edulis",
+  "icon": "",
+  "default": true,
+  "tileUrls": {
+    "today": [
+      "https://storage.googleapis.com/mushroom-radar-tiles/boletus_edilus/basque_country/today/{z}/{x}/{y}.pbf?nocache=1",
+      "https://storage.googleapis.com/mushroom-radar-tiles/boletus_edilus/tuscany/today/{z}/{x}/{y}.pbf?nocache=1"
+    ],
+    "tomorrow": [
+      "https://storage.googleapis.com/mushroom-radar-tiles/boletus_edilus/basque_country/today/{z}/{x}/{y}.pbf?nocache=1",
+      "https://storage.googleapis.com/mushroom-radar-tiles/boletus_edilus/tuscany/today/{z}/{x}/{y}.pbf?nocache=1"
+    ],
+    "later": [
+      "https://storage.googleapis.com/mushroom-radar-tiles/boletus_edilus/basque_country/today/{z}/{x}/{y}.pbf?nocache=1",
+      "https://storage.googleapis.com/mushroom-radar-tiles/boletus_edilus/tuscany/today/{z}/{x}/{y}.pbf?nocache=1"
+    ]
+  }
+}

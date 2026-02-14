@@ -6,6 +6,8 @@ WORKDIR /app
 # Vite env vars (baked in at build time) – pass via docker build --build-arg
 ARG VITE_CLERK_PUBLISHABLE_KEY
 ENV VITE_CLERK_PUBLISHABLE_KEY=$VITE_CLERK_PUBLISHABLE_KEY
+ARG VITE_MAPBOX_TOKEN
+ENV VITE_MAPBOX_TOKEN=$VITE_MAPBOX_TOKEN
 
 # Install dependencies
 COPY package.json package-lock.json* pnpm-lock.yaml* ./

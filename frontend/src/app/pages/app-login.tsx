@@ -8,17 +8,29 @@ const CLERK_APPEARANCE = {
     colorBackground: "#0A0E0C",
     colorText: "#F5F5F0",
     colorTextSecondary: "#9CA89F",
+    colorForeground: "#F5F5F0",
+    colorInputText: "#F5F5F0",
+    colorInputBackground: "#1B3022",
+    colorInput: "#1B3022",
+    colorNeutral: "#2D5F3F",
     borderRadius: "0.75rem",
   },
   elements: {
-    formButtonPrimary: "bg-[#2D5F3F] hover:bg-[#4A7C5D]",
-    card: "bg-[#0A0E0C] border border-[#2D5F3F]/30 shadow-xl",
-    headerTitle: "text-[#F5F5F0]",
-    headerSubtitle: "text-[#9CA89F]",
-    socialButtonsBlockButton: "border-[#2D5F3F] text-[#F5F5F0]",
-    formFieldLabel: "text-[#9CA89F]",
-    formFieldInput: "bg-[#1B3022] border-[#2D5F3F] text-[#F5F5F0]",
-    footerActionLink: "text-[#4A7C5D] hover:text-[#6B9B7A]",
+    card: "!bg-[#0A0E0C] border border-[#2D5F3F]/30 shadow-xl",
+    headerTitle: "!text-[#F5F5F0]",
+    headerSubtitle: "!text-[#9CA89F]",
+    socialButtonsBlockButton: "!border-[#2D5F3F] !text-[#F5F5F0]",
+    dividerLine: "!bg-[#2D5F3F]/50",
+    dividerText: "!text-[#9CA89F]",
+    formFieldLabel: "!text-[#9CA89F]",
+    formFieldInput: "!bg-[#1B3022] !border-[#2D5F3F] !text-[#F5F5F0] placeholder:!text-[#6B7B6E]",
+    formButtonPrimary: "!bg-[#2D5F3F] hover:!bg-[#4A7C5D] !text-[#F5F5F0]",
+    footerActionLink: "!text-[#4A7C5D] hover:!text-[#6B9B7A]",
+    footerActionText: "!text-[#9CA89F]",
+    identityPreviewEditButton: "!text-[#4A7C5D]",
+    formFieldInputShowPasswordButton: "!text-[#9CA89F]",
+    alert: "!text-[#F5F5F0]",
+    formResendCodeLink: "!text-[#4A7C5D]",
   },
 };
 
@@ -29,12 +41,43 @@ export function AppLoginPage() {
   return (
     <div className="min-h-screen flex bg-[#0A0E0C]">
       {/* Left: Clerk sign-in form */}
-      <div className="flex-1 flex items-center justify-center p-8 lg:p-12">
+      <div className="flex-1 flex items-center justify-center p-8 lg:p-12 clerk-signin-dark">
+        <style>{`
+          .clerk-signin-dark,
+          .clerk-signin-dark *,
+          .clerk-signin-dark [data-clerk-component],
+          .clerk-signin-dark [data-clerk-component] * {
+            color: #F5F5F0 !important;
+          }
+          .clerk-signin-dark [data-clerk-component] .cl-formFieldLabel,
+          .clerk-signin-dark [data-clerk-component] label {
+            color: #9CA89F !important;
+          }
+          .clerk-signin-dark [data-clerk-component] input::placeholder,
+          .clerk-signin-dark [data-clerk-component] .cl-input::placeholder {
+            color: #6B7B6E !important;
+          }
+          .clerk-signin-dark [data-clerk-component] a,
+          .clerk-signin-dark [data-clerk-component] [role="link"] {
+            color: #4A7C5D !important;
+          }
+          .clerk-signin-dark [data-clerk-component] .cl-footerActionText,
+          .clerk-signin-dark [data-clerk-component] .cl-formFieldHintText {
+            color: #9CA89F !important;
+          }
+          .clerk-signin-dark [data-clerk-component] .cl-headerSubtitle {
+            color: #9CA89F !important;
+          }
+          .clerk-signin-dark [data-clerk-component] small,
+          .clerk-signin-dark [data-clerk-component] .cl-formFieldSuccessText {
+            color: #9CA89F !important;
+          }
+        `}</style>
         <div className="w-full max-w-md">
           {hasClerkKey ? (
             <SignIn
               appearance={CLERK_APPEARANCE}
-              fallbackRedirectUrl="/"
+              fallbackRedirectUrl="/app/dashboard"
               signUpUrl="/app"
             />
           ) : (
