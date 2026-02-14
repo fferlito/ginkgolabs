@@ -111,10 +111,9 @@ export function MapContainer() {
     if (!state.showMushroomLayer || !state.layerVisible) setPopupInfo(null);
   }, [state.showMushroomLayer, state.layerVisible]);
 
-  const currentTileUrl = getCurrentTileUrl(state.selectedDate);
-  const interactiveLayerIds = currentTileUrl
-    ? currentTileUrl.map((_, idx) => `mushroom-fill-${idx}`)
-    : [];
+  const currentTileUrls = getCurrentTileUrl(state.selectedDate);
+  const hasTiles = currentTileUrls && currentTileUrls.length > 0;
+  const interactiveLayerIds = hasTiles ? ["mushroom-fill"] : [];
 
   return (
     <div className="absolute inset-0 w-full h-full">
@@ -136,36 +135,33 @@ export function MapContainer() {
         logoPosition="bottom-right"
         antialias={false}
       >
-        {state.showMushroomLayer &&
-          state.layerVisible &&
-          currentTileUrl.length > 0 &&
-          currentTileUrl.map((url, idx) => (
-            <Source
-              key={`mushroom-polygons-${idx}`}
-              id={`mushroom-polygons-${idx}`}
-              type="vector"
-              tiles={[url]}
-              minzoom={10}
-              maxzoom={14}
-            >
-              <Layer
-                id={`mushroom-fill-${idx}`}
-                type="fill"
-                source-layer="predictions"
-                paint={mushroomLayerPaint}
-              />
-              <Layer
-                id={`mushroom-outline-${idx}`}
-                type="line"
-                source-layer="predictions"
-                paint={{
-                  "line-color": "#000",
-                  "line-width": 1,
-                  "line-opacity": 0.1,
-                }}
-              />
-            </Source>
-          ))}
+        {/* Single vector source with all tile URLs, same as old app */}
+        {state.showMushroomLayer && state.layerVisible && hasTiles && (
+          <Source
+            id="mushroom-polygons"
+            type="vector"
+            tiles={currentTileUrls}
+            minzoom={10}
+            maxzoom={14}
+          >
+            <Layer
+              id="mushroom-fill"
+              type="fill"
+              sourceLayer="predictions"
+              paint={mushroomLayerPaint}
+            />
+            <Layer
+              id="mushroom-outline"
+              type="line"
+              sourceLayer="predictions"
+              paint={{
+                "line-color": "#000",
+                "line-width": 1,
+                "line-opacity": 0.1,
+              }}
+            />
+          </Source>
+        )}
         {popupInfo && (
           <MushroomPopup
             key={`${popupInfo.longitude}-${popupInfo.latitude}`}
