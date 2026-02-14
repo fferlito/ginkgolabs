@@ -1,0 +1,6 @@
+# Railway / Nixpacks config for Vite + React SPA
+# Build: vite build → dist/
+# Start: serve -s dist (SPA fallback, respects PORT)
+
+[phases.setup]
+nixPkgs = ["nodejs_20"]
