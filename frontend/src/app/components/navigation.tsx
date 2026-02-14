@@ -43,15 +43,12 @@ export function Navigation() {
             ))}
           </div>
 
-          {/* Auth Buttons */}
-          <div className="flex items-center gap-3">
-            <Button variant="ghost" className="text-[#9CA89F] hover:text-[#F5F5F0]">
-              Login
-            </Button>
+          {/* Go to app */}
+          <Link to="/app">
             <Button className="bg-[#2D5F3F] hover:bg-[#4A7C5D] text-[#F5F5F0]">
-              Register
+              Go to app
             </Button>
-          </div>
+          </Link>
         </div>
       </div>
     </nav>
