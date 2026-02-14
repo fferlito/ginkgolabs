@@ -113,63 +113,80 @@ export function MapContainer() {
 
   const currentTileUrls = getCurrentTileUrl(state.selectedDate);
   const hasTiles = currentTileUrls && currentTileUrls.length > 0;
-  const interactiveLayerIds = hasTiles ? ["mushroom-fill"] : [];
+  const interactiveLayerIds = hasTiles
+    ? currentTileUrls.map((_, idx) => `mushroom-fill-${idx}`)
+    : [];
 
-  // Add/remove mushroom source and layers imperatively so "source-layer" is passed correctly to Mapbox
+  // Match old implementation: one Source per tile URL, each with fill + outline layer (added imperatively for "source-layer")
   useEffect(() => {
     const map = state.map;
     if (!map || !state.isMapLoaded) return;
 
     const shouldShow =
       state.showMushroomLayer && state.layerVisible && hasTiles;
-    const tileUrls = currentTileUrls;
+    const tileUrls = currentTileUrls ?? [];
+
+    const removeLayersForIndices = (count: number) => {
+      for (let idx = 0; idx < count; idx++) {
+        try {
+          const outlineId = `mushroom-outline-${idx}`;
+          const fillId = `mushroom-fill-${idx}`;
+          const sourceId = `mushroom-polygons-${idx}`;
+          if (map.getLayer(outlineId)) map.removeLayer(outlineId);
+          if (map.getLayer(fillId)) map.removeLayer(fillId);
+          if (map.getSource(sourceId)) map.removeSource(sourceId);
+        } catch {
+          // already removed or style changed
+        }
+      }
+    };
 
     const addLayers = () => {
-      if (!shouldShow || !tileUrls?.length) return;
-      if (!map.getSource("mushroom-polygons")) {
-        map.addSource("mushroom-polygons", {
-          type: "vector",
-          tiles: tileUrls,
-          minzoom: 10,
-          maxzoom: 14,
-        });
-      }
-      if (!map.getLayer("mushroom-fill")) {
-        map.addLayer({
-          id: "mushroom-fill",
-          type: "fill",
-          source: "mushroom-polygons",
-          "source-layer": "predictions",
-          paint: mushroomLayerPaint,
-        });
-      }
-      if (!map.getLayer("mushroom-outline")) {
-        map.addLayer({
-          id: "mushroom-outline",
-          type: "line",
-          source: "mushroom-polygons",
-          "source-layer": "predictions",
-          paint: {
-            "line-color": "#000",
-            "line-width": 1,
-            "line-opacity": 0.1,
-          },
-        });
-      }
+      if (!shouldShow || tileUrls.length === 0) return;
+      // Remove any existing mushroom layers (e.g. after species or date change) up to current count
+      removeLayersForIndices(tileUrls.length);
+      tileUrls.forEach((url, idx) => {
+        const sourceId = `mushroom-polygons-${idx}`;
+        const fillId = `mushroom-fill-${idx}`;
+        const outlineId = `mushroom-outline-${idx}`;
+        if (!map.getSource(sourceId)) {
+          map.addSource(sourceId, {
+            type: "vector",
+            tiles: [url],
+            minzoom: 10,
+            maxzoom: 14,
+          });
+        }
+        if (!map.getLayer(fillId)) {
+          map.addLayer({
+            id: fillId,
+            type: "fill",
+            source: sourceId,
+            "source-layer": "predictions",
+            paint: mushroomLayerPaint,
+          });
+        }
+        if (!map.getLayer(outlineId)) {
+          map.addLayer({
+            id: outlineId,
+            type: "line",
+            source: sourceId,
+            "source-layer": "predictions",
+            paint: {
+              "line-color": "#000",
+              "line-width": 1,
+              "line-opacity": 0.1,
+            },
+          });
+        }
+      });
     };
 
-    const removeLayers = () => {
-      try {
-        if (map.getLayer("mushroom-outline")) map.removeLayer("mushroom-outline");
-        if (map.getLayer("mushroom-fill")) map.removeLayer("mushroom-fill");
-        if (map.getSource("mushroom-polygons")) map.removeSource("mushroom-polygons");
-      } catch {
-        // style may have changed and removed them
-      }
-    };
+    const MAX_SOURCES = 10;
+    const removeAllMushroomLayers = () => removeLayersForIndices(MAX_SOURCES);
 
     if (!shouldShow) {
-      removeLayers();
+      removeAllMushroomLayers();
       return;
     }
 
@@ -180,7 +197,7 @@ export function MapContainer() {
 
     return () => {
       map.off("style.load", addLayers);
-      removeLayers();
+      removeAllMushroomLayers();
     };
   }, [
     state.map,
