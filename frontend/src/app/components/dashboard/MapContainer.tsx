@@ -115,6 +115,74 @@ export function MapContainer() {
   const hasTiles = currentTileUrls && currentTileUrls.length > 0;
   const interactiveLayerIds = hasTiles ? ["mushroom-fill"] : [];
 
+  // Add/remove mushroom source and layers imperatively so "source-layer" is passed correctly to Mapbox
+  useEffect(() => {
+    const map = state.map;
+    if (!map || !state.isMapLoaded) return;
+
+    const shouldShow =
+      state.showMushroomLayer && state.layerVisible && hasTiles;
+
+    if (!shouldShow) {
+      if (map.getLayer("mushroom-outline")) map.removeLayer("mushroom-outline");
+      if (map.getLayer("mushroom-fill")) map.removeLayer("mushroom-fill");
+      if (map.getSource("mushroom-polygons")) map.removeSource("mushroom-polygons");
+      return;
+    }
+
+    const addLayers = () => {
+      if (!map.getSource("mushroom-polygons")) {
+        map.addSource("mushroom-polygons", {
+          type: "vector",
+          tiles: currentTileUrls,
+          minzoom: 10,
+          maxzoom: 14,
+        });
+      }
+      if (!map.getLayer("mushroom-fill")) {
+        map.addLayer({
+          id: "mushroom-fill",
+          type: "fill",
+          source: "mushroom-polygons",
+          "source-layer": "predictions",
+          paint: mushroomLayerPaint,
+        });
+      }
+      if (!map.getLayer("mushroom-outline")) {
+        map.addLayer({
+          id: "mushroom-outline",
+          type: "line",
+          source: "mushroom-polygons",
+          "source-layer": "predictions",
+          paint: {
+            "line-color": "#000",
+            "line-width": 1,
+            "line-opacity": 0.1,
+          },
+        });
+      }
+    };
+
+    if (map.isStyleLoaded()) {
+      addLayers();
+    } else {
+      map.once("style.load", addLayers);
+    }
+
+    return () => {
+      if (map.getLayer("mushroom-outline")) map.removeLayer("mushroom-outline");
+      if (map.getLayer("mushroom-fill")) map.removeLayer("mushroom-fill");
+      if (map.getSource("mushroom-polygons")) map.removeSource("mushroom-polygons");
+    };
+  }, [
+    state.map,
+    state.isMapLoaded,
+    state.showMushroomLayer,
+    state.layerVisible,
+    hasTiles,
+    currentTileUrls,
+  ]);
+
   return (
     <div className="absolute inset-0 w-full h-full">
       <Map
@@ -135,33 +203,6 @@ export function MapContainer() {
         logoPosition="bottom-right"
         antialias={false}
       >
-        {/* Single vector source with all tile URLs, same as old app */}
-        {state.showMushroomLayer && state.layerVisible && hasTiles && (
-          <Source
-            id="mushroom-polygons"
-            type="vector"
-            tiles={currentTileUrls}
-            minzoom={10}
-            maxzoom={14}
-          >
-            <Layer
-              id="mushroom-fill"
-              type="fill"
-              source-layer="predictions"
-              paint={mushroomLayerPaint}
-            />
-            <Layer
-              id="mushroom-outline"
-              type="line"
-              source-layer="predictions"
-              paint={{
-                "line-color": "#000",
-                "line-width": 1,
-                "line-opacity": 0.1,
-              }}
-            />
-          </Source>
-        )}
         {popupInfo && (
           <MushroomPopup
             key={`${popupInfo.longitude}-${popupInfo.latitude}`}
