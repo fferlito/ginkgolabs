@@ -4,6 +4,7 @@ import { Radar } from "lucide-react";
 
 export function Navigation() {
   const location = useLocation();
+  const isAppView = location.pathname.startsWith("/app");
 
   const navLinks = [
     { path: "/", label: "Home" },
@@ -26,29 +27,33 @@ export function Navigation() {
             </span>
           </Link>
 
-          {/* Navigation Links */}
-          <div className="hidden md:flex items-center gap-8">
-            {navLinks.map((link) => (
-              <Link
-                key={link.path}
-                to={link.path}
-                className={`text-sm transition-colors ${
-                  location.pathname === link.path
-                    ? "text-[#4A7C5D]"
-                    : "text-[#9CA89F] hover:text-[#F5F5F0]"
-                }`}
-              >
-                {link.label}
-              </Link>
-            ))}
-          </div>
+          {!isAppView && (
+            <>
+              {/* Navigation Links */}
+              <div className="hidden md:flex items-center gap-8">
+                {navLinks.map((link) => (
+                  <Link
+                    key={link.path}
+                    to={link.path}
+                    className={`text-sm transition-colors ${
+                      location.pathname === link.path
+                        ? "text-[#4A7C5D]"
+                        : "text-[#9CA89F] hover:text-[#F5F5F0]"
+                    }`}
+                  >
+                    {link.label}
+                  </Link>
+                ))}
+              </div>
 
-          {/* Go to app (redirects to login if not signed in) */}
-          <Link to="/app/dashboard">
-            <Button className="bg-[#2D5F3F] hover:bg-[#4A7C5D] text-[#F5F5F0]">
-              Go to app
-            </Button>
-          </Link>
+              {/* Go to app */}
+              <Link to="/app/dashboard">
+                <Button className="bg-[#2D5F3F] hover:bg-[#4A7C5D] text-[#F5F5F0]">
+                  Go to app
+                </Button>
+              </Link>
+            </>
+          )}
         </div>
       </div>
     </nav>
