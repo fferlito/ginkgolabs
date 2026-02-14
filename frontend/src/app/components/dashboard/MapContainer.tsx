@@ -143,43 +143,46 @@ export function MapContainer() {
 
     const addLayers = () => {
       if (!shouldShow || tileUrls.length === 0) return;
-      // Remove any existing mushroom layers (e.g. after species or date change) up to current count
-      removeLayersForIndices(tileUrls.length);
-      tileUrls.forEach((url, idx) => {
-        const sourceId = `mushroom-polygons-${idx}`;
-        const fillId = `mushroom-fill-${idx}`;
-        const outlineId = `mushroom-outline-${idx}`;
-        if (!map.getSource(sourceId)) {
-          map.addSource(sourceId, {
-            type: "vector",
-            tiles: [url],
-            minzoom: 10,
-            maxzoom: 14,
-          });
-        }
-        if (!map.getLayer(fillId)) {
-          map.addLayer({
-            id: fillId,
-            type: "fill",
-            source: sourceId,
-            "source-layer": "predictions",
-            paint: mushroomLayerPaint,
-          });
-        }
-        if (!map.getLayer(outlineId)) {
-          map.addLayer({
-            id: outlineId,
-            type: "line",
-            source: sourceId,
-            "source-layer": "predictions",
-            paint: {
-              "line-color": "#000",
-              "line-width": 1,
-              "line-opacity": 0.1,
-            },
-          });
-        }
-      });
+      try {
+        removeLayersForIndices(tileUrls.length);
+        tileUrls.forEach((url, idx) => {
+          const sourceId = `mushroom-polygons-${idx}`;
+          const fillId = `mushroom-fill-${idx}`;
+          const outlineId = `mushroom-outline-${idx}`;
+          if (!map.getSource(sourceId)) {
+            map.addSource(sourceId, {
+              type: "vector",
+              tiles: [url],
+              minzoom: 10,
+              maxzoom: 14,
+            });
+          }
+          if (!map.getLayer(fillId)) {
+            map.addLayer({
+              id: fillId,
+              type: "fill",
+              source: sourceId,
+              "source-layer": "predictions",
+              paint: mushroomLayerPaint,
+            });
+          }
+          if (!map.getLayer(outlineId)) {
+            map.addLayer({
+              id: outlineId,
+              type: "line",
+              source: sourceId,
+              "source-layer": "predictions",
+              paint: {
+                "line-color": "#000",
+                "line-width": 1,
+                "line-opacity": 0.1,
+              },
+            });
+          }
+        });
+      } catch (e) {
+        console.warn("MapContainer: addLayers failed", e);
+      }
     };
 
     const MAX_SOURCES = 10;
@@ -190,13 +193,31 @@ export function MapContainer() {
       return;
     }
 
+    // Re-add layers when style is ready or when user switches style
+    const onStyleLoad = () => {
+      if (shouldShow && tileUrls.length > 0) requestAnimationFrame(addLayers);
+    };
+    map.on("style.load", onStyleLoad);
+
+    // Run addLayers when style is already loaded (tile URLs arrived after map ready)
     if (map.isStyleLoaded()) {
-      addLayers();
+      requestAnimationFrame(() => requestAnimationFrame(addLayers));
     }
-    map.on("style.load", addLayers);
+
+    // Fallback: ensure layers are added even if we missed style.load (e.g. style loaded before we subscribed)
+    const fallbackId = window.setTimeout(() => {
+      if (tileUrls.length > 0) {
+        try {
+          if (map.isStyleLoaded()) addLayers();
+        } catch {
+          // no-op
+        }
+      }
+    }, 250);
 
     return () => {
-      map.off("style.load", addLayers);
+      window.clearTimeout(fallbackId);
+      map.off("style.load", onStyleLoad);
       removeAllMushroomLayers();
     };
   }, [
