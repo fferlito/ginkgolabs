@@ -1,5 +1,5 @@
 import { useRef, useCallback, useEffect, useState } from "react";
-import Map, { Source, Layer } from "react-map-gl";
+import Map from "react-map-gl";
 import mapboxgl from "mapbox-gl";
 import { useDashboard } from "../../context/dashboard-context";
 import { MushroomPopup } from "./MushroomPopup";
@@ -122,19 +122,14 @@ export function MapContainer() {
 
     const shouldShow =
       state.showMushroomLayer && state.layerVisible && hasTiles;
-
-    if (!shouldShow) {
-      if (map.getLayer("mushroom-outline")) map.removeLayer("mushroom-outline");
-      if (map.getLayer("mushroom-fill")) map.removeLayer("mushroom-fill");
-      if (map.getSource("mushroom-polygons")) map.removeSource("mushroom-polygons");
-      return;
-    }
+    const tileUrls = currentTileUrls;
 
     const addLayers = () => {
+      if (!shouldShow || !tileUrls?.length) return;
       if (!map.getSource("mushroom-polygons")) {
         map.addSource("mushroom-polygons", {
           type: "vector",
-          tiles: currentTileUrls,
+          tiles: tileUrls,
           minzoom: 10,
           maxzoom: 14,
         });
@@ -163,16 +158,29 @@ export function MapContainer() {
       }
     };
 
-    if (map.isStyleLoaded()) {
-      addLayers();
-    } else {
-      map.once("style.load", addLayers);
+    const removeLayers = () => {
+      try {
+        if (map.getLayer("mushroom-outline")) map.removeLayer("mushroom-outline");
+        if (map.getLayer("mushroom-fill")) map.removeLayer("mushroom-fill");
+        if (map.getSource("mushroom-polygons")) map.removeSource("mushroom-polygons");
+      } catch {
+        // style may have changed and removed them
+      }
+    };
+
+    if (!shouldShow) {
+      removeLayers();
+      return;
     }
 
+    if (map.isStyleLoaded()) {
+      addLayers();
+    }
+    map.on("style.load", addLayers);
+
     return () => {
-      if (map.getLayer("mushroom-outline")) map.removeLayer("mushroom-outline");
-      if (map.getLayer("mushroom-fill")) map.removeLayer("mushroom-fill");
-      if (map.getSource("mushroom-polygons")) map.removeSource("mushroom-polygons");
+      map.off("style.load", addLayers);
+      removeLayers();
     };
   }, [
     state.map,
@@ -180,7 +188,10 @@ export function MapContainer() {
     state.showMushroomLayer,
     state.layerVisible,
     hasTiles,
-    currentTileUrls,
+    state.selectedDate,
+    state.tileUrls.today,
+    state.tileUrls.tomorrow,
+    state.tileUrls.later,
   ]);
 
   return (
