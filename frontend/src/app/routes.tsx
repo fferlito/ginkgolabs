@@ -4,6 +4,7 @@ import { LandingPage } from "./pages/landing";
 import { SciencePage } from "./pages/science";
 import { PricingPage } from "./pages/pricing";
 import { ContactPage } from "./pages/contact";
+import { AppLoginPage } from "./pages/app-login";
 
 export const router = createBrowserRouter([
   {
@@ -16,4 +17,5 @@ export const router = createBrowserRouter([
       { path: "contact", Component: ContactPage },
     ],
   },
+  { path: "/app", Component: AppLoginPage },
 ]);
