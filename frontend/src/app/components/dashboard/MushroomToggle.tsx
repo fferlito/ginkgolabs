@@ -59,10 +59,17 @@ export function MushroomToggle({
         </span>
       </div>
       {showVisibilityToggle && (
-        <button
-          type="button"
+        <span
+          role="button"
+          tabIndex={0}
           onClick={handleVisibilityToggle}
-          className="ml-2 flex items-center justify-center border-l border-[#2D5F3F]/30 pl-2"
+          onKeyDown={(e) => {
+            if (e.key === "Enter" || e.key === " ") {
+              e.preventDefault();
+              handleVisibilityToggle(e as unknown as React.MouseEvent);
+            }
+          }}
+          className="ml-2 flex cursor-pointer items-center justify-center border-l border-[#2D5F3F]/30 pl-2"
           aria-label={isLayerVisible ? "Layer visible" : "Layer hidden"}
         >
           {isLayerVisible ? (
@@ -70,7 +77,7 @@ export function MushroomToggle({
           ) : (
             <EyeOff className="h-5 w-5 text-[#9CA89F]" />
           )}
-        </button>
+        </span>
       )}
     </button>
   );
