@@ -1,6 +1,7 @@
 import { Link, useLocation } from "react-router";
 import { Button } from "./ui/button";
 import { Radar } from "lucide-react";
+import { UserMenu } from "./UserMenu";
 
 export function Navigation() {
   const location = useLocation();
@@ -54,6 +55,7 @@ export function Navigation() {
               </Link>
             </>
           )}
+          {isAppView && <UserMenu />}
         </div>
       </div>
     </nav>

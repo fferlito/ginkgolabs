@@ -17,7 +17,7 @@ function DashboardContent() {
         <MapContainer />
       </div>
 
-      <div className="pointer-events-none absolute left-5 top-[95px] z-[1001] flex flex-col gap-3 md:top-[95px]">
+      <div className="pointer-events-none absolute right-5 top-4 z-[1001] flex flex-col items-end gap-3">
         <div className="pointer-events-auto">
           {isLoadingMushroomData ? (
             <div className="rounded-xl border border-[#2D5F3F]/30 bg-[#0A0E0C]/90 px-4 py-3 text-sm text-[#9CA89F]">
@@ -32,13 +32,8 @@ function DashboardContent() {
             />
           )}
         </div>
-      </div>
-
-      <div className="pointer-events-none absolute right-5 top-[95px] z-[1001] flex flex-col gap-2 md:top-[95px]">
-        <div className="pointer-events-auto">
+        <div className="pointer-events-auto flex scale-90 origin-top-right flex-col gap-2">
           <BasemapToggle />
-        </div>
-        <div className="pointer-events-auto">
           <MapControls />
         </div>
       </div>

@@ -47,7 +47,12 @@ export function MushroomToggle({
     >
       <div className="flex h-8 w-8 flex-shrink-0 items-center justify-center rounded-lg bg-[#1B3022]">
         {icon && !icon.startsWith(".") ? (
-          <img src={icon} alt="" className="h-5 w-5 object-contain" />
+          <img
+            src={icon}
+            alt=""
+            className="h-5 w-5 object-contain"
+            style={{ filter: "brightness(0) invert(1)" }}
+          />
         ) : (
           <Leaf className="h-5 w-5 text-[#4A7C5D]" />
         )}

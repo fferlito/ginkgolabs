@@ -7,14 +7,7 @@ export function TimelineLegend() {
       <div className="flex min-h-10 items-center border-b border-white/10 bg-black/60 px-4 py-2 backdrop-blur">
         <DateSelector />
       </div>
-      <div
-        className="flex items-center px-4 py-2"
-        style={{
-          background: `linear-gradient(to right, #5E0000, #ED8200, #FFE500, #FFE500, #00DE1A, #004D1B)`,
-        }}
-      >
-        <Legend />
-      </div>
+      <Legend />
     </div>
   );
 }

@@ -1,7 +1,7 @@
 {
   "name": "Porcini",
   "scientificName": "Boletus edulis",
-  "icon": "",
+  "icon": "/assets/mushroom.png",
   "default": true,
   "tileUrls": {
     "today": [

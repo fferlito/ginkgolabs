@@ -1,7 +1,7 @@
 {
   "name": "Galletto",
   "scientificName": "Cantharellus cibarius",
-  "icon": "",
+  "icon": "/assets/galletto.png",
   "default": false,
   "tileUrls": {
     "today": ["https://storage.googleapis.com/mushroom-radar-tiles/tiles/{z}/{x}/{y}.pbf?nocache=1"],
