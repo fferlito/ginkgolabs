@@ -28,26 +28,23 @@ export function MushroomPopup({
       closeOnClick
       className="mushroom-popup"
     >
-      <div className="flex flex-col items-center gap-1 p-2">
-        <span className="font-semibold text-[#0A0E0C]">
+      <div className="flex flex-col items-center gap-1 p-2 text-white">
+        <span className="font-semibold">
           Probability: {(prediction * 100).toFixed(1)}%
         </span>
         <a
           href={googleMapsUrl}
           target="_blank"
           rel="noopener noreferrer"
-          className="text-sm text-[#2D5F3F] hover:underline"
+          className="text-sm text-[#4A7C5D] hover:text-[#6B9A7C] hover:underline"
         >
           (Open in Maps)
         </a>
         {onShowStats && (
           <button
             type="button"
-            onClick={() => {
-              onShowStats();
-              onClose();
-            }}
-            className="text-sm text-[#2D5F3F] hover:underline mt-1"
+            onClick={() => onShowStats()}
+            className="text-sm text-[#4A7C5D] hover:text-[#6B9A7C] hover:underline mt-1"
           >
             Show stats
           </button>

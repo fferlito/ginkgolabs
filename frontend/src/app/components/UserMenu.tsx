@@ -5,17 +5,18 @@ import { useClerk, useUser } from "@clerk/clerk-react";
 
 const menuItems = [
   { id: "account", label: "Account" },
-  { id: "about", label: "About" },
+  { id: "mushroompedia", label: "Mushroompedia" },
   { id: "privacy", label: "Privacy Policy & Terms of Use" },
 ] as const;
 
 interface UserMenuUIProps {
   onLogout: () => void;
+  onItemClick?: (id: string) => void;
   userName?: string | null;
   userInitials?: string;
 }
 
-function UserMenuUI({ onLogout, userName, userInitials = "?" }: UserMenuUIProps) {
+function UserMenuUI({ onLogout, onItemClick, userName, userInitials = "?" }: UserMenuUIProps) {
   const [open, setOpen] = useState(false);
   const [position, setPosition] = useState({ top: 0, left: 0 });
   const menuRef = useRef<HTMLDivElement>(null);
@@ -47,11 +48,11 @@ function UserMenuUI({ onLogout, userName, userInitials = "?" }: UserMenuUIProps)
   }, [open]);
 
   const handleClick = (id: string) => {
+    setOpen(false);
     if (id === "logout") {
-      setOpen(false);
       onLogout();
     } else {
-      setOpen(false);
+      onItemClick?.(id);
     }
   };
 
@@ -133,17 +134,24 @@ const hasClerkKey = !!import.meta.env.VITE_CLERK_PUBLISHABLE_KEY;
 export function UserMenu() {
   const navigate = useNavigate();
 
+  const handleItemClick = (id: string) => {
+    if (id === "account") navigate("/app/account");
+    if (id === "mushroompedia") navigate("/app/mushroompedia");
+    if (id === "privacy") navigate("/app/privacy");
+  };
+
   if (hasClerkKey) {
-    return <UserMenuWithClerk />;
+    return <UserMenuWithClerk onItemClick={handleItemClick} />;
   }
   return (
     <UserMenuUI
       onLogout={() => navigate("/app", { replace: true })}
+      onItemClick={handleItemClick}
     />
   );
 }
 
-function UserMenuWithClerk() {
+function UserMenuWithClerk({ onItemClick }: { onItemClick?: (id: string) => void }) {
   const navigate = useNavigate();
   const { signOut } = useClerk();
   const { user } = useUser();
@@ -160,6 +168,7 @@ function UserMenuWithClerk() {
   return (
     <UserMenuUI
       onLogout={handleLogout}
+      onItemClick={onItemClick}
       userName={userName}
       userInitials={initials}
     />

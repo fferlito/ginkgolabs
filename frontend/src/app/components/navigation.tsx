@@ -9,7 +9,7 @@ export function Navigation() {
 
   const navLinks = [
     { path: "/", label: "Home" },
-    { path: "/science", label: "Science" },
+    { path: "/science", label: "How it works" },
     { path: "/pricing", label: "Pricing" },
     { path: "/contact", label: "Contact" },
   ];

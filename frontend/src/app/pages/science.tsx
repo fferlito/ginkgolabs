@@ -59,8 +59,7 @@ export function SciencePage() {
       {/* Header */}
       <section className="container mx-auto px-6 mb-16">
         <div className="max-w-4xl mx-auto text-center space-y-4">
-          <Badge className="bg-[#2D5F3F] text-[#F5F5F0] mb-4">How It Works</Badge>
-          <h1 className="text-5xl text-[#F5F5F0]">The Science Behind MushroomRadar</h1>
+          <h1 className="text-5xl text-[#F5F5F0]">How It Works</h1>
           <p className="text-xl text-[#9CA89F]">
             We combine real-time weather data, forest intelligence, and machine learning 
             to predict exactly when and where mushrooms will appear

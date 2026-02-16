@@ -50,3 +50,23 @@ html {
 ::-webkit-scrollbar-thumb:hover {
   background: #4A7C5D;
 }
+
+/* Mushroom map popup: black semi-transparent, white text, green links */
+.mapboxgl-popup.mushroom-popup .mapboxgl-popup-content,
+.mapboxgl-popup-content.mushroom-popup {
+  background: rgba(0, 0, 0, 0.75);
+  color: #fff;
+  border: none;
+  padding: 0;
+  border-radius: 8px;
+  box-shadow: 0 2px 10px rgba(0, 0, 0, 0.4);
+}
+.mapboxgl-popup.mushroom-popup .mapboxgl-popup-tip {
+  border-top-color: rgba(0, 0, 0, 0.75);
+}
+.mapboxgl-popup.mushroom-popup.mapboxgl-popup-anchor-top .mapboxgl-popup-tip,
+.mapboxgl-popup.mushroom-popup.mapboxgl-popup-anchor-top-left .mapboxgl-popup-tip,
+.mapboxgl-popup.mushroom-popup.mapboxgl-popup-anchor-top-right .mapboxgl-popup-tip {
+  border-top-color: transparent;
+  border-bottom-color: rgba(0, 0, 0, 0.75);
+}
