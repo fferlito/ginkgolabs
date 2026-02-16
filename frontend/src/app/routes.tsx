@@ -41,16 +41,7 @@ export const router = createBrowserRouter([
   {
     path: "/app/privacy",
     Component: AppLayout,
-    children: [
-      {
-        index: true,
-        element: (
-          <RequireAuth>
-            <PrivacyTermsPage />
-          </RequireAuth>
-        ),
-      },
-    ],
+    children: [{ index: true, Component: PrivacyTermsPage }],
   },
   {
     path: "/app/account",

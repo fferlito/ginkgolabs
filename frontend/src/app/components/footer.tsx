@@ -21,12 +21,9 @@ export function Footer() {
               <Mail className="w-4 h-4" />
               Contact
             </Link>
-            <a href="#" className="text-sm text-[#9CA89F] hover:text-[#4A7C5D] transition-colors">
-              Privacy Policy
-            </a>
-            <a href="#" className="text-sm text-[#9CA89F] hover:text-[#4A7C5D] transition-colors">
-              Terms of Service
-            </a>
+            <Link to="/app/privacy" className="text-sm text-[#9CA89F] hover:text-[#4A7C5D] transition-colors">
+              Privacy & Terms
+            </Link>
           </div>
 
           {/* Social Links */}
