@@ -1,3 +1,4 @@
+import { useState } from "react";
 import "mapbox-gl/dist/mapbox-gl.css";
 import { DashboardProvider, useDashboard } from "../context/dashboard-context";
 import { MapContainer } from "../components/dashboard/MapContainer";
@@ -6,15 +7,27 @@ import { BasemapToggle } from "../components/dashboard/BasemapToggle";
 import { MapControls } from "../components/dashboard/MapControls";
 import { TimelineLegend } from "../components/dashboard/TimelineLegend";
 import { MushroomSelectionPopup } from "../components/dashboard/MushroomSelectionPopup";
+import { StatsPanel } from "../components/dashboard/StatsPanel";
 
 function DashboardContent() {
   const { state, dispatch } = useDashboard();
   const { selectedMushroom, isLoadingMushroomData } = state;
+  const [statsPanelOpen, setStatsPanelOpen] = useState(false);
+  const [selectedPoint, setSelectedPoint] = useState<{
+    lat: number;
+    lng: number;
+    prediction: number;
+  } | null>(null);
+
+  const handleShowStats = (lat: number, lng: number, prediction: number) => {
+    setSelectedPoint({ lat, lng, prediction });
+    setStatsPanelOpen(true);
+  };
 
   return (
     <>
       <div className="absolute inset-0 pt-0">
-        <MapContainer />
+        <MapContainer onShowStats={handleShowStats} />
       </div>
 
       <div className="pointer-events-none absolute right-5 top-4 z-[1001] flex flex-col items-end gap-3">
@@ -45,6 +58,12 @@ function DashboardContent() {
           onClose={() => dispatch({ type: "TOGGLE_MUSHROOM_SELECTION" })}
         />
       )}
+
+      <StatsPanel
+        open={statsPanelOpen}
+        onClose={() => setStatsPanelOpen(false)}
+        point={selectedPoint}
+      />
     </>
   );
 }

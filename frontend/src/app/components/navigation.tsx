@@ -16,14 +16,14 @@ export function Navigation() {
 
   return (
     <nav className="fixed top-0 left-0 right-0 z-50 border-b border-border/50 backdrop-blur-lg bg-background/80">
-      <div className="container mx-auto px-6 py-4">
-        <div className="flex items-center justify-between">
+      <div className="container mx-auto px-4 sm:px-6 py-3 md:py-4">
+        <div className="flex items-center justify-between gap-2">
           {/* Logo */}
-          <Link to="/" className="flex items-center gap-2">
-            <div className="p-2 rounded-lg bg-[#2D5F3F]">
-              <Radar className="w-6 h-6 text-[#F5F5F0]" />
+          <Link to="/" className="flex items-center gap-1.5 sm:gap-2 min-w-0">
+            <div className="p-1.5 sm:p-2 rounded-lg bg-[#2D5F3F] flex-shrink-0">
+              <Radar className="w-5 h-5 sm:w-6 sm:h-6 text-[#F5F5F0]" />
             </div>
-            <span className="text-xl tracking-tight text-[#F5F5F0]">
+            <span className="text-lg sm:text-xl tracking-tight text-[#F5F5F0] truncate">
               Mushroom<span className="text-[#4A7C5D]">Radar</span>
             </span>
           </Link>
@@ -48,8 +48,8 @@ export function Navigation() {
               </div>
 
               {/* Go to app */}
-              <Link to="/app/dashboard">
-                <Button className="bg-[#2D5F3F] hover:bg-[#4A7C5D] text-[#F5F5F0]">
+              <Link to="/app/dashboard" className="flex-shrink-0">
+                <Button className="bg-[#2D5F3F] hover:bg-[#4A7C5D] text-[#F5F5F0] text-sm sm:text-base px-3 sm:px-4">
                   Go to app
                 </Button>
               </Link>

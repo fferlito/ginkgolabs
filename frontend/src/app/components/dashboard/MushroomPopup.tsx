@@ -5,6 +5,7 @@ interface MushroomPopupProps {
   latitude: number;
   prediction: number;
   onClose: () => void;
+  onShowStats?: () => void;
 }
 
 export function MushroomPopup({
@@ -12,6 +13,7 @@ export function MushroomPopup({
   latitude,
   prediction,
   onClose,
+  onShowStats,
 }: MushroomPopupProps) {
   const lat = latitude.toFixed(6);
   const lng = longitude.toFixed(6);
@@ -38,6 +40,18 @@ export function MushroomPopup({
         >
           (Open in Maps)
         </a>
+        {onShowStats && (
+          <button
+            type="button"
+            onClick={() => {
+              onShowStats();
+              onClose();
+            }}
+            className="text-sm text-[#2D5F3F] hover:underline mt-1"
+          >
+            Show stats
+          </button>
+        )}
       </div>
     </Popup>
   );

@@ -28,7 +28,11 @@ const mushroomLayerPaint: mapboxgl.FillPaint = {
   "fill-opacity": 0.6,
 };
 
-export function MapContainer() {
+interface MapContainerProps {
+  onShowStats?: (lat: number, lng: number, prediction: number) => void;
+}
+
+export function MapContainer({ onShowStats }: MapContainerProps = {}) {
   const mapRef = useRef<mapboxgl.Map | null>(null);
   const { state, dispatch, mapStyles, getCurrentTileUrl } = useDashboard();
   const [popupInfo, setPopupInfo] = useState<{
@@ -259,6 +263,16 @@ export function MapContainer() {
             latitude={popupInfo.latitude}
             prediction={popupInfo.prediction}
             onClose={() => setPopupInfo(null)}
+            onShowStats={
+              onShowStats
+                ? () =>
+                    onShowStats(
+                      popupInfo.latitude,
+                      popupInfo.longitude,
+                      popupInfo.prediction
+                    )
+                : undefined
+            }
           />
         )}
       </Map>
