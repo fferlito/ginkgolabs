@@ -8,23 +8,26 @@ export function PricingPage() {
   const pricingTiers = [
     {
       name: "Basic",
-      price: "€30",
+      price: "$2.99",
       period: "/month",
+      trial: "1 week free trial",
       description: "Perfect for casual foragers",
       features: [
         "1 Region access",
         "3-day forecast",
         "Popular species only",
         "Basic probability maps",
+        "Mushroompedia",
         "Mobile app access",
       ],
-      cta: "Start Basic",
+      cta: "Start free trial",
       highlighted: false,
     },
     {
-      name: "Pro",
-      price: "€59",
+      name: "Premium",
+      price: "$5.99",
       period: "/month",
+      trial: "1 week free trial",
       description: "For serious mycologists",
       features: [
         "Full Nation coverage",
@@ -32,9 +35,10 @@ export function PricingPage() {
         "All species database",
         "Advanced environmental data",
         "Email support",
+        "Mushroompedia",
         "Mobile app access",
       ],
-      cta: "Start Pro Trial",
+      cta: "Start free trial",
       highlighted: true,
       badge: "Most Popular",
     },
@@ -42,6 +46,7 @@ export function PricingPage() {
       name: "Enterprise",
       price: "Custom",
       period: "",
+      trial: "",
       description: "Tailored solutions for organizations",
       features: [
         "Global coverage",
@@ -50,6 +55,7 @@ export function PricingPage() {
         "Dedicated support",
         "Team collaboration",
         "Custom ML models",
+        "Mushroompedia",
         "Mobile app access",
       ],
       cta: "Contact Sales",
@@ -64,7 +70,7 @@ export function PricingPage() {
         <div className="max-w-3xl mx-auto text-center space-y-4">
           <h1 className="text-5xl text-[#F5F5F0]">Choose Your Plan</h1>
           <p className="text-xl text-[#9CA89F]">
-            Start with a 14-day free trial. No credit card required.
+            Start with a 1-week free trial. No credit card required.
           </p>
         </div>
       </section>
@@ -100,6 +106,9 @@ export function PricingPage() {
                   <span className="text-5xl text-[#F5F5F0]">{tier.price}</span>
                   <span className="text-[#9CA89F]">{tier.period}</span>
                 </div>
+                {tier.trial && (
+                  <p className="text-sm text-[#4A7C5D] mt-2">{tier.trial}</p>
+                )}
               </div>
 
               <div className="space-y-4 mb-8">
@@ -171,7 +180,7 @@ export function PricingPage() {
               },
               {
                 q: "Is there a free trial?",
-                a: "Yes! All paid plans come with a 14-day free trial. No credit card required to start.",
+                a: "Yes! All paid plans come with a 1-week free trial. No credit card required to start.",
               },
               {
                 q: "How accurate are the predictions?",
