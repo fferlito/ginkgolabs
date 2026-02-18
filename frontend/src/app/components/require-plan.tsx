@@ -9,7 +9,7 @@ const hasClerkKey = !!(import.meta as unknown as { env?: { VITE_CLERK_PUBLISHABL
 
 /**
  * When Clerk Billing is enabled, only users with a paid plan (Basic or premium) can see the children.
- * Free users see a fallback with a link to the pricing page.
+ * Users without a paid plan see a fallback with a link to the pricing page.
  * When Clerk is not configured, children are always shown.
  */
 export function RequirePlan({ children }: RequirePlanProps) {

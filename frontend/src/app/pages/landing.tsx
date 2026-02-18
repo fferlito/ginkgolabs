@@ -101,7 +101,7 @@ export function LandingPage() {
             <div className="flex flex-col sm:flex-row gap-2 sm:gap-4 justify-center pt-1 md:pt-4">
               <Link to="/pricing" className="w-full sm:w-auto">
                 <Button size="lg" className="w-full sm:w-auto bg-[#2D5F3F] hover:bg-[#4A7C5D] text-[#F5F5F0] text-base md:text-lg px-6 md:px-8">
-                  Start Free Trial
+                  Start Trial
                 </Button>
               </Link>
               <Link to="/science" className="w-full sm:w-auto">

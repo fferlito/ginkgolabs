@@ -4,9 +4,6 @@ import { Button } from "../components/ui/button";
 import { Badge } from "../components/ui/badge";
 import { Check, Star } from "lucide-react";
 import { Link } from "react-router";
-import { PricingTable } from "@clerk/clerk-react";
-
-const hasClerkBilling = !!(import.meta as unknown as { env?: { VITE_CLERK_PUBLISHABLE_KEY?: string } }).env?.VITE_CLERK_PUBLISHABLE_KEY;
 
 export function PricingPage() {
   const [yearly, setYearly] = useState(false);
@@ -17,7 +14,7 @@ export function PricingPage() {
       priceMonthly: 2.99,
       price: "€2.99",
       period: "/month",
-      trial: "1 week free trial",
+      trial: "1 week trial",
       description: "Perfect for casual foragers",
       features: [
         "1 Region access",
@@ -27,7 +24,7 @@ export function PricingPage() {
         "Mushroompedia",
         "Mobile app access",
       ],
-      cta: "Start free trial",
+      cta: "Start trial",
       highlighted: false,
     },
     {
@@ -35,7 +32,7 @@ export function PricingPage() {
       priceMonthly: 5.99,
       price: "€5.99",
       period: "/month",
-      trial: "1 week free trial",
+      trial: "1 week trial",
       description: "For serious mycologists",
       features: [
         "Full Nation coverage",
@@ -46,7 +43,7 @@ export function PricingPage() {
         "Mushroompedia",
         "Mobile app access",
       ],
-      cta: "Start free trial",
+      cta: "Start trial",
       highlighted: true,
       badge: "Most Popular",
     },
@@ -79,59 +76,30 @@ export function PricingPage() {
         <div className="max-w-3xl mx-auto text-center space-y-4">
           <h1 className="text-5xl text-[#F5F5F0]">Choose Your Plan</h1>
           <p className="text-xl text-[#9CA89F]">
-            Start with a 1-week free trial. No credit card required.
+            Start with a 1-week trial. No credit card required.
           </p>
-          {!hasClerkBilling && (
-            <div className="flex items-center justify-center gap-3 pt-2">
-              <span className={`text-sm font-medium ${!yearly ? "text-[#F5F5F0]" : "text-[#9CA89F]"}`}>Monthly</span>
-              <button
-                type="button"
-                role="switch"
-                aria-checked={yearly}
-                onClick={() => setYearly((y) => !y)}
-                className={`relative inline-flex h-6 w-11 shrink-0 rounded-full border border-[#2D5F3F] transition-colors focus:outline-none focus:ring-2 focus:ring-[#4A7C5D] focus:ring-offset-2 focus:ring-offset-[#0A0E0C] ${yearly ? "bg-[#4A7C5D]" : "bg-[#1B3022]"}`}
-              >
-                <span
-                  className={`pointer-events-none inline-block h-5 w-5 rounded-full bg-[#F5F5F0] shadow ring-0 transition translate-x-0.5 ${yearly ? "translate-x-5" : "translate-x-0.5"}`}
-                />
-              </button>
-              <span className={`flex flex-col items-start ${yearly ? "text-[#F5F5F0]" : "text-[#9CA89F]"}`}>
-                <span className="text-sm font-medium">Yearly</span>
-                <span className="text-xs text-[#4A7C5D]">(Save 10%)</span>
-              </span>
-            </div>
-          )}
+          <div className="flex items-center justify-center gap-3 pt-2">
+            <span className={`text-sm font-medium ${!yearly ? "text-[#F5F5F0]" : "text-[#9CA89F]"}`}>Monthly</span>
+            <button
+              type="button"
+              role="switch"
+              aria-checked={yearly}
+              onClick={() => setYearly((y) => !y)}
+              className={`relative inline-flex h-6 w-11 shrink-0 rounded-full border border-[#2D5F3F] transition-colors focus:outline-none focus:ring-2 focus:ring-[#4A7C5D] focus:ring-offset-2 focus:ring-offset-[#0A0E0C] ${yearly ? "bg-[#4A7C5D]" : "bg-[#1B3022]"}`}
+            >
+              <span
+                className={`pointer-events-none inline-block h-5 w-5 rounded-full bg-[#F5F5F0] shadow ring-0 transition translate-x-0.5 ${yearly ? "translate-x-5" : "translate-x-0.5"}`}
+              />
+            </button>
+            <span className={`flex flex-col items-start ${yearly ? "text-[#F5F5F0]" : "text-[#9CA89F]"}`}>
+              <span className="text-sm font-medium">Yearly</span>
+              <span className="text-xs text-[#4A7C5D]">(Save 10%)</span>
+            </span>
+          </div>
         </div>
       </section>
 
-      {/* Clerk Billing: live plans and checkout from Clerk Dashboard */}
-      {hasClerkBilling ? (
-        <section className="container mx-auto px-6 mb-16">
-          <div className="max-w-4xl mx-auto pricing-table-clerk">
-            <PricingTable
-              for="user"
-              newSubscriptionRedirectUrl={`${window.location.origin}/app/dashboard`}
-              appearance={{
-                variables: {
-                  colorPrimary: "#4A7C5D",
-                  colorBackground: "#0A0E0C",
-                  colorInputBackground: "#1B3022",
-                  colorInputText: "#F5F5F0",
-                  colorText: "#F5F5F0",
-                  colorTextSecondary: "#9CA89F",
-                  borderRadius: "0.75rem",
-                },
-                elements: {
-                  card: "bg-[#1B3022]/60 border border-[#2D5F3F]/30",
-                  headerTitle: "text-[#F5F5F0]",
-                  headerSubtitle: "text-[#9CA89F]",
-                },
-              }}
-            />
-          </div>
-        </section>
-      ) : (
-      /* Custom pricing cards (fallback when Clerk Billing not configured) */
+      {/* Pricing Cards */}
       <section className="container mx-auto px-6 mb-16">
         <div className="grid md:grid-cols-3 gap-8 max-w-6xl mx-auto">
           {pricingTiers.map((tier, idx) => (
@@ -192,22 +160,31 @@ export function PricingPage() {
                 ))}
               </div>
 
-              <Link to="/dashboard">
-                <Button
-                  className={`w-full ${
-                    tier.highlighted
-                      ? "bg-[#4A7C5D] hover:bg-[#2D5F3F] text-[#F5F5F0]"
-                      : "bg-[#1B3022] hover:bg-[#2D5F3F] text-[#F5F5F0] border border-[#2D5F3F]"
-                  }`}
-                >
-                  {tier.cta}
-                </Button>
-              </Link>
+              {tier.cta === "Contact Sales" ? (
+                <Link to="/contact">
+                  <Button
+                    className="w-full bg-[#1B3022] hover:bg-[#2D5F3F] text-[#F5F5F0] border border-[#2D5F3F]"
+                  >
+                    {tier.cta}
+                  </Button>
+                </Link>
+              ) : (
+                <Link to="/app">
+                  <Button
+                    className={`w-full ${
+                      tier.highlighted
+                        ? "bg-[#4A7C5D] hover:bg-[#2D5F3F] text-[#F5F5F0]"
+                        : "bg-[#1B3022] hover:bg-[#2D5F3F] text-[#F5F5F0] border border-[#2D5F3F]"
+                    }`}
+                  >
+                    {tier.cta}
+                  </Button>
+                </Link>
+              )}
             </Card>
           ))}
         </div>
       </section>
-      )}
 
       {/* Features Comparison */}
       <section className="container mx-auto px-6 mb-16">
@@ -250,8 +227,8 @@ export function PricingPage() {
                 a: "We accept all major credit cards, PayPal, and SEPA direct debit for European customers.",
               },
               {
-                q: "Is there a free trial?",
-                a: "Yes! All paid plans come with a 1-week free trial. No credit card required to start.",
+                q: "Is there a trial?",
+                a: "Yes! All paid plans come with a 1-week trial. No credit card required to start.",
               },
               {
                 q: "How accurate are the predictions?",
