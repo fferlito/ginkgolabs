@@ -63,6 +63,7 @@ function DashboardContent() {
         open={statsPanelOpen}
         onClose={() => setStatsPanelOpen(false)}
         point={selectedPoint}
+        mushroomId={selectedMushroom?.id ?? null}
       />
     </>
   );

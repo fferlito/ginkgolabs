@@ -9,6 +9,8 @@ export interface MushroomData {
   scientificName: string;
   icon?: string;
   default?: boolean;
+  /** Optional API id for backend (e.g. "porcini") to fetch climate/ideal data. */
+  id?: string;
   tileUrls: MushroomTileUrls;
 }
 

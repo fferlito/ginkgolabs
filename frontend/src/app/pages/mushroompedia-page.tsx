@@ -689,7 +689,7 @@ export function MushroompediaPage() {
                           }}
                           formatter={(value: number) => [`${Number(value).toFixed(1)}%`, "Relative"]}
                         />
-                        <Bar dataKey="value" fill="#4A7C5D" radius={[4, 4, 0, 0]} name="Relative" />
+                        <Bar dataKey="value" fill="#2E8B7E" radius={[4, 4, 0, 0]} name="Relative" />
                       </BarChart>
                     </ResponsiveContainer>
                   </div>

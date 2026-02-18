@@ -1,4 +1,4 @@
-import React, { useMemo } from "react";
+import React, { useMemo, useState, useEffect } from "react";
 import {
   LineChart,
   Line,
@@ -11,21 +11,55 @@ import {
 import { subDays, format } from "date-fns";
 import { X } from "lucide-react";
 
-// Ideal trend: gentle curve around base value over 14 days (for trend line)
+const DAYS = 14;
+
+function getApiBase(): string {
+  const env = (import.meta as { env?: Record<string, string | undefined> }).env;
+  const url = (env?.VITE_API_URL?.trim() || env?.VITE_MUSHROOM_API_BASE?.trim()) || "";
+  if (url) return url;
+  const isProduction = typeof window !== "undefined" && window.location?.hostname !== "localhost" && !window.location?.hostname?.startsWith("127.");
+  return isProduction ? "https://backend-production-bc08.up.railway.app" : "http://localhost:8000";
+}
+
+function getApiKey(): string {
+  const env = (import.meta as { env?: Record<string, string | undefined> }).env;
+  return (env?.VITE_API_KEY?.trim() ?? env?.VITE_MUSHROOM_API_KEY?.trim() ?? "") || "";
+}
+
+async function apiGet<T>(url: string): Promise<T | null> {
+  const headers: Record<string, string> = { "Cache-Control": "no-cache", Pragma: "no-cache" };
+  if (getApiKey()) headers["X-API-Key"] = getApiKey();
+  const res = await fetch(url, { headers });
+  const ct = res.headers.get("content-type") ?? "";
+  if (ct.includes("text/html") || !res.ok) return null;
+  try {
+    return (await res.json()) as T;
+  } catch {
+    return null;
+  }
+}
+
+type ClimateDay = {
+  day: string;
+  idealTemperature: number;
+  idealHumidity: number;
+  idealRain: number;
+};
+
+// Ideal trend fallback when no API data
 function idealTrend(base: number, amplitude: number, days: number) {
   return (i: number) =>
     base + amplitude * Math.sin((i / (days - 1)) * Math.PI * 0.8);
 }
 
-// Fake 2-week data + ideal trend values
-function useFakeChartData() {
+// Base chart data: 14 days with date labels; actual (fake) + ideal from API or fallback
+function useBaseChartData() {
   return useMemo(() => {
-    const days = 14;
-    const idealT = idealTrend(15, 2, days);
-    const idealH = idealTrend(80, 5, days);
-    const idealR = idealTrend(3, 0.8, days);
-    return Array.from({ length: days }, (_, i) => {
-      const d = subDays(new Date(), days - 1 - i);
+    const idealT = idealTrend(15, 2, DAYS);
+    const idealH = idealTrend(80, 5, DAYS);
+    const idealR = idealTrend(3, 0.8, DAYS);
+    return Array.from({ length: DAYS }, (_, i) => {
+      const d = subDays(new Date(), DAYS - 1 - i);
       return {
         date: format(d, "MMM d"),
         temperature: 12 + Math.sin(i * 0.5) * 6 + (Math.random() - 0.5) * 4,
@@ -51,10 +85,39 @@ interface StatsPanelProps {
   open: boolean;
   onClose: () => void;
   point: { lat: number; lng: number; prediction: number } | null;
+  /** API mushroom id (e.g. "porcini") to fetch ideal climate from backend. */
+  mushroomId: string | null;
 }
 
-export function StatsPanel({ open, onClose, point }: StatsPanelProps) {
-  const data = useFakeChartData();
+export function StatsPanel({ open, onClose, point, mushroomId }: StatsPanelProps) {
+  const baseData = useBaseChartData();
+  const [idealFromApi, setIdealFromApi] = useState<ClimateDay[] | null>(null);
+
+  useEffect(() => {
+    if (!open || !mushroomId) {
+      setIdealFromApi(null);
+      return;
+    }
+    const apiBase = getApiBase();
+    apiGet<{ days: ClimateDay[] }>(`${apiBase}/api/mushrooms/${mushroomId}/climate`).then((res) => {
+      if (res?.days?.length === DAYS) setIdealFromApi(res.days);
+      else setIdealFromApi(null);
+    });
+  }, [open, mushroomId]);
+
+  const data = useMemo(() => {
+    return baseData.map((row, i) => {
+      if (idealFromApi && idealFromApi[i]) {
+        return {
+          ...row,
+          idealTemperature: idealFromApi[i].idealTemperature,
+          idealHumidity: idealFromApi[i].idealHumidity,
+          idealRain: idealFromApi[i].idealRain,
+        };
+      }
+      return row;
+    });
+  }, [baseData, idealFromApi]);
 
   if (!open) return null;
 
