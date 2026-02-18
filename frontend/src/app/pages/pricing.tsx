@@ -1,3 +1,4 @@
+import React, { useState } from "react";
 import { Card } from "../components/ui/card";
 import { Button } from "../components/ui/button";
 import { Badge } from "../components/ui/badge";
@@ -5,9 +6,12 @@ import { Check, Star } from "lucide-react";
 import { Link } from "react-router";
 
 export function PricingPage() {
+  const [yearly, setYearly] = useState(false);
+
   const pricingTiers = [
     {
       name: "Basic",
+      priceMonthly: 2.99,
       price: "$2.99",
       period: "/month",
       trial: "1 week free trial",
@@ -25,6 +29,7 @@ export function PricingPage() {
     },
     {
       name: "Premium",
+      priceMonthly: 5.99,
       price: "$5.99",
       period: "/month",
       trial: "1 week free trial",
@@ -44,6 +49,7 @@ export function PricingPage() {
     },
     {
       name: "Enterprise",
+      priceMonthly: undefined as number | undefined,
       price: "Custom",
       period: "",
       trial: "",
@@ -72,6 +78,22 @@ export function PricingPage() {
           <p className="text-xl text-[#9CA89F]">
             Start with a 1-week free trial. No credit card required.
           </p>
+          <div className="flex items-center justify-center gap-3 pt-2">
+            <span className={`text-sm font-medium ${!yearly ? "text-[#F5F5F0]" : "text-[#9CA89F]"}`}>Monthly</span>
+            <button
+              type="button"
+              role="switch"
+              aria-checked={yearly}
+              onClick={() => setYearly((y) => !y)}
+              className={`relative inline-flex h-6 w-11 shrink-0 rounded-full border border-[#2D5F3F] transition-colors focus:outline-none focus:ring-2 focus:ring-[#4A7C5D] focus:ring-offset-2 focus:ring-offset-[#0A0E0C] ${yearly ? "bg-[#4A7C5D]" : "bg-[#1B3022]"}`}
+            >
+              <span
+                className={`pointer-events-none inline-block h-5 w-5 rounded-full bg-[#F5F5F0] shadow ring-0 transition translate-x-0.5 ${yearly ? "translate-x-5" : "translate-x-0.5"}`}
+              />
+            </button>
+            <span className={`text-sm font-medium ${yearly ? "text-[#F5F5F0]" : "text-[#9CA89F]"}`}>Yearly</span>
+            {yearly && <span className="text-xs text-[#4A7C5D]">(Save 10%)</span>}
+          </div>
         </div>
       </section>
 
@@ -103,9 +125,20 @@ export function PricingPage() {
 
               <div className="mb-8">
                 <div className="flex items-baseline gap-1">
-                  <span className="text-5xl text-[#F5F5F0]">{tier.price}</span>
-                  <span className="text-[#9CA89F]">{tier.period}</span>
+                  <span className="text-5xl text-[#F5F5F0]">
+                    {yearly && tier.priceMonthly != null
+                      ? `$${(tier.priceMonthly * 12 * 0.9).toFixed(2)}`
+                      : tier.price}
+                  </span>
+                  <span className="text-[#9CA89F]">
+                    {yearly && tier.priceMonthly != null ? "/year" : tier.period}
+                  </span>
                 </div>
+                {yearly && tier.priceMonthly != null && (
+                  <p className="text-xs text-[#9CA89F] mt-1">
+                    ${tier.priceMonthly.toFixed(2)}/mo billed annually
+                  </p>
+                )}
                 {tier.trial && (
                   <p className="text-sm text-[#4A7C5D] mt-2">{tier.trial}</p>
                 )}
