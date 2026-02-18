@@ -1,0 +1,14 @@
+{
+  "id": "summer_bolete",
+  "name": "Summer Bolete",
+  "scientificName": "Boletus reticulatus",
+  "description": "The **Summer Bolete** (*Boletus reticulatus*) is an early-fruiting relative of the porcini, often appearing from late spring through summer. It has a pale to brown cap with a characteristic network pattern and a similar pore layer and stout stem.\n\nIt associates with broadleaf trees, especially oak and beech, and is a choice edible with a nutty flavour similar to the classic porcini.",
+  "statistics": [
+    { "label": "Season", "value": "Late spring – summer" },
+    { "label": "Habitat", "value": "Deciduous forest (oak, beech)" },
+    { "label": "Edibility", "value": "Choice edible" },
+    { "label": "Avg. cap size", "value": "5–20 cm" },
+    { "label": "Conservation", "value": "Widespread" }
+  ],
+  "csv_file": "Summer Bolete_climate_topography_corine.csv"
+}

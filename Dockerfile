@@ -3,11 +3,14 @@ FROM node:20-alpine AS builder
 
 WORKDIR /app
 
-# Vite env vars (baked in at build time) – pass via docker build --build-arg
+# Vite env vars (baked in at build time) – pass via docker build --build-arg or Railway env
 ARG VITE_CLERK_PUBLISHABLE_KEY
 ENV VITE_CLERK_PUBLISHABLE_KEY=$VITE_CLERK_PUBLISHABLE_KEY
 ARG VITE_MAPBOX_TOKEN
 ENV VITE_MAPBOX_TOKEN=$VITE_MAPBOX_TOKEN
+# Backend API URL (e.g. https://your-backend.railway.app) – set in Railway or build-arg
+ARG VITE_API_URL
+ENV VITE_API_URL=$VITE_API_URL
 
 # Install dependencies
 COPY package.json package-lock.json* pnpm-lock.yaml* ./

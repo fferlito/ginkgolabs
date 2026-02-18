@@ -1,4 +1,4 @@
-import { useState, useMemo } from "react";
+import React, { useState, useEffect } from "react";
 import {
   LineChart,
   Line,
@@ -14,53 +14,11 @@ import {
 
 const MONTHS = ["Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"];
 
-/** Sprouting activity by month (0–100), peak around October (index 9). */
-function useSeasonData(mushroomId: string) {
-  return useMemo(() => {
-    const peakMonth = 9; // October
-    const sigma = 5;
-    return MONTHS.map((month, i) => ({
-      month,
-      activity: Math.round(100 * Math.exp(-Math.pow(i - peakMonth, 2) / sigma)),
-    }));
-  }, [mushroomId]);
-}
-
-function idealTrend(base: number, amplitude: number, days: number) {
-  return (i: number) =>
-    base + amplitude * Math.sin((i / (days - 1)) * Math.PI * 0.8);
-}
-
-const DAYS = 14;
-const TEMP_SD = 1.5;
-const HUMIDITY_SD = 8;
-const RAIN_SD = 0.5;
-
-/** 14-day generic sequence: ideal average ± 1 SD band (no calendar dates). */
-function useChartData(mushroomId: string) {
-  return useMemo(() => {
-    const idealT = idealTrend(15, 2, DAYS);
-    const idealH = idealTrend(80, 5, DAYS);
-    const idealR = idealTrend(3, 0.8, DAYS);
-    return Array.from({ length: DAYS }, (_, i) => {
-      const t = idealT(i);
-      const h = idealH(i);
-      const r = Math.max(0, idealR(i));
-      return {
-        day: `Day ${i + 1}`,
-        idealTemperature: Math.round(t * 10) / 10,
-        idealTemperatureUpper: Math.round((t + TEMP_SD) * 10) / 10,
-        idealTemperatureLower: Math.round((t - TEMP_SD) * 10) / 10,
-        idealHumidity: Math.round(h * 10) / 10,
-        idealHumidityUpper: Math.round((h + HUMIDITY_SD) * 10) / 10,
-        idealHumidityLower: Math.round((h - HUMIDITY_SD) * 10) / 10,
-        idealRain: Math.round(r * 10) / 10,
-        idealRainUpper: Math.round((r + RAIN_SD) * 10) / 10,
-        idealRainLower: Math.round(Math.max(0, r - RAIN_SD) * 10) / 10,
-      };
-    });
-  }, [mushroomId]);
-}
+// Backend API URL: set VITE_API_URL in Railway (or .env) for production
+const API_BASE =
+  (import.meta as { env?: { VITE_API_URL?: string; VITE_MUSHROOM_API_BASE?: string } }).env?.VITE_API_URL ??
+  (import.meta as { env?: { VITE_MUSHROOM_API_BASE?: string } }).env?.VITE_MUSHROOM_API_BASE ??
+  "http://localhost:8000";
 
 type MushroomEntry = {
   id: string;
@@ -70,7 +28,61 @@ type MushroomEntry = {
   statistics: { label: string; value: string }[];
 };
 
-const MUSHROOMS: MushroomEntry[] = [
+type ClimateDay = {
+  day: string;
+  idealTemperature: number;
+  idealTemperatureUpper: number;
+  idealTemperatureLower: number;
+  idealHumidity: number;
+  idealHumidityUpper: number;
+  idealHumidityLower: number;
+  idealRain: number;
+  idealRainUpper: number;
+  idealRainLower: number;
+  idealPressure?: number;
+  idealPressureUpper?: number;
+  idealPressureLower?: number;
+};
+
+/** Fallback synthetic season data (peak October). */
+function fallbackSeasonData(): { month: string; activity: number }[] {
+  const peakMonth = 9;
+  const sigma = 5;
+  return MONTHS.map((month, i) => ({
+    month,
+    activity: Math.round(100 * Math.exp(-Math.pow(i - peakMonth, 2) / sigma)),
+  }));
+}
+
+/** Fallback 14-day ideal conditions. */
+function fallbackChartData(): ClimateDay[] {
+  const DAYS = 14;
+  const TEMP_SD = 1.5;
+  const HUMIDITY_SD = 8;
+  const RAIN_SD = 0.5;
+  const idealT = (i: number) => 15 + 2 * Math.sin((i / (DAYS - 1)) * Math.PI * 0.8);
+  const idealH = (i: number) => 80 + 5 * Math.sin((i / (DAYS - 1)) * Math.PI * 0.8);
+  const idealR = (i: number) => Math.max(0, 3 + 0.8 * Math.sin((i / (DAYS - 1)) * Math.PI * 0.8));
+  return Array.from({ length: DAYS }, (_, i) => {
+    const t = idealT(i);
+    const h = idealH(i);
+    const r = idealR(i);
+    return {
+      day: `Day ${i + 1}`,
+      idealTemperature: Math.round(t * 10) / 10,
+      idealTemperatureUpper: Math.round((t + TEMP_SD) * 10) / 10,
+      idealTemperatureLower: Math.round((t - TEMP_SD) * 10) / 10,
+      idealHumidity: Math.round(h * 10) / 10,
+      idealHumidityUpper: Math.round((h + HUMIDITY_SD) * 10) / 10,
+      idealHumidityLower: Math.round((h - HUMIDITY_SD) * 10) / 10,
+      idealRain: Math.round(r * 10) / 10,
+      idealRainUpper: Math.round((r + RAIN_SD) * 10) / 10,
+      idealRainLower: Math.round(Math.max(0, r - RAIN_SD) * 10) / 10,
+    };
+  });
+}
+
+const FALLBACK_MUSHROOMS: MushroomEntry[] = [
   {
     id: "porcini",
     name: "Porcini",
@@ -91,10 +103,71 @@ Porcini are used in risottos, pastas, soups, and sauces, and are also dried for 
 ];
 
 export function MushroompediaPage() {
-  const [selectedId, setSelectedId] = useState<string>(MUSHROOMS[0].id);
-  const selected = MUSHROOMS.find((m) => m.id === selectedId) ?? MUSHROOMS[0];
-  const chartData = useChartData(selectedId);
-  const seasonData = useSeasonData(selectedId);
+  const [mushrooms, setMushrooms] = useState<MushroomEntry[]>(FALLBACK_MUSHROOMS);
+  const [selectedId, setSelectedId] = useState<string>(FALLBACK_MUSHROOMS[0].id);
+  const [chartData, setChartData] = useState<ClimateDay[]>(fallbackChartData());
+  const [seasonData, setSeasonData] = useState<{ month: string; activity: number }[]>(fallbackSeasonData());
+  const [elevationBins, setElevationBins] = useState<{ bin_start: number; bin_end: number; count: number }[]>([]);
+  const [slopeBins, setSlopeBins] = useState<{ bin_start: number; bin_end: number; count: number }[]>([]);
+  const [aspectBins, setAspectBins] = useState<{ bin_start: number; bin_end: number; count: number }[]>([]);
+  const [geomorphonCategories, setGeomorphonCategories] = useState<{ label: string; count: number }[]>([]);
+  const [landcoverCategories, setLandcoverCategories] = useState<{ code: number; count: number }[]>([]);
+  const [loading, setLoading] = useState(true);
+  const [chartsLoading, setChartsLoading] = useState(true);
+
+  const selected = mushrooms.find((m) => m.id === selectedId) ?? mushrooms[0];
+
+  // Fetch mushroom list from API
+  useEffect(() => {
+    let cancelled = false;
+    fetch(`${API_BASE}/api/mushrooms`)
+      .then((r) => (r.ok ? r.json() : null))
+      .then((data: MushroomEntry[] | null) => {
+        if (cancelled || !data?.length) return;
+        setMushrooms(data);
+        if (!data.some((m) => m.id === selectedId)) setSelectedId(data[0].id);
+      })
+      .catch(() => {})
+      .finally(() => setLoading(false));
+    return () => { cancelled = true; };
+  }, []);
+
+  // Fetch chart data when selected mushroom changes
+  useEffect(() => {
+    if (!selectedId) return;
+    setChartsLoading(true);
+    const promises = [
+      fetch(`${API_BASE}/api/mushrooms/${selectedId}/climate`).then((r) => (r.ok ? r.json() : null)),
+      fetch(`${API_BASE}/api/mushrooms/${selectedId}/season`).then((r) => (r.ok ? r.json() : null)),
+      fetch(`${API_BASE}/api/mushrooms/${selectedId}/elevation`).then((r) => (r.ok ? r.json() : null)),
+      fetch(`${API_BASE}/api/mushrooms/${selectedId}/slope`).then((r) => (r.ok ? r.json() : null)),
+      fetch(`${API_BASE}/api/mushrooms/${selectedId}/aspect`).then((r) => (r.ok ? r.json() : null)),
+      fetch(`${API_BASE}/api/mushrooms/${selectedId}/geomorphon`).then((r) => (r.ok ? r.json() : null)),
+      fetch(`${API_BASE}/api/mushrooms/${selectedId}/landcover`).then((r) => (r.ok ? r.json() : null)),
+    ];
+    Promise.all(promises)
+      .then(([climate, season, elevation, slope, aspect, geomorphon, landcover]) => {
+        if (climate?.days?.length) setChartData(climate.days);
+        else setChartData(fallbackChartData());
+        if (season?.months?.length) setSeasonData(season.months);
+        else setSeasonData(fallbackSeasonData());
+        setElevationBins(elevation?.bins?.length ? elevation.bins : []);
+        setSlopeBins(slope?.bins?.length ? slope.bins : []);
+        setAspectBins(aspect?.bins?.length ? aspect.bins : []);
+        setGeomorphonCategories(geomorphon?.categories?.length ? geomorphon.categories : []);
+        setLandcoverCategories(landcover?.categories?.length ? landcover.categories : []);
+      })
+      .catch(() => {
+        setChartData(fallbackChartData());
+        setSeasonData(fallbackSeasonData());
+        setElevationBins([]);
+        setSlopeBins([]);
+        setAspectBins([]);
+        setGeomorphonCategories([]);
+        setLandcoverCategories([]);
+      })
+      .finally(() => setChartsLoading(false));
+  }, [selectedId]);
 
   return (
     <div className="min-h-screen bg-[#0A0E0C]">
@@ -111,7 +184,7 @@ export function MushroompediaPage() {
               aria-label="Mushroom list"
             >
               <ul className="space-y-0.5">
-                {MUSHROOMS.map((m) => (
+                {mushrooms.map((m) => (
                   <li key={m.id}>
                     <button
                       type="button"
@@ -163,7 +236,7 @@ export function MushroompediaPage() {
                 Ideal conditions
               </h3>
               <p className="text-xs text-[#9CA89F] mb-3">
-                14-day average with standard deviation band (±1 SD)
+                {chartsLoading ? "Loading…" : "14-day average with standard deviation band (±1 SD) from observation data"}
               </p>
               <div className="space-y-3">
                 <div className="rounded-xl border border-[#2D5F3F]/30 bg-[#1B3022]/60 p-3">
@@ -296,6 +369,51 @@ export function MushroompediaPage() {
                     </ResponsiveContainer>
                   </div>
                 </div>
+                {chartData.length > 0 && "idealPressure" in chartData[0] && (
+                  <div className="rounded-xl border border-[#2D5F3F]/30 bg-[#1B3022]/60 p-3">
+                    <h4 className="text-sm font-medium text-[#F5F5F0] mb-2">Pressure</h4>
+                    <div className="h-[120px]">
+                      <ResponsiveContainer width="100%" height="100%">
+                        <LineChart data={chartData} margin={{ top: 5, right: 5, left: -20, bottom: 0 }}>
+                          <CartesianGrid strokeDasharray="3 3" stroke="rgba(45,95,63,0.2)" />
+                          <XAxis dataKey="day" tick={{ fontSize: 10, fill: "#9CA89F" }} />
+                          <YAxis tick={{ fontSize: 10, fill: "#9CA89F" }} unit=" Pa" />
+                          <Tooltip
+                            contentStyle={{
+                              backgroundColor: "#0A0E0C",
+                              border: "1px solid #2D5F3F",
+                              borderRadius: "8px",
+                            }}
+                            formatter={(value: number) =>
+                              value != null ? Number(value).toFixed(0) : "—"
+                            }
+                          />
+                          <Area
+                            type="monotone"
+                            dataKey="idealPressureUpper"
+                            fill="#9B59B6"
+                            fillOpacity={0.25}
+                            stroke="none"
+                          />
+                          <Area
+                            type="monotone"
+                            dataKey="idealPressureLower"
+                            fill="#0A0E0C"
+                            stroke="none"
+                          />
+                          <Line
+                            type="monotone"
+                            dataKey="idealPressure"
+                            stroke="#9B59B6"
+                            strokeWidth={2}
+                            dot={false}
+                            name="Avg Pa"
+                          />
+                        </LineChart>
+                      </ResponsiveContainer>
+                    </div>
+                  </div>
+                )}
               </div>
             </section>
 
@@ -305,7 +423,7 @@ export function MushroompediaPage() {
               </h3>
               <div className="rounded-xl border border-[#2D5F3F]/30 bg-[#1B3022]/60 p-3">
                 <p className="text-xs text-[#9CA89F] mb-2">
-                  Typical sprouting activity over the year (peak around October)
+                  {chartsLoading ? "Loading…" : "Sprouting activity by month from observation dates"}
                 </p>
                 <div className="h-[180px]">
                   <ResponsiveContainer width="100%" height="100%">
@@ -338,6 +456,177 @@ export function MushroompediaPage() {
                 </div>
               </div>
             </section>
+
+            {elevationBins.length > 0 && (
+              <section className="mb-6">
+                <h3 className="text-sm font-semibold uppercase tracking-wider text-[#9CA89F] mb-3">
+                  Elevation distribution
+                </h3>
+                <div className="rounded-xl border border-[#2D5F3F]/30 bg-[#1B3022]/60 p-3">
+                  <p className="text-xs text-[#9CA89F] mb-2">
+                    Distribution of observations by elevation (m a.s.l.)
+                  </p>
+                  <div className="h-[180px]">
+                    <ResponsiveContainer width="100%" height="100%">
+                      <BarChart
+                        data={elevationBins.map((b) => ({ name: `${b.bin_start}-${b.bin_end}`, count: b.count }))}
+                        margin={{ top: 5, right: 5, left: -10, bottom: 0 }}
+                      >
+                        <CartesianGrid strokeDasharray="3 3" stroke="rgba(45,95,63,0.2)" vertical={false} />
+                        <XAxis dataKey="name" tick={{ fontSize: 9, fill: "#9CA89F" }} />
+                        <YAxis tick={{ fontSize: 10, fill: "#9CA89F" }} />
+                        <Tooltip
+                          contentStyle={{
+                            backgroundColor: "#0A0E0C",
+                            border: "1px solid #2D5F3F",
+                            borderRadius: "8px",
+                          }}
+                          formatter={(value: number) => [value, "Observations"]}
+                        />
+                        <Bar dataKey="count" fill="#4A7C5D" radius={[4, 4, 0, 0]} name="Observations" />
+                      </BarChart>
+                    </ResponsiveContainer>
+                  </div>
+                </div>
+              </section>
+            )}
+
+            {slopeBins.length > 0 && (
+              <section className="mb-6">
+                <h3 className="text-sm font-semibold uppercase tracking-wider text-[#9CA89F] mb-3">
+                  Slope distribution
+                </h3>
+                <div className="rounded-xl border border-[#2D5F3F]/30 bg-[#1B3022]/60 p-3">
+                  <p className="text-xs text-[#9CA89F] mb-2">
+                    Distribution of observations by slope (°)
+                  </p>
+                  <div className="h-[180px]">
+                    <ResponsiveContainer width="100%" height="100%">
+                      <BarChart
+                        data={slopeBins.map((b) => ({ name: `${b.bin_start.toFixed(1)}–${b.bin_end.toFixed(1)}`, count: b.count }))}
+                        margin={{ top: 5, right: 5, left: -10, bottom: 0 }}
+                      >
+                        <CartesianGrid strokeDasharray="3 3" stroke="rgba(45,95,63,0.2)" vertical={false} />
+                        <XAxis dataKey="name" tick={{ fontSize: 9, fill: "#9CA89F" }} />
+                        <YAxis tick={{ fontSize: 10, fill: "#9CA89F" }} />
+                        <Tooltip
+                          contentStyle={{
+                            backgroundColor: "#0A0E0C",
+                            border: "1px solid #2D5F3F",
+                            borderRadius: "8px",
+                          }}
+                          formatter={(value: number) => [value, "Observations"]}
+                        />
+                        <Bar dataKey="count" fill="#4A7C5D" radius={[4, 4, 0, 0]} name="Observations" />
+                      </BarChart>
+                    </ResponsiveContainer>
+                  </div>
+                </div>
+              </section>
+            )}
+
+            {aspectBins.length > 0 && (
+              <section className="mb-6">
+                <h3 className="text-sm font-semibold uppercase tracking-wider text-[#9CA89F] mb-3">
+                  Aspect distribution
+                </h3>
+                <div className="rounded-xl border border-[#2D5F3F]/30 bg-[#1B3022]/60 p-3">
+                  <p className="text-xs text-[#9CA89F] mb-2">
+                    Distribution of observations by aspect (0–360°)
+                  </p>
+                  <div className="h-[180px]">
+                    <ResponsiveContainer width="100%" height="100%">
+                      <BarChart
+                        data={aspectBins.map((b) => ({ name: `${b.bin_start}–${b.bin_end}`, count: b.count }))}
+                        margin={{ top: 5, right: 5, left: -10, bottom: 0 }}
+                      >
+                        <CartesianGrid strokeDasharray="3 3" stroke="rgba(45,95,63,0.2)" vertical={false} />
+                        <XAxis dataKey="name" tick={{ fontSize: 9, fill: "#9CA89F" }} />
+                        <YAxis tick={{ fontSize: 10, fill: "#9CA89F" }} />
+                        <Tooltip
+                          contentStyle={{
+                            backgroundColor: "#0A0E0C",
+                            border: "1px solid #2D5F3F",
+                            borderRadius: "8px",
+                          }}
+                          formatter={(value: number) => [value, "Observations"]}
+                        />
+                        <Bar dataKey="count" fill="#D4AF37" radius={[4, 4, 0, 0]} name="Observations" />
+                      </BarChart>
+                    </ResponsiveContainer>
+                  </div>
+                </div>
+              </section>
+            )}
+
+            {geomorphonCategories.length > 0 && (
+              <section className="mb-6">
+                <h3 className="text-sm font-semibold uppercase tracking-wider text-[#9CA89F] mb-3">
+                  Geomorphon (terrain form)
+                </h3>
+                <div className="rounded-xl border border-[#2D5F3F]/30 bg-[#1B3022]/60 p-3">
+                  <p className="text-xs text-[#9CA89F] mb-2">
+                    Distribution of observations by terrain form
+                  </p>
+                  <div className="h-[180px]">
+                    <ResponsiveContainer width="100%" height="100%">
+                      <BarChart
+                        data={geomorphonCategories}
+                        margin={{ top: 5, right: 5, left: -10, bottom: 0 }}
+                        layout="vertical"
+                      >
+                        <CartesianGrid strokeDasharray="3 3" stroke="rgba(45,95,63,0.2)" horizontal={false} />
+                        <XAxis type="number" tick={{ fontSize: 10, fill: "#9CA89F" }} />
+                        <YAxis type="category" dataKey="label" tick={{ fontSize: 10, fill: "#9CA89F" }} width={70} />
+                        <Tooltip
+                          contentStyle={{
+                            backgroundColor: "#0A0E0C",
+                            border: "1px solid #2D5F3F",
+                            borderRadius: "8px",
+                          }}
+                          formatter={(value: number) => [value, "Observations"]}
+                        />
+                        <Bar dataKey="count" fill="#5B8DEF" radius={[0, 4, 4, 0]} name="Observations" />
+                      </BarChart>
+                    </ResponsiveContainer>
+                  </div>
+                </div>
+              </section>
+            )}
+
+            {landcoverCategories.length > 0 && (
+              <section className="mb-6">
+                <h3 className="text-sm font-semibold uppercase tracking-wider text-[#9CA89F] mb-3">
+                  Land cover
+                </h3>
+                <div className="rounded-xl border border-[#2D5F3F]/30 bg-[#1B3022]/60 p-3">
+                  <p className="text-xs text-[#9CA89F] mb-2">
+                    Distribution of observations by land cover code (CORINE)
+                  </p>
+                  <div className="h-[180px]">
+                    <ResponsiveContainer width="100%" height="100%">
+                      <BarChart
+                        data={landcoverCategories.map((c) => ({ label: `LC ${c.code}`, count: c.count }))}
+                        margin={{ top: 5, right: 5, left: -10, bottom: 0 }}
+                      >
+                        <CartesianGrid strokeDasharray="3 3" stroke="rgba(45,95,63,0.2)" vertical={false} />
+                        <XAxis dataKey="label" tick={{ fontSize: 10, fill: "#9CA89F" }} />
+                        <YAxis tick={{ fontSize: 10, fill: "#9CA89F" }} />
+                        <Tooltip
+                          contentStyle={{
+                            backgroundColor: "#0A0E0C",
+                            border: "1px solid #2D5F3F",
+                            borderRadius: "8px",
+                          }}
+                          formatter={(value: number) => [value, "Observations"]}
+                        />
+                        <Bar dataKey="count" fill="#9B59B6" radius={[4, 4, 0, 0]} name="Observations" />
+                      </BarChart>
+                    </ResponsiveContainer>
+                  </div>
+                </div>
+              </section>
+            )}
 
             <section>
               <h3 className="text-sm font-semibold uppercase tracking-wider text-[#9CA89F] mb-3">

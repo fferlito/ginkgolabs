@@ -1,0 +1,14 @@
+{
+  "id": "porcini",
+  "name": "Porcini",
+  "scientificName": "Boletus edulis",
+  "description": "The **porcini** (*Boletus edulis*) is one of the most sought-after wild mushrooms in the world. It has a nutty, earthy flavour and a firm, meaty texture that holds up well when cooked.\n\nIt forms a symbiotic relationship with trees (especially pine, spruce, and oak) and typically fruits from late summer into autumn, depending on region and weather. The cap is broad and brown; the underside has a spongy layer of pores instead of gills, and the stem is thick and often bulbous.\n\nPorcini are used in risottos, pastas, soups, and sauces, and are also dried for long-term storage.",
+  "statistics": [
+    { "label": "Season", "value": "Late summer – autumn" },
+    { "label": "Habitat", "value": "Coniferous & deciduous forest" },
+    { "label": "Edibility", "value": "Choice edible" },
+    { "label": "Avg. cap size", "value": "5–25 cm" },
+    { "label": "Conservation", "value": "Widespread, not threatened" }
+  ],
+  "csv_file": "boletus_edulis_cleaned_ready.csv"
+}
