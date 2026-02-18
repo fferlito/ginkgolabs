@@ -327,7 +327,18 @@ export function MushroompediaPage() {
                       <LineChart data={chartData} margin={{ top: 5, right: 5, left: -20, bottom: 0 }}>
                         <CartesianGrid strokeDasharray="3 3" stroke="rgba(45,95,63,0.2)" />
                         <XAxis dataKey="day" tick={{ fontSize: 10, fill: "#9CA89F" }} />
-                        <YAxis tick={{ fontSize: 10, fill: "#9CA89F" }} unit="°C" />
+                        <YAxis
+                          tick={{ fontSize: 10, fill: "#9CA89F" }}
+                          unit="°C"
+                          domain={
+                            chartData.length
+                              ? [
+                                  Math.min(...chartData.map((d) => d.idealTemperatureLower)) - 1,
+                                  Math.max(...chartData.map((d) => d.idealTemperatureUpper)) + 1,
+                                ]
+                              : undefined
+                          }
+                        />
                         <Tooltip
                           contentStyle={{
                             backgroundColor: "#0A0E0C",
@@ -339,11 +350,12 @@ export function MushroompediaPage() {
                             value != null ? Number(value).toFixed(1) : "—"
                           }
                         />
+                        {/* ±1 SD band: upper area then lower area (same as background) so band shows between them */}
                         <Area
                           type="monotone"
                           dataKey="idealTemperatureUpper"
                           fill="#4A7C5D"
-                          fillOpacity={0.25}
+                          fillOpacity={0.5}
                           stroke="none"
                         />
                         <Area
@@ -371,7 +383,18 @@ export function MushroompediaPage() {
                       <LineChart data={chartData} margin={{ top: 5, right: 5, left: -20, bottom: 0 }}>
                         <CartesianGrid strokeDasharray="3 3" stroke="rgba(45,95,63,0.2)" />
                         <XAxis dataKey="day" tick={{ fontSize: 10, fill: "#9CA89F" }} />
-                        <YAxis tick={{ fontSize: 10, fill: "#9CA89F" }} unit="%" />
+                        <YAxis
+                          tick={{ fontSize: 10, fill: "#9CA89F" }}
+                          unit="%"
+                          domain={
+                            chartData.length
+                              ? [
+                                  Math.min(...chartData.map((d) => d.idealHumidityLower)) - 2,
+                                  Math.max(...chartData.map((d) => d.idealHumidityUpper)) + 2,
+                                ]
+                              : undefined
+                          }
+                        />
                         <Tooltip
                           contentStyle={{
                             backgroundColor: "#0A0E0C",
@@ -386,7 +409,7 @@ export function MushroompediaPage() {
                           type="monotone"
                           dataKey="idealHumidityUpper"
                           fill="#D4AF37"
-                          fillOpacity={0.25}
+                          fillOpacity={0.5}
                           stroke="none"
                         />
                         <Area
@@ -414,7 +437,18 @@ export function MushroompediaPage() {
                       <LineChart data={chartData} margin={{ top: 5, right: 5, left: -20, bottom: 0 }}>
                         <CartesianGrid strokeDasharray="3 3" stroke="rgba(45,95,63,0.2)" />
                         <XAxis dataKey="day" tick={{ fontSize: 10, fill: "#9CA89F" }} />
-                        <YAxis tick={{ fontSize: 10, fill: "#9CA89F" }} unit=" mm" />
+                        <YAxis
+                          tick={{ fontSize: 10, fill: "#9CA89F" }}
+                          unit=" mm"
+                          domain={
+                            chartData.length
+                              ? [
+                                  Math.min(...chartData.map((d) => d.idealRainLower)) - 0.2,
+                                  Math.max(...chartData.map((d) => d.idealRainUpper)) + 0.2,
+                                ]
+                              : undefined
+                          }
+                        />
                         <Tooltip
                           contentStyle={{
                             backgroundColor: "#0A0E0C",
@@ -429,7 +463,7 @@ export function MushroompediaPage() {
                           type="monotone"
                           dataKey="idealRainUpper"
                           fill="#5B8DEF"
-                          fillOpacity={0.25}
+                          fillOpacity={0.5}
                           stroke="none"
                         />
                         <Area
@@ -458,7 +492,18 @@ export function MushroompediaPage() {
                         <LineChart data={chartData} margin={{ top: 5, right: 5, left: -20, bottom: 0 }}>
                           <CartesianGrid strokeDasharray="3 3" stroke="rgba(45,95,63,0.2)" />
                           <XAxis dataKey="day" tick={{ fontSize: 10, fill: "#9CA89F" }} />
-                          <YAxis tick={{ fontSize: 10, fill: "#9CA89F" }} unit=" Pa" />
+                          <YAxis
+                            tick={{ fontSize: 10, fill: "#9CA89F" }}
+                            unit=" Pa"
+                            domain={
+                              chartData.length && "idealPressureLower" in chartData[0]
+                                ? [
+                                    Math.min(...chartData.map((d) => (d as ClimateDay).idealPressureLower!)) - 500,
+                                    Math.max(...chartData.map((d) => (d as ClimateDay).idealPressureUpper!)) + 500,
+                                  ]
+                                : undefined
+                            }
+                          />
                           <Tooltip
                             contentStyle={{
                               backgroundColor: "#0A0E0C",
@@ -473,7 +518,7 @@ export function MushroompediaPage() {
                             type="monotone"
                             dataKey="idealPressureUpper"
                             fill="#9B59B6"
-                            fillOpacity={0.25}
+                            fillOpacity={0.5}
                             stroke="none"
                           />
                           <Area
