@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useRef } from "react";
 import {
   LineChart,
   Line,
@@ -14,11 +14,33 @@ import {
 
 const MONTHS = ["Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"];
 
-// Backend API URL: set VITE_API_URL in Railway (or .env) for production
-const API_BASE =
-  (import.meta as { env?: { VITE_API_URL?: string; VITE_MUSHROOM_API_BASE?: string } }).env?.VITE_API_URL ??
-  (import.meta as { env?: { VITE_MUSHROOM_API_BASE?: string } }).env?.VITE_MUSHROOM_API_BASE ??
-  "http://localhost:8000";
+// Backend API URL – must point to your FastAPI backend, not the frontend.
+// 1) Use VITE_API_URL or VITE_MUSHROOM_API_BASE if set at build time.
+// 2) In production (non-localhost), use the deployed backend so the app works without env.
+// 3) Otherwise localhost:8000 for local dev.
+const PRODUCTION_API_URL = "https://backend-production-bc08.up.railway.app";
+
+function getApiBase(): string {
+  const env = (import.meta as { env?: Record<string, string | undefined> }).env;
+  const url = (env?.VITE_API_URL?.trim() || env?.VITE_MUSHROOM_API_BASE?.trim()) || "";
+  if (url) return url;
+  const isProduction = typeof window !== "undefined" && window.location?.hostname !== "localhost" && !window.location?.hostname?.startsWith("127.");
+  return isProduction ? PRODUCTION_API_URL : "http://localhost:8000";
+}
+const API_BASE = getApiBase();
+
+/** Fetch JSON from API; returns null if response is HTML (wrong URL) or not ok. */
+async function apiGet<T = unknown>(url: string, opts?: RequestInit): Promise<T | null> {
+  const res = await fetch(url, opts);
+  const contentType = res.headers.get("content-type") ?? "";
+  if (contentType.includes("text/html")) return null;
+  if (!res.ok) return null;
+  try {
+    return (await res.json()) as T;
+  } catch {
+    return null;
+  }
+}
 
 type MushroomEntry = {
   id: string;
@@ -112,41 +134,84 @@ export function MushroompediaPage() {
   const [aspectBins, setAspectBins] = useState<{ bin_start: number; bin_end: number; count: number }[]>([]);
   const [geomorphonCategories, setGeomorphonCategories] = useState<{ label: string; count: number }[]>([]);
   const [landcoverCategories, setLandcoverCategories] = useState<{ code: number; count: number }[]>([]);
+  const [selectedDetail, setSelectedDetail] = useState<MushroomEntry | null>(null);
   const [loading, setLoading] = useState(true);
+  const [detailLoading, setDetailLoading] = useState(false);
   const [chartsLoading, setChartsLoading] = useState(true);
+  const [apiMisconfigured, setApiMisconfigured] = useState(false);
+  const selectedIdRef = useRef(selectedId);
+  selectedIdRef.current = selectedId;
 
-  const selected = mushrooms.find((m) => m.id === selectedId) ?? mushrooms[0];
+  // Use API-loaded detail when available, otherwise list entry
+  const selectedFromList = mushrooms.find((m) => m.id === selectedId) ?? mushrooms[0];
+  const selected: MushroomEntry = selectedDetail ?? selectedFromList;
 
-  // Fetch mushroom list from API
+  // Fetch mushroom list from API (sidebar) – no cache so list is fresh
   useEffect(() => {
     let cancelled = false;
-    fetch(`${API_BASE}/api/mushrooms`)
-      .then((r) => (r.ok ? r.json() : null))
-      .then((data: MushroomEntry[] | null) => {
-        if (cancelled || !data?.length) return;
-        setMushrooms(data);
-        if (!data.some((m) => m.id === selectedId)) setSelectedId(data[0].id);
+    const noCache = { headers: { "Cache-Control": "no-cache", Pragma: "no-cache" } };
+    apiGet<MushroomEntry[]>(`${API_BASE}/api/mushrooms`, noCache)
+      .then((data) => {
+        if (cancelled) return;
+        if (data?.length) {
+          setMushrooms(data);
+          if (!data.some((m) => m.id === selectedId)) setSelectedId(data[0].id);
+          setApiMisconfigured(false);
+        } else {
+          setApiMisconfigured(true);
+        }
       })
-      .catch(() => {})
-      .finally(() => setLoading(false));
+      .catch(() => setApiMisconfigured(true))
+      .finally(() => { if (!cancelled) setLoading(false); });
     return () => { cancelled = true; };
   }, []);
 
-  // Fetch chart data when selected mushroom changes
+  // Fetch current mushroom detail from API (name, description, statistics for the page)
   useEffect(() => {
     if (!selectedId) return;
+    setDetailLoading(true);
+    setSelectedDetail(null);
+    const noCache = { headers: { "Cache-Control": "no-cache", Pragma: "no-cache" } };
+    apiGet<MushroomEntry>(`${API_BASE}/api/mushrooms/${selectedId}`, noCache)
+      .then((data) => {
+        if (data && data.id === selectedId) {
+          setSelectedDetail({
+            id: data.id,
+            name: data.name,
+            scientificName: data.scientificName,
+            description: data.description,
+            statistics: data.statistics ?? [],
+          });
+        }
+      })
+      .catch(() => {})
+      .finally(() => setDetailLoading(false));
+  }, [selectedId]);
+
+  // Fetch chart data from API when selected mushroom changes (no cache, ignore stale responses)
+  useEffect(() => {
+    if (!selectedId) return;
+    const id = selectedId;
     setChartsLoading(true);
-    const promises = [
-      fetch(`${API_BASE}/api/mushrooms/${selectedId}/climate`).then((r) => (r.ok ? r.json() : null)),
-      fetch(`${API_BASE}/api/mushrooms/${selectedId}/season`).then((r) => (r.ok ? r.json() : null)),
-      fetch(`${API_BASE}/api/mushrooms/${selectedId}/elevation`).then((r) => (r.ok ? r.json() : null)),
-      fetch(`${API_BASE}/api/mushrooms/${selectedId}/slope`).then((r) => (r.ok ? r.json() : null)),
-      fetch(`${API_BASE}/api/mushrooms/${selectedId}/aspect`).then((r) => (r.ok ? r.json() : null)),
-      fetch(`${API_BASE}/api/mushrooms/${selectedId}/geomorphon`).then((r) => (r.ok ? r.json() : null)),
-      fetch(`${API_BASE}/api/mushrooms/${selectedId}/landcover`).then((r) => (r.ok ? r.json() : null)),
-    ];
-    Promise.all(promises)
+    // Avoid cached responses so plots always show fresh API data
+    const noCache = { headers: { "Cache-Control": "no-cache", Pragma: "no-cache" } };
+    type ClimateRes = { days: ClimateDay[] };
+    type SeasonRes = { months: { month: string; activity: number }[] };
+    type BinsRes = { bins: { bin_start: number; bin_end: number; count: number }[] };
+    type GeomorphonRes = { categories: { label: string; count: number }[] };
+    type LandcoverRes = { categories: { code: number; count: number }[] };
+
+    Promise.all([
+      apiGet<ClimateRes>(`${API_BASE}/api/mushrooms/${id}/climate`, noCache),
+      apiGet<SeasonRes>(`${API_BASE}/api/mushrooms/${id}/season`, noCache),
+      apiGet<BinsRes>(`${API_BASE}/api/mushrooms/${id}/elevation`, noCache),
+      apiGet<BinsRes>(`${API_BASE}/api/mushrooms/${id}/slope`, noCache),
+      apiGet<BinsRes>(`${API_BASE}/api/mushrooms/${id}/aspect`, noCache),
+      apiGet<GeomorphonRes>(`${API_BASE}/api/mushrooms/${id}/geomorphon`, noCache),
+      apiGet<LandcoverRes>(`${API_BASE}/api/mushrooms/${id}/landcover`, noCache),
+    ])
       .then(([climate, season, elevation, slope, aspect, geomorphon, landcover]) => {
+        if (id !== selectedIdRef.current) return;
         if (climate?.days?.length) setChartData(climate.days);
         else setChartData(fallbackChartData());
         if (season?.months?.length) setSeasonData(season.months);
@@ -158,6 +223,7 @@ export function MushroompediaPage() {
         setLandcoverCategories(landcover?.categories?.length ? landcover.categories : []);
       })
       .catch(() => {
+        if (id !== selectedIdRef.current) return;
         setChartData(fallbackChartData());
         setSeasonData(fallbackSeasonData());
         setElevationBins([]);
@@ -166,7 +232,9 @@ export function MushroompediaPage() {
         setGeomorphonCategories([]);
         setLandcoverCategories([]);
       })
-      .finally(() => setChartsLoading(false));
+      .finally(() => {
+        if (id === selectedIdRef.current) setChartsLoading(false);
+      });
   }, [selectedId]);
 
   return (
@@ -175,6 +243,14 @@ export function MushroompediaPage() {
         <h1 className="text-2xl sm:text-3xl font-semibold text-[#F5F5F0] mb-6">
           Mushroompedia
         </h1>
+
+        {apiMisconfigured && (
+          <div className="mb-6 rounded-xl border border-amber-500/50 bg-amber-950/40 px-4 py-3 text-amber-200 text-sm">
+            <strong>API not reached.</strong> Requests are getting the app page instead of JSON. Set{" "}
+            <code className="rounded bg-black/30 px-1">VITE_API_URL</code> to your backend URL (e.g.{" "}
+            <code className="rounded bg-black/30 px-1">https://your-backend.railway.app</code>) and rebuild the frontend. Using fallback data for now.
+          </div>
+        )}
 
         <div className="flex flex-col md:flex-row gap-6 md:gap-8">
           {/* Left sidebar: mushroom names */}
@@ -203,13 +279,18 @@ export function MushroompediaPage() {
             </nav>
           </aside>
 
-          {/* Main content: markdown-style entry */}
+          {/* Main content: loaded from API (GET /api/mushrooms, /api/mushrooms/:id, climate, season, etc.) */}
           <article className="flex-1 min-w-0 rounded-xl border border-[#2D5F3F]/30 bg-[#1B3022]/40 p-6 sm:p-8 text-[#F5F5F0]">
             <header className="border-b border-[#2D5F3F]/30 pb-4 mb-4">
               <h2 className="text-xl sm:text-2xl font-semibold text-[#F5F5F0]">
                 {selected.name}
               </h2>
-              <p className="text-[#4A7C5D] italic mt-1">{selected.scientificName}</p>
+              <p className="text-[#4A7C5D] italic mt-1">
+                {selected.scientificName}
+                {detailLoading && (
+                  <span className="ml-2 text-xs text-[#9CA89F] normal-case">(loading…)</span>
+                )}
+              </p>
             </header>
 
             <section className="mb-6">

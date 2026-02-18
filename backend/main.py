@@ -1,9 +1,13 @@
 """
 FastAPI backend for Mushroompedia: mushroom definitions and chart data from CSV.
+All routes return JSON only (lists/objects). If you get HTML, the request is
+hitting the frontend server, not this API – set the frontend's VITE_API_URL to
+this service's URL and rebuild.
 """
 
 from fastapi import FastAPI, HTTPException
 from fastapi.middleware.cors import CORSMiddleware
+from fastapi.responses import JSONResponse
 
 from config import MUSHROOM_DEFINITIONS, get_csv_path
 from services.data_service import (
@@ -19,8 +23,9 @@ from services.data_service import (
 
 app = FastAPI(
     title="Mushroompedia API",
-    description="Mushroom definitions and chart data (climate, elevation, season)",
+    description="Mushroom definitions and chart data (climate, elevation, season). Returns JSON only.",
     version="1.0.0",
+    default_response_class=JSONResponse,
 )
 
 app.add_middleware(
