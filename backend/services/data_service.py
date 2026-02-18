@@ -1,8 +1,17 @@
 """Load mushroom CSV data and compute aggregates for charts."""
 
+import math
 from pathlib import Path
 import pandas as pd
 from typing import Any
+
+
+def _norm_pdf(x: float, mu: float, sigma: float) -> float:
+    """Normal (Gaussian) PDF. Returns 0 if sigma <= 0."""
+    if sigma <= 0:
+        return 0.0
+    z = (x - mu) / sigma
+    return math.exp(-0.5 * z * z) / (sigma * math.sqrt(2 * math.pi))
 
 MONTHS = ["Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"]
 
@@ -83,22 +92,33 @@ def climate_14day(df: pd.DataFrame) -> list[dict[str, Any]] | None:
 
 def elevation_distribution(df: pd.DataFrame, bins: int = 15) -> list[dict[str, Any]] | None:
     """
-    Return elevation (dem) distribution as histogram: list of { bin_start, bin_end, count }.
+    Return elevation (dem) as normal curve over bins: list of { bin_start, bin_end, value }.
+    value is 0–100 from normal PDF (mean, std of data) scaled so max = 100.
     """
     if df is None or "dem" not in df.columns:
         return None
     dem = pd.to_numeric(df["dem"], errors="coerce").dropna()
     if dem.empty:
         return None
+    mu, sigma = float(dem.mean()), float(dem.std())
+    if pd.isna(sigma) or sigma <= 0:
+        sigma = max(dem.max() - dem.min(), 1) / 4
     binned = pd.cut(dem, bins=bins)
-    vc = binned.value_counts().sort_index()
+    intervals = sorted(binned.dropna().unique(), key=lambda iv: iv.left)
     out = []
-    for iv, count in vc.items():
+    for iv in intervals:
+        center = (float(iv.left) + float(iv.right)) / 2
+        pdf_val = _norm_pdf(center, mu, sigma)
         out.append({
             "bin_start": round(float(iv.left), 0),
             "bin_end": round(float(iv.right), 0),
-            "count": int(count),
+            "value": pdf_val,
         })
+    if not out:
+        return None
+    max_val = max(r["value"] for r in out) or 1
+    for r in out:
+        r["value"] = round(100 * r["value"] / max_val, 1)
     return out
 
 
@@ -130,34 +150,68 @@ def season_activity(df: pd.DataFrame) -> list[dict[str, Any]] | None:
 
 
 def slope_distribution(df: pd.DataFrame, bins: int = 15) -> list[dict[str, Any]] | None:
-    """Slope distribution as histogram: list of { bin_start, bin_end, count }."""
+    """
+    Slope as normal curve over bins: list of { bin_start, bin_end, value }.
+    value is 0–100 from normal PDF (mean, std of slope) scaled so max = 100.
+    """
     if df is None or "slope" not in df.columns:
         return None
     slope = pd.to_numeric(df["slope"], errors="coerce").dropna()
     if slope.empty:
         return None
+    mu, sigma = float(slope.mean()), float(slope.std())
+    if pd.isna(sigma) or sigma <= 0:
+        sigma = max(float(slope.max() - slope.min()), 0.1) / 4
     binned = pd.cut(slope, bins=bins)
-    vc = binned.value_counts().sort_index()
-    return [
-        {"bin_start": round(float(iv.left), 1), "bin_end": round(float(iv.right), 1), "count": int(c)}
-        for iv, c in vc.items()
-    ]
+    intervals = sorted(binned.dropna().unique(), key=lambda iv: iv.left)
+    out = []
+    for iv in intervals:
+        center = (float(iv.left) + float(iv.right)) / 2
+        pdf_val = _norm_pdf(center, mu, sigma)
+        out.append({
+            "bin_start": round(float(iv.left), 1),
+            "bin_end": round(float(iv.right), 1),
+            "value": pdf_val,
+        })
+    if not out:
+        return None
+    max_val = max(r["value"] for r in out) or 1
+    for r in out:
+        r["value"] = round(100 * r["value"] / max_val, 1)
+    return out
 
 
 def aspect_distribution(df: pd.DataFrame, bins: int = 18) -> list[dict[str, Any]] | None:
-    """Aspect distribution (0–360°) as histogram: list of { bin_start, bin_end, count }."""
+    """
+    Aspect (0–360°) as normal curve over bins: list of { bin_start, bin_end, value }.
+    value is 0–100 from normal PDF (mean, std of aspect) scaled so max = 100.
+    """
     if df is None or "aspect" not in df.columns:
         return None
     aspect = pd.to_numeric(df["aspect"], errors="coerce").dropna()
     aspect = aspect[(aspect >= 0) & (aspect <= 360)]
     if aspect.empty:
         return None
+    mu, sigma = float(aspect.mean()), float(aspect.std())
+    if pd.isna(sigma) or sigma <= 0:
+        sigma = 45.0
     binned = pd.cut(aspect, bins=bins)
-    vc = binned.value_counts().sort_index()
-    return [
-        {"bin_start": round(float(iv.left), 0), "bin_end": round(float(iv.right), 0), "count": int(c)}
-        for iv, c in vc.items()
-    ]
+    intervals = sorted(binned.dropna().unique(), key=lambda iv: iv.left)
+    out = []
+    for iv in intervals:
+        center = (float(iv.left) + float(iv.right)) / 2
+        pdf_val = _norm_pdf(center, mu, sigma)
+        out.append({
+            "bin_start": round(float(iv.left), 0),
+            "bin_end": round(float(iv.right), 0),
+            "value": pdf_val,
+        })
+    if not out:
+        return None
+    max_val = max(r["value"] for r in out) or 1
+    for r in out:
+        r["value"] = round(100 * r["value"] / max_val, 1)
+    return out
 
 
 GEOMORPHON_LABELS = {
@@ -167,7 +221,9 @@ GEOMORPHON_LABELS = {
 
 
 def geomorphon_distribution(df: pd.DataFrame) -> list[dict[str, Any]] | None:
-    """Geomorphon type distribution: list of { label, count }. Uses geomorphon_class if present else geomorphon code."""
+    """
+    Geomorphon type: list of { label, value }. value is 0–100 normalized by max count.
+    """
     if df is None:
         return None
     if "geomorphon_class" in df.columns:
@@ -180,15 +236,17 @@ def geomorphon_distribution(df: pd.DataFrame) -> list[dict[str, Any]] | None:
     if col.empty:
         return None
     vc = col.value_counts()
-    return [{"label": str(k), "count": int(v)} for k, v in vc.items()]
+    max_c = vc.max() or 1
+    return [{"label": str(k), "value": round(100 * int(v) / max_c, 1)} for k, v in vc.items()]
 
 
 def landcover_distribution(df: pd.DataFrame) -> list[dict[str, Any]] | None:
-    """Land cover (LC) distribution: list of { code, count }."""
+    """Land cover (LC): list of { code, value }. value is 0–100 normalized by max count."""
     if df is None or "LC" not in df.columns:
         return None
     lc = pd.to_numeric(df["LC"], errors="coerce").dropna()
     if lc.empty:
         return None
     vc = lc.value_counts().sort_index()
-    return [{"code": int(k), "count": int(v)} for k, v in vc.items()]
+    max_c = vc.max() or 1
+    return [{"code": int(k), "value": round(100 * int(v) / max_c, 1)} for k, v in vc.items()]

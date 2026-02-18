@@ -147,11 +147,11 @@ export function MushroompediaPage() {
   const [selectedId, setSelectedId] = useState<string>(FALLBACK_MUSHROOMS[0].id);
   const [chartData, setChartData] = useState<ClimateDay[]>(fallbackChartData());
   const [seasonData, setSeasonData] = useState<{ month: string; activity: number }[]>(fallbackSeasonData());
-  const [elevationBins, setElevationBins] = useState<{ bin_start: number; bin_end: number; count: number }[]>([]);
-  const [slopeBins, setSlopeBins] = useState<{ bin_start: number; bin_end: number; count: number }[]>([]);
-  const [aspectBins, setAspectBins] = useState<{ bin_start: number; bin_end: number; count: number }[]>([]);
-  const [geomorphonCategories, setGeomorphonCategories] = useState<{ label: string; count: number }[]>([]);
-  const [landcoverCategories, setLandcoverCategories] = useState<{ code: number; count: number }[]>([]);
+  const [elevationBins, setElevationBins] = useState<{ bin_start: number; bin_end: number; value: number }[]>([]);
+  const [slopeBins, setSlopeBins] = useState<{ bin_start: number; bin_end: number; value: number }[]>([]);
+  const [aspectBins, setAspectBins] = useState<{ bin_start: number; bin_end: number; value: number }[]>([]);
+  const [geomorphonCategories, setGeomorphonCategories] = useState<{ label: string; value: number }[]>([]);
+  const [landcoverCategories, setLandcoverCategories] = useState<{ code: number; value: number }[]>([]);
   const [selectedDetail, setSelectedDetail] = useState<MushroomEntry | null>(null);
   const [loading, setLoading] = useState(true);
   const [detailLoading, setDetailLoading] = useState(false);
@@ -215,9 +215,9 @@ export function MushroompediaPage() {
     const noCache = { headers: { "Cache-Control": "no-cache", Pragma: "no-cache" } };
     type ClimateRes = { days: ClimateDay[] };
     type SeasonRes = { months: { month: string; activity: number }[] };
-    type BinsRes = { bins: { bin_start: number; bin_end: number; count: number }[] };
-    type GeomorphonRes = { categories: { label: string; count: number }[] };
-    type LandcoverRes = { categories: { code: number; count: number }[] };
+    type BinsRes = { bins: { bin_start: number; bin_end: number; value: number }[] };
+    type GeomorphonRes = { categories: { label: string; value: number }[] };
+    type LandcoverRes = { categories: { code: number; value: number }[] };
 
     Promise.all([
       apiGet<ClimateRes>(`${API_BASE}/api/mushrooms/${id}/climate`, noCache),
@@ -644,26 +644,26 @@ export function MushroompediaPage() {
                 </h3>
                 <div className="rounded-xl border border-[#2D5F3F]/30 bg-[#1B3022]/60 p-3">
                   <p className="text-xs text-[#9CA89F] mb-2">
-                    Distribution of observations by elevation (m a.s.l.)
+                    Normal curve by elevation (m a.s.l.) — relative scale 0–100%
                   </p>
                   <div className="h-[180px]">
                     <ResponsiveContainer width="100%" height="100%">
                       <BarChart
-                        data={elevationBins.map((b) => ({ name: `${b.bin_start}-${b.bin_end}`, count: b.count }))}
+                        data={elevationBins.map((b) => ({ name: `${b.bin_start}-${b.bin_end}`, value: b.value }))}
                         margin={{ top: 5, right: 5, left: -10, bottom: 0 }}
                       >
                         <CartesianGrid strokeDasharray="3 3" stroke="rgba(45,95,63,0.2)" vertical={false} />
                         <XAxis dataKey="name" tick={{ fontSize: 9, fill: "#9CA89F" }} />
-                        <YAxis tick={{ fontSize: 10, fill: "#9CA89F" }} />
+                        <YAxis tick={{ fontSize: 10, fill: "#9CA89F" }} domain={[0, 100]} tickFormatter={(v) => `${v}%`} />
                         <Tooltip
                           contentStyle={{
                             backgroundColor: "#0A0E0C",
                             border: "1px solid #2D5F3F",
                             borderRadius: "8px",
                           }}
-                          formatter={(value: number) => [value, "Observations"]}
+                          formatter={(value: number) => [`${Number(value).toFixed(1)}%`, "Relative"]}
                         />
-                        <Bar dataKey="count" fill="#4A7C5D" radius={[4, 4, 0, 0]} name="Observations" />
+                        <Bar dataKey="value" fill="#4A7C5D" radius={[4, 4, 0, 0]} name="Relative" />
                       </BarChart>
                     </ResponsiveContainer>
                   </div>
@@ -678,26 +678,26 @@ export function MushroompediaPage() {
                 </h3>
                 <div className="rounded-xl border border-[#2D5F3F]/30 bg-[#1B3022]/60 p-3">
                   <p className="text-xs text-[#9CA89F] mb-2">
-                    Distribution of observations by slope (°)
+                    Normal curve by slope (°) — relative scale 0–100%
                   </p>
                   <div className="h-[180px]">
                     <ResponsiveContainer width="100%" height="100%">
                       <BarChart
-                        data={slopeBins.map((b) => ({ name: `${b.bin_start.toFixed(1)}–${b.bin_end.toFixed(1)}`, count: b.count }))}
+                        data={slopeBins.map((b) => ({ name: `${b.bin_start.toFixed(1)}–${b.bin_end.toFixed(1)}`, value: b.value }))}
                         margin={{ top: 5, right: 5, left: -10, bottom: 0 }}
                       >
                         <CartesianGrid strokeDasharray="3 3" stroke="rgba(45,95,63,0.2)" vertical={false} />
                         <XAxis dataKey="name" tick={{ fontSize: 9, fill: "#9CA89F" }} />
-                        <YAxis tick={{ fontSize: 10, fill: "#9CA89F" }} />
+                        <YAxis tick={{ fontSize: 10, fill: "#9CA89F" }} domain={[0, 100]} tickFormatter={(v) => `${v}%`} />
                         <Tooltip
                           contentStyle={{
                             backgroundColor: "#0A0E0C",
                             border: "1px solid #2D5F3F",
                             borderRadius: "8px",
                           }}
-                          formatter={(value: number) => [value, "Observations"]}
+                          formatter={(value: number) => [`${Number(value).toFixed(1)}%`, "Relative"]}
                         />
-                        <Bar dataKey="count" fill="#4A7C5D" radius={[4, 4, 0, 0]} name="Observations" />
+                        <Bar dataKey="value" fill="#4A7C5D" radius={[4, 4, 0, 0]} name="Relative" />
                       </BarChart>
                     </ResponsiveContainer>
                   </div>
@@ -712,26 +712,26 @@ export function MushroompediaPage() {
                 </h3>
                 <div className="rounded-xl border border-[#2D5F3F]/30 bg-[#1B3022]/60 p-3">
                   <p className="text-xs text-[#9CA89F] mb-2">
-                    Distribution of observations by aspect (0–360°)
+                    Normal curve by aspect (0–360°) — relative scale 0–100%
                   </p>
                   <div className="h-[180px]">
                     <ResponsiveContainer width="100%" height="100%">
                       <BarChart
-                        data={aspectBins.map((b) => ({ name: `${b.bin_start}–${b.bin_end}`, count: b.count }))}
+                        data={aspectBins.map((b) => ({ name: `${b.bin_start}–${b.bin_end}`, value: b.value }))}
                         margin={{ top: 5, right: 5, left: -10, bottom: 0 }}
                       >
                         <CartesianGrid strokeDasharray="3 3" stroke="rgba(45,95,63,0.2)" vertical={false} />
                         <XAxis dataKey="name" tick={{ fontSize: 9, fill: "#9CA89F" }} />
-                        <YAxis tick={{ fontSize: 10, fill: "#9CA89F" }} />
+                        <YAxis tick={{ fontSize: 10, fill: "#9CA89F" }} domain={[0, 100]} tickFormatter={(v) => `${v}%`} />
                         <Tooltip
                           contentStyle={{
                             backgroundColor: "#0A0E0C",
                             border: "1px solid #2D5F3F",
                             borderRadius: "8px",
                           }}
-                          formatter={(value: number) => [value, "Observations"]}
+                          formatter={(value: number) => [`${Number(value).toFixed(1)}%`, "Relative"]}
                         />
-                        <Bar dataKey="count" fill="#D4AF37" radius={[4, 4, 0, 0]} name="Observations" />
+                        <Bar dataKey="value" fill="#D4AF37" radius={[4, 4, 0, 0]} name="Relative" />
                       </BarChart>
                     </ResponsiveContainer>
                   </div>
@@ -746,7 +746,7 @@ export function MushroompediaPage() {
                 </h3>
                 <div className="rounded-xl border border-[#2D5F3F]/30 bg-[#1B3022]/60 p-3">
                   <p className="text-xs text-[#9CA89F] mb-2">
-                    Distribution of observations by terrain form
+                    Relative frequency by terrain form (0–100%)
                   </p>
                   <div className="h-[180px]">
                     <ResponsiveContainer width="100%" height="100%">
@@ -756,7 +756,7 @@ export function MushroompediaPage() {
                         layout="vertical"
                       >
                         <CartesianGrid strokeDasharray="3 3" stroke="rgba(45,95,63,0.2)" horizontal={false} />
-                        <XAxis type="number" tick={{ fontSize: 10, fill: "#9CA89F" }} />
+                        <XAxis type="number" tick={{ fontSize: 10, fill: "#9CA89F" }} domain={[0, 100]} tickFormatter={(v) => `${v}%`} />
                         <YAxis type="category" dataKey="label" tick={{ fontSize: 10, fill: "#9CA89F" }} width={70} />
                         <Tooltip
                           contentStyle={{
@@ -764,9 +764,9 @@ export function MushroompediaPage() {
                             border: "1px solid #2D5F3F",
                             borderRadius: "8px",
                           }}
-                          formatter={(value: number) => [value, "Observations"]}
+                          formatter={(value: number) => [`${Number(value).toFixed(1)}%`, "Relative"]}
                         />
-                        <Bar dataKey="count" fill="#5B8DEF" radius={[0, 4, 4, 0]} name="Observations" />
+                        <Bar dataKey="value" fill="#5B8DEF" radius={[0, 4, 4, 0]} name="Relative" />
                       </BarChart>
                     </ResponsiveContainer>
                   </div>
@@ -781,26 +781,26 @@ export function MushroompediaPage() {
                 </h3>
                 <div className="rounded-xl border border-[#2D5F3F]/30 bg-[#1B3022]/60 p-3">
                   <p className="text-xs text-[#9CA89F] mb-2">
-                    Distribution of observations by land cover code (CORINE)
+                    Relative frequency by land cover code (CORINE) — 0–100%
                   </p>
                   <div className="h-[180px]">
                     <ResponsiveContainer width="100%" height="100%">
                       <BarChart
-                        data={landcoverCategories.map((c) => ({ label: `LC ${c.code}`, count: c.count }))}
+                        data={landcoverCategories.map((c) => ({ label: `LC ${c.code}`, value: c.value }))}
                         margin={{ top: 5, right: 5, left: -10, bottom: 0 }}
                       >
                         <CartesianGrid strokeDasharray="3 3" stroke="rgba(45,95,63,0.2)" vertical={false} />
                         <XAxis dataKey="label" tick={{ fontSize: 10, fill: "#9CA89F" }} />
-                        <YAxis tick={{ fontSize: 10, fill: "#9CA89F" }} />
+                        <YAxis tick={{ fontSize: 10, fill: "#9CA89F" }} domain={[0, 100]} tickFormatter={(v) => `${v}%`} />
                         <Tooltip
                           contentStyle={{
                             backgroundColor: "#0A0E0C",
                             border: "1px solid #2D5F3F",
                             borderRadius: "8px",
                           }}
-                          formatter={(value: number) => [value, "Observations"]}
+                          formatter={(value: number) => [`${Number(value).toFixed(1)}%`, "Relative"]}
                         />
-                        <Bar dataKey="count" fill="#9B59B6" radius={[4, 4, 0, 0]} name="Observations" />
+                        <Bar dataKey="value" fill="#9B59B6" radius={[4, 4, 0, 0]} name="Relative" />
                       </BarChart>
                     </ResponsiveContainer>
                   </div>
