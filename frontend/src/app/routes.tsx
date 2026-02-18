@@ -55,9 +55,7 @@ export const router = createBrowserRouter([
         index: true,
         element: (
           <RequireAuth>
-            <RequirePlan>
-              <AccountPage />
-            </RequirePlan>
+            <AccountPage />
           </RequireAuth>
         ),
       },
