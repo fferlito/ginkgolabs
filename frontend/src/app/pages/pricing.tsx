@@ -12,7 +12,7 @@ export function PricingPage() {
     {
       name: "Basic",
       priceMonthly: 2.99,
-      price: "$2.99",
+      price: "€2.99",
       period: "/month",
       trial: "1 week free trial",
       description: "Perfect for casual foragers",
@@ -30,7 +30,7 @@ export function PricingPage() {
     {
       name: "Premium",
       priceMonthly: 5.99,
-      price: "$5.99",
+      price: "€5.99",
       period: "/month",
       trial: "1 week free trial",
       description: "For serious mycologists",
@@ -91,8 +91,10 @@ export function PricingPage() {
                 className={`pointer-events-none inline-block h-5 w-5 rounded-full bg-[#F5F5F0] shadow ring-0 transition translate-x-0.5 ${yearly ? "translate-x-5" : "translate-x-0.5"}`}
               />
             </button>
-            <span className={`text-sm font-medium ${yearly ? "text-[#F5F5F0]" : "text-[#9CA89F]"}`}>Yearly</span>
-            {yearly && <span className="text-xs text-[#4A7C5D]">(Save 10%)</span>}
+            <span className={`flex flex-col items-start ${yearly ? "text-[#F5F5F0]" : "text-[#9CA89F]"}`}>
+              <span className="text-sm font-medium">Yearly</span>
+              <span className="text-xs text-[#4A7C5D]">(Save 10%)</span>
+            </span>
           </div>
         </div>
       </section>
@@ -124,19 +126,27 @@ export function PricingPage() {
               </div>
 
               <div className="mb-8">
-                <div className="flex items-baseline gap-1">
-                  <span className="text-5xl text-[#F5F5F0]">
-                    {yearly && tier.priceMonthly != null
-                      ? `$${(tier.priceMonthly * 12 * 0.9).toFixed(2)}`
-                      : tier.price}
-                  </span>
-                  <span className="text-[#9CA89F]">
-                    {yearly && tier.priceMonthly != null ? "/year" : tier.period}
-                  </span>
-                </div>
+                {yearly && tier.priceMonthly != null ? (
+                  <div className="flex flex-wrap items-baseline gap-3">
+                    <span className="text-2xl text-[#9CA89F] line-through tabular-nums">
+                      €{(tier.priceMonthly * 12).toFixed(2)}
+                    </span>
+                    <span className="inline-flex items-baseline gap-1.5">
+                      <span className="text-5xl font-semibold text-[#4A7C5D] tabular-nums">
+                        €{(tier.priceMonthly * 12 * 0.9).toFixed(2)}
+                      </span>
+                      <span className="text-[#9CA89F]">/year</span>
+                    </span>
+                  </div>
+                ) : (
+                  <div className="flex items-baseline gap-1">
+                    <span className="text-5xl text-[#F5F5F0]">{tier.price}</span>
+                    <span className="text-[#9CA89F]">{tier.period}</span>
+                  </div>
+                )}
                 {yearly && tier.priceMonthly != null && (
-                  <p className="text-xs text-[#9CA89F] mt-1">
-                    ${tier.priceMonthly.toFixed(2)}/mo billed annually
+                  <p className="text-xs text-[#9CA89F] mt-2">
+                    €{tier.priceMonthly.toFixed(2)}/mo billed annually
                   </p>
                 )}
                 {tier.trial && (
