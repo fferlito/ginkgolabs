@@ -368,20 +368,29 @@ export function MushroompediaPage() {
                             value != null ? Number(value).toFixed(1) : "—"
                           }
                         />
-                        {/* ±1 SD band: upper area then lower area (same as background) so band shows between them */}
-                        <Area
-                          type="monotone"
-                          dataKey="idealTemperatureUpper"
-                          fill="#4A7C5D"
-                          fillOpacity={0.5}
-                          stroke="none"
-                        />
-                        <Area
-                          type="monotone"
-                          dataKey="idealTemperatureLower"
-                          fill="#0A0E0C"
-                          stroke="none"
-                        />
+                        {/* ±1 SD band: baseValue = domain min so fill is from lower to upper line */}
+                        {chartData.length > 0 && (() => {
+                          const base = Math.min(...chartData.map((d) => d.idealTemperatureLower)) - 1;
+                          return (
+                            <>
+                              <Area
+                                type="monotone"
+                                dataKey="idealTemperatureUpper"
+                                baseValue={base}
+                                fill="#4A7C5D"
+                                fillOpacity={0.5}
+                                stroke="none"
+                              />
+                              <Area
+                                type="monotone"
+                                dataKey="idealTemperatureLower"
+                                baseValue={base}
+                                fill="#0A0E0C"
+                                stroke="none"
+                              />
+                            </>
+                          );
+                        })()}
                         <Line
                           type="monotone"
                           dataKey="idealTemperature"
@@ -423,19 +432,28 @@ export function MushroompediaPage() {
                             value != null ? Number(value).toFixed(1) : "—"
                           }
                         />
-                        <Area
-                          type="monotone"
-                          dataKey="idealHumidityUpper"
-                          fill="#D4AF37"
-                          fillOpacity={0.5}
-                          stroke="none"
-                        />
-                        <Area
-                          type="monotone"
-                          dataKey="idealHumidityLower"
-                          fill="#0A0E0C"
-                          stroke="none"
-                        />
+                        {chartData.length > 0 && (() => {
+                          const base = Math.min(...chartData.map((d) => d.idealHumidityLower)) - 2;
+                          return (
+                            <>
+                              <Area
+                                type="monotone"
+                                dataKey="idealHumidityUpper"
+                                baseValue={base}
+                                fill="#D4AF37"
+                                fillOpacity={0.5}
+                                stroke="none"
+                              />
+                              <Area
+                                type="monotone"
+                                dataKey="idealHumidityLower"
+                                baseValue={base}
+                                fill="#0A0E0C"
+                                stroke="none"
+                              />
+                            </>
+                          );
+                        })()}
                         <Line
                           type="monotone"
                           dataKey="idealHumidity"
@@ -477,19 +495,28 @@ export function MushroompediaPage() {
                             value != null ? Number(value).toFixed(1) : "—"
                           }
                         />
-                        <Area
-                          type="monotone"
-                          dataKey="idealRainUpper"
-                          fill="#5B8DEF"
-                          fillOpacity={0.5}
-                          stroke="none"
-                        />
-                        <Area
-                          type="monotone"
-                          dataKey="idealRainLower"
-                          fill="#0A0E0C"
-                          stroke="none"
-                        />
+                        {chartData.length > 0 && (() => {
+                          const base = Math.min(...chartData.map((d) => d.idealRainLower)) - 0.2;
+                          return (
+                            <>
+                              <Area
+                                type="monotone"
+                                dataKey="idealRainUpper"
+                                baseValue={base}
+                                fill="#5B8DEF"
+                                fillOpacity={0.5}
+                                stroke="none"
+                              />
+                              <Area
+                                type="monotone"
+                                dataKey="idealRainLower"
+                                baseValue={base}
+                                fill="#0A0E0C"
+                                stroke="none"
+                              />
+                            </>
+                          );
+                        })()}
                         <Line
                           type="monotone"
                           dataKey="idealRain"
@@ -532,19 +559,28 @@ export function MushroompediaPage() {
                               value != null ? Number(value).toFixed(0) : "—"
                             }
                           />
-                          <Area
-                            type="monotone"
-                            dataKey="idealPressureUpper"
-                            fill="#9B59B6"
-                            fillOpacity={0.5}
-                            stroke="none"
-                          />
-                          <Area
-                            type="monotone"
-                            dataKey="idealPressureLower"
-                            fill="#0A0E0C"
-                            stroke="none"
-                          />
+                          {chartData.length > 0 && "idealPressureLower" in chartData[0] && (() => {
+                            const base = Math.min(...chartData.map((d) => (d as ClimateDay).idealPressureLower!)) - 500;
+                            return (
+                              <>
+                                <Area
+                                  type="monotone"
+                                  dataKey="idealPressureUpper"
+                                  baseValue={base}
+                                  fill="#9B59B6"
+                                  fillOpacity={0.5}
+                                  stroke="none"
+                                />
+                                <Area
+                                  type="monotone"
+                                  dataKey="idealPressureLower"
+                                  baseValue={base}
+                                  fill="#0A0E0C"
+                                  stroke="none"
+                                />
+                              </>
+                            );
+                          })()}
                           <Line
                             type="monotone"
                             dataKey="idealPressure"
