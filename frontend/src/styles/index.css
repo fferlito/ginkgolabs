@@ -70,3 +70,12 @@ html {
   border-top-color: transparent;
   border-bottom-color: rgba(0, 0, 0, 0.75);
 }
+
+/* Clerk checkout / payment success: keep above app layout (nav, map, panels) */
+[data-clerk-portal],
+.cl-modalBackdrop,
+[data-clerk-component="checkout"],
+iframe[title*="Clerk"],
+body > [id^="clerk-"] {
+  z-index: 99999 !important;
+}
