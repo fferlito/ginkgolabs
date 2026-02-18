@@ -1,10 +1,171 @@
+import React from "react";
 import { Link } from "react-router";
-import { ArrowLeft } from "lucide-react";
+import { ArrowLeft, CreditCard, Loader2 } from "lucide-react";
 import { useUser } from "@clerk/clerk-react";
+import {
+  useSubscription,
+  SubscriptionDetailsButton,
+} from "@clerk/clerk-react/experimental";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "../components/ui/tabs";
 import { Button } from "../components/ui/button";
 import { Input } from "../components/ui/input";
 import { Label } from "../components/ui/label";
+
+function SubscriptionTabContent() {
+  const { data: subscription, isLoading, error, revalidate } = useSubscription({
+    for: "user",
+  });
+
+  if (isLoading) {
+    return (
+      <div className="flex items-center justify-center py-12 text-[#9CA89F]">
+        <Loader2 className="h-8 w-8 animate-spin mr-2" />
+        Loading subscription…
+      </div>
+    );
+  }
+
+  if (error) {
+    return (
+      <div className="rounded-xl border border-[#2D5F3F]/30 bg-[#1B3022]/40 p-6 sm:p-8 space-y-4">
+        <h2 className="text-lg font-semibold text-[#4A7C5D]">Subscription</h2>
+        <p className="text-red-400">Failed to load subscription: {error.message}</p>
+        <Button
+          variant="outline"
+          className="border-[#2D5F3F] text-[#F5F5F0] hover:bg-[#1B3022]"
+          onClick={() => revalidate()}
+        >
+          Try again
+        </Button>
+      </div>
+    );
+  }
+
+  if (!subscription) {
+    return (
+      <div className="rounded-xl border border-[#2D5F3F]/30 bg-[#1B3022]/40 p-6 sm:p-8 space-y-6">
+        <h2 className="text-lg font-semibold text-[#4A7C5D]">Subscription</h2>
+        <p className="text-[#9CA89F]">You don’t have an active subscription.</p>
+        <Link to="/pricing">
+          <Button className="bg-[#4A7C5D] text-white hover:bg-[#3d6a4d]">
+            View plans
+          </Button>
+        </Link>
+      </div>
+    );
+  }
+
+  const planNames = subscription.subscriptionItems
+    ?.map((item) => item.plan?.name)
+    .filter(Boolean) as string[] | undefined;
+  const planName = planNames?.length ? planNames.join(", ") : "—";
+  const firstItem = subscription.subscriptionItems?.[0];
+  const periodLabel = firstItem?.planPeriod === "annual" ? "Yearly" : "Monthly";
+  const periodStart = firstItem?.periodStart;
+  const periodEnd = firstItem?.periodEnd;
+
+  return (
+    <div className="rounded-xl border border-[#2D5F3F]/30 bg-[#1B3022]/40 p-6 sm:p-8 space-y-6">
+      <h2 className="text-lg font-semibold text-[#4A7C5D]">Subscription</h2>
+      <div className="space-y-4">
+        <div className="flex flex-wrap items-center justify-between gap-4">
+          <div>
+            <p className="text-sm text-[#9CA89F]">Current plan</p>
+            <p className="text-lg font-medium text-[#F5F5F0]">{planName}</p>
+            <p className="text-sm text-[#9CA89F]">{periodLabel}</p>
+          </div>
+          <span
+            className={`inline-flex items-center rounded-full px-3 py-1 text-sm font-medium ${
+              subscription.status === "active"
+                ? "bg-[#2D5F3F]/40 text-[#4A7C5D]"
+                : "bg-amber-500/20 text-amber-400"
+            }`}
+          >
+            {subscription.status === "active" ? "Active" : "Past due"}
+          </span>
+        </div>
+        <div className="grid gap-3 sm:grid-cols-2 border-t border-[#2D5F3F]/20 pt-4">
+          {subscription.activeAt && (
+            <div>
+              <p className="text-sm text-[#9CA89F]">Active since</p>
+              <p className="text-[#F5F5F0]">
+                {new Date(subscription.activeAt).toLocaleDateString(undefined, {
+                  dateStyle: "medium",
+                })}
+              </p>
+            </div>
+          )}
+          {periodStart && (
+            <div>
+              <p className="text-sm text-[#9CA89F]">Current period start</p>
+              <p className="text-[#F5F5F0]">
+                {new Date(periodStart).toLocaleDateString(undefined, {
+                  dateStyle: "medium",
+                })}
+              </p>
+            </div>
+          )}
+          {periodEnd && (
+            <div>
+              <p className="text-sm text-[#9CA89F]">Current period end</p>
+              <p className="text-[#F5F5F0]">
+                {new Date(periodEnd).toLocaleDateString(undefined, {
+                  dateStyle: "medium",
+                })}
+              </p>
+            </div>
+          )}
+          {subscription.nextPayment && (
+            <div>
+              <p className="text-sm text-[#9CA89F]">Next payment</p>
+              <p className="text-[#F5F5F0]">
+                {subscription.nextPayment.amount?.amountFormatted ?? "—"} on{" "}
+                {new Date(subscription.nextPayment.date).toLocaleDateString(
+                  undefined,
+                  { dateStyle: "medium" }
+                )}
+              </p>
+            </div>
+          )}
+        </div>
+        <div className="flex flex-wrap gap-3 pt-2">
+          <SubscriptionDetailsButton
+            subscriptionDetailsProps={{
+              appearance: {
+                variables: {
+                  colorPrimary: "#4A7C5D",
+                  colorBackground: "#0A0E0C",
+                  colorInputBackground: "#1B3022",
+                  colorInputText: "#F5F5F0",
+                  colorText: "#F5F5F0",
+                  colorTextSecondary: "#9CA89F",
+                  borderRadius: "0.75rem",
+                },
+              },
+            }}
+            onSubscriptionCancel={() => revalidate()}
+          >
+            <Button
+              variant="outline"
+              className="border-[#2D5F3F] text-[#F5F5F0] hover:bg-[#1B3022] inline-flex items-center gap-2"
+            >
+              <CreditCard className="h-4 w-4" />
+              Manage subscription
+            </Button>
+          </SubscriptionDetailsButton>
+          <Link to="/pricing">
+            <Button
+              variant="ghost"
+              className="text-[#9CA89F] hover:text-[#F5F5F0] hover:bg-[#1B3022]/50"
+            >
+              Change plan
+            </Button>
+          </Link>
+        </div>
+      </div>
+    </div>
+  );
+}
 
 function ProfileFields({
   displayName = "User",
@@ -51,8 +212,10 @@ function ProfileFields({
 
 function AccountPageContent({
   profile,
+  subscriptionTabContent,
 }: {
   profile: { displayName: string; email: string; initials: string };
+  subscriptionTabContent?: React.ReactNode;
 }) {
   return (
     <div className="min-h-[calc(100vh-4rem)] bg-[#0A0E0C]">
@@ -80,6 +243,12 @@ function AccountPageContent({
               Profile
             </TabsTrigger>
             <TabsTrigger
+              value="subscription"
+              className="data-[state=active]:bg-[#2D5F3F] data-[state=active]:text-[#F5F5F0] text-[#9CA89F]"
+            >
+              Subscription
+            </TabsTrigger>
+            <TabsTrigger
               value="settings"
               className="data-[state=active]:bg-[#2D5F3F] data-[state=active]:text-[#F5F5F0] text-[#9CA89F]"
             >
@@ -99,6 +268,15 @@ function AccountPageContent({
                 Profile details are managed by your account provider. To update name or email, use your provider&apos;s account settings.
               </p>
             </div>
+          </TabsContent>
+
+          <TabsContent value="subscription" className="mt-0">
+            {subscriptionTabContent ?? (
+              <div className="rounded-xl border border-[#2D5F3F]/30 bg-[#1B3022]/40 p-6 sm:p-8">
+                <h2 className="text-lg font-semibold text-[#4A7C5D] mb-2">Subscription</h2>
+                <p className="text-[#9CA89F]">Subscription management is not available.</p>
+              </div>
+            )}
           </TabsContent>
 
           <TabsContent value="settings" className="mt-0">
@@ -141,7 +319,7 @@ function AccountPageContent({
   );
 }
 
-const hasClerkKey = !!import.meta.env.VITE_CLERK_PUBLISHABLE_KEY;
+const hasClerkKey = !!(import.meta as unknown as { env?: { VITE_CLERK_PUBLISHABLE_KEY?: string } }).env?.VITE_CLERK_PUBLISHABLE_KEY;
 
 function AccountPageWithClerk() {
   const { user } = useUser();
@@ -160,6 +338,7 @@ function AccountPageWithClerk() {
   return (
     <AccountPageContent
       profile={{ displayName, email, initials: initials.toUpperCase().slice(0, 2) }}
+      subscriptionTabContent={<SubscriptionTabContent />}
     />
   );
 }

@@ -1,7 +1,9 @@
+import React from "react";
 import { createBrowserRouter } from "react-router";
 import { RootLayout } from "./components/root-layout";
 import { AppLayout } from "./components/app-layout";
 import { RequireAuth } from "./components/require-auth";
+import { RequirePlan } from "./components/require-plan";
 import { LandingPage } from "./pages/landing";
 import { SciencePage } from "./pages/science";
 import { PricingPage } from "./pages/pricing";
@@ -32,7 +34,9 @@ export const router = createBrowserRouter([
         index: true,
         element: (
           <RequireAuth>
-            <DashboardPage />
+            <RequirePlan>
+              <DashboardPage />
+            </RequirePlan>
           </RequireAuth>
         ),
       },
@@ -51,7 +55,9 @@ export const router = createBrowserRouter([
         index: true,
         element: (
           <RequireAuth>
-            <AccountPage />
+            <RequirePlan>
+              <AccountPage />
+            </RequirePlan>
           </RequireAuth>
         ),
       },
@@ -65,7 +71,9 @@ export const router = createBrowserRouter([
         index: true,
         element: (
           <RequireAuth>
-            <MushroompediaPage />
+            <RequirePlan>
+              <MushroompediaPage />
+            </RequirePlan>
           </RequireAuth>
         ),
       },
