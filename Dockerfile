@@ -11,6 +11,9 @@ ENV VITE_MAPBOX_TOKEN=$VITE_MAPBOX_TOKEN
 # Backend API URL (e.g. https://your-backend.railway.app) – set in Railway or build-arg
 ARG VITE_API_URL
 ENV VITE_API_URL=$VITE_API_URL
+# Optional API key for backend (set in Railway); backend requires X-API-Key when API_KEY is set
+ARG VITE_API_KEY
+ENV VITE_API_KEY=$VITE_API_KEY
 
 # Install dependencies
 COPY package.json package-lock.json* pnpm-lock.yaml* ./

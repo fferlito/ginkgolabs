@@ -18,3 +18,17 @@ This repo is set up for [Railway](https://railway.app):
 4. Open the generated URL or attach a custom domain in the service settings.
 
 Build and runtime are configured via `nixpacks.toml` (Node 20).
+
+### Backend API security (Railway)
+
+The backend uses **rate limiting** (per IP) and optional **API key** auth:
+
+- **Backend service** – set in the API service env:
+  - `API_KEY` – (optional) If set, every request must send header `X-API-Key` with this value; otherwise 401.
+  - `RATE_LIMIT_REQUESTS` – max requests per IP per window (default `40`).
+  - `RATE_LIMIT_WINDOW_SEC` – window in seconds (default `60`).
+  - `BLOCK_WINDOW_SEC` – when limit exceeded, block that IP for this many seconds (default `300`).
+- **Frontend service** – set at build time so the app can call the API:
+  - `VITE_API_KEY` – same value as backend `API_KEY`; the app sends it as `X-API-Key` on each request.
+
+Use the same strong secret for `API_KEY` and `VITE_API_KEY` so only your frontend (and anyone with the key) can access the API; bots without the key get 401.

@@ -3,6 +3,10 @@ FastAPI backend for Mushroompedia: mushroom definitions and chart data from CSV.
 All routes return JSON only (lists/objects). If you get HTML, the request is
 hitting the frontend server, not this API – set the frontend's VITE_API_URL to
 this service's URL and rebuild.
+
+Security: rate limiting (per IP) and optional API key (set API_KEY in env;
+frontend sends X-API-Key from VITE_API_KEY). Configure via env:
+  API_KEY, RATE_LIMIT_REQUESTS, RATE_LIMIT_WINDOW_SEC, BLOCK_WINDOW_SEC.
 """
 
 from fastapi import FastAPI, HTTPException
@@ -10,6 +14,7 @@ from fastapi.middleware.cors import CORSMiddleware
 from fastapi.responses import JSONResponse
 
 from config import MUSHROOM_DEFINITIONS, get_csv_path
+from security import RateLimitAndAuthMiddleware
 from services.data_service import (
     load_df,
     climate_14day,
@@ -28,6 +33,7 @@ app = FastAPI(
     default_response_class=JSONResponse,
 )
 
+app.add_middleware(RateLimitAndAuthMiddleware)
 app.add_middleware(
     CORSMiddleware,
     allow_origins=["*"],

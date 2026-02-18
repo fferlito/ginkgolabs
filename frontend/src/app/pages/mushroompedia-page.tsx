@@ -29,9 +29,27 @@ function getApiBase(): string {
 }
 const API_BASE = getApiBase();
 
+/** API key for backend (set VITE_API_KEY in Railway frontend env); sent as X-API-Key when set. */
+function getApiKey(): string {
+  const env = (import.meta as { env?: Record<string, string | undefined> }).env;
+  return (env?.VITE_API_KEY?.trim() ?? env?.VITE_MUSHROOM_API_KEY?.trim() ?? "") || "";
+}
+const API_KEY = getApiKey();
+
+/** Default headers for API requests (cache bust + optional API key). */
+function apiHeaders(overrides?: HeadersInit): HeadersInit {
+  const h: Record<string, string> = {
+    "Cache-Control": "no-cache",
+    Pragma: "no-cache",
+    ...(overrides as Record<string, string>),
+  };
+  if (API_KEY) h["X-API-Key"] = API_KEY;
+  return h;
+}
+
 /** Fetch JSON from API; returns null if response is HTML (wrong URL) or not ok. */
 async function apiGet<T = unknown>(url: string, opts?: RequestInit): Promise<T | null> {
-  const res = await fetch(url, opts);
+  const res = await fetch(url, { ...opts, headers: apiHeaders(opts?.headers) });
   const contentType = res.headers.get("content-type") ?? "";
   if (contentType.includes("text/html")) return null;
   if (!res.ok) return null;
