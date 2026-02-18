@@ -55,9 +55,9 @@ def climate_14day(df: pd.DataFrame) -> list[dict[str, Any]] | None:
         t_mean, t_std = df[t_col].mean(), df[t_col].std()
         h_mean, h_std = df[h_col].mean(), df[h_col].std()
         r_mean, r_std = df[r_col].mean(), df[r_col].std()
-        if pd.isna(t_std): t_std = 1.5
-        if pd.isna(h_std): h_std = 8.0
-        if pd.isna(r_std): r_std = 0.5
+        if pd.isna(t_std) or t_std == 0: t_std = 1.5
+        if pd.isna(h_std) or h_std == 0: h_std = 8.0
+        if pd.isna(r_std) or r_std == 0: r_std = 0.5
         row = {
             "day": f"Day {day}",
             "idealTemperature": round(float(t_mean), 1),
@@ -73,7 +73,7 @@ def climate_14day(df: pd.DataFrame) -> list[dict[str, Any]] | None:
         if has_pressure:
             pr_mean = df[p_cols[i]].mean()
             pr_std = df[p_cols[i]].std()
-            if pd.isna(pr_std): pr_std = 100.0
+            if pd.isna(pr_std) or pr_std == 0: pr_std = 100.0
             row["idealPressure"] = round(float(pr_mean), 0)
             row["idealPressureUpper"] = round(float(pr_mean + pr_std), 0)
             row["idealPressureLower"] = round(float(pr_mean - pr_std), 0)
