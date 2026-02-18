@@ -16,6 +16,7 @@ import {
   PolarAngleAxis,
   PolarRadiusAxis,
 } from "recharts";
+import { Loader2 } from "lucide-react";
 
 const MONTHS = ["Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"];
 
@@ -281,6 +282,15 @@ export function MushroompediaPage() {
       });
   }, [selectedId]);
 
+  if (loading) {
+    return (
+      <div className="min-h-screen bg-[#0A0E0C] flex flex-col items-center justify-center gap-4">
+        <Loader2 className="h-10 w-10 text-[#4A7C5D] animate-spin" aria-hidden />
+        <p className="text-[#9CA89F] text-sm">Loading Mushroompedia…</p>
+      </div>
+    );
+  }
+
   return (
     <div className="min-h-screen bg-[#0A0E0C]">
       <div className="container mx-auto px-4 sm:px-6 py-8 max-w-6xl">
@@ -356,12 +366,19 @@ export function MushroompediaPage() {
               </div>
             </section>
 
+            {chartsLoading ? (
+              <section className="mb-6 flex flex-col items-center justify-center rounded-xl border border-[#2D5F3F]/30 bg-[#1B3022]/60 p-12 min-h-[280px]">
+                <Loader2 className="h-10 w-10 text-[#4A7C5D] animate-spin shrink-0 mb-3" aria-hidden />
+                <p className="text-sm text-[#9CA89F]">Loading charts and data…</p>
+              </section>
+            ) : (
+            <>
             <section className="mb-6">
               <h3 className="text-sm font-semibold uppercase tracking-wider text-[#9CA89F] mb-1">
                 Ideal conditions
               </h3>
               <p className="text-xs text-[#9CA89F] mb-3">
-                {chartsLoading ? "Loading…" : "14-day average with standard deviation band (±1 SD) from observation data"}
+                14-day average with standard deviation band (±1 SD) from observation data
               </p>
               <div className="space-y-3">
                 <div className="rounded-xl border border-[#2D5F3F]/30 bg-[#1B3022]/60 p-3">
@@ -629,7 +646,7 @@ export function MushroompediaPage() {
               </h3>
               <div className="rounded-xl border border-[#2D5F3F]/30 bg-[#1B3022]/60 p-3">
                 <p className="text-xs text-[#9CA89F] mb-2">
-                  {chartsLoading ? "Loading…" : "Sprouting activity by month from observation dates"}
+                  Sprouting activity by month from observation dates
                 </p>
                 <div className="h-[180px]">
                   <ResponsiveContainer width="100%" height="100%">
@@ -848,6 +865,10 @@ export function MushroompediaPage() {
                   </div>
                 </div>
               </section>
+            )}
+
+            </>
+
             )}
 
             <section>
