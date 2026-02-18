@@ -18,7 +18,12 @@ export function RequirePlan({ children }: RequirePlanProps) {
   }
   return (
     <Protect
-      condition={(has) => has({ plan: "Basic" }) || has({ plan: "premium" })}
+      condition={(has) =>
+        has({ plan: "basic" }) ||
+        has({ plan: "Basic" }) ||
+        has({ plan: "premium" }) ||
+        has({ plan: "Premium" })
+      }
       fallback={
         <div className="flex flex-col items-center justify-center min-h-[60vh] px-6 text-center">
           <h2 className="text-2xl font-semibold text-[#F5F5F0] mb-2">Subscription required</h2>
