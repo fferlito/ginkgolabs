@@ -10,9 +10,35 @@ import {
   CartesianGrid,
   Tooltip,
   ResponsiveContainer,
+  RadarChart,
+  Radar,
+  PolarGrid,
+  PolarAngleAxis,
+  PolarRadiusAxis,
 } from "recharts";
 
 const MONTHS = ["Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"];
+
+/** Compass order for radar: N at top, then clockwise (NE, E, SE, S, SW, W, NW). */
+const ASPECT_COMPASS = ["N", "NE", "E", "SE", "S", "SW", "W", "NW"] as const;
+
+/** Map aspect bins (0–360°) to radar data: one value per compass direction (max in that sector). */
+function aspectBinsToRadarData(
+  bins: { bin_start: number; bin_end: number; value: number }[]
+): { subject: string; value: number; fullMark: number }[] {
+  const bySector = new Array(8).fill(0).map(() => 0);
+  for (const b of bins) {
+    const center = (b.bin_start + b.bin_end) / 2;
+    const angle = ((center % 360) + 360) % 360;
+    const index = Math.round(angle / 45) % 8;
+    if (b.value > bySector[index]) bySector[index] = b.value;
+  }
+  return ASPECT_COMPASS.map((subject, i) => ({
+    subject,
+    value: Math.round(bySector[i] * 10) / 10,
+    fullMark: 100,
+  }));
+}
 
 // Backend API URL – must point to your FastAPI backend, not the frontend.
 // 1) Use VITE_API_URL or VITE_MUSHROOM_API_BASE if set at build time.
@@ -705,39 +731,55 @@ export function MushroompediaPage() {
               </section>
             )}
 
-            {aspectBins.length > 0 && (
-              <section className="mb-6">
-                <h3 className="text-sm font-semibold uppercase tracking-wider text-[#9CA89F] mb-3">
-                  Aspect distribution
-                </h3>
-                <div className="rounded-xl border border-[#2D5F3F]/30 bg-[#1B3022]/60 p-3">
-                  <p className="text-xs text-[#9CA89F] mb-2">
-                    Normal curve by aspect (0–360°) — relative scale 0–100%
-                  </p>
-                  <div className="h-[180px]">
-                    <ResponsiveContainer width="100%" height="100%">
-                      <BarChart
-                        data={aspectBins.map((b) => ({ name: `${b.bin_start}–${b.bin_end}`, value: b.value }))}
-                        margin={{ top: 5, right: 5, left: -10, bottom: 0 }}
-                      >
-                        <CartesianGrid strokeDasharray="3 3" stroke="rgba(45,95,63,0.2)" vertical={false} />
-                        <XAxis dataKey="name" tick={{ fontSize: 9, fill: "#9CA89F" }} />
-                        <YAxis tick={{ fontSize: 10, fill: "#9CA89F" }} domain={[0, 100]} tickFormatter={(v) => `${v}%`} />
-                        <Tooltip
-                          contentStyle={{
-                            backgroundColor: "#0A0E0C",
-                            border: "1px solid #2D5F3F",
-                            borderRadius: "8px",
-                          }}
-                          formatter={(value: number) => [`${Number(value).toFixed(1)}%`, "Relative"]}
-                        />
-                        <Bar dataKey="value" fill="#D4AF37" radius={[4, 4, 0, 0]} name="Relative" />
-                      </BarChart>
-                    </ResponsiveContainer>
+            {aspectBins.length > 0 && (() => {
+              const radarData = aspectBinsToRadarData(aspectBins);
+              return (
+                <section className="mb-6">
+                  <h3 className="text-sm font-semibold uppercase tracking-wider text-[#9CA89F] mb-3">
+                    Aspect distribution
+                  </h3>
+                  <div className="rounded-xl border border-[#2D5F3F]/30 bg-[#1B3022]/60 p-3">
+                    <p className="text-xs text-[#9CA89F] mb-2">
+                      Normal curve by compass direction (N at top, 0–100% relative)
+                    </p>
+                    <div className="h-[280px]">
+                      <ResponsiveContainer width="100%" height="100%">
+                        <RadarChart data={radarData} margin={{ top: 16, right: 16, bottom: 16, left: 16 }}>
+                          <PolarGrid stroke="rgba(45,95,63,0.3)" />
+                          <PolarAngleAxis
+                            dataKey="subject"
+                            tick={{ fontSize: 11, fill: "#9CA89F" }}
+                          />
+                          <PolarRadiusAxis
+                            angle={90}
+                            domain={[0, 100]}
+                            tick={{ fontSize: 10, fill: "#9CA89F" }}
+                            tickFormatter={(v) => `${v}%`}
+                          />
+                          <Radar
+                            name="Relative"
+                            dataKey="value"
+                            stroke="#D4AF37"
+                            fill="#D4AF37"
+                            fillOpacity={0.5}
+                            strokeWidth={1.5}
+                          />
+                          <Tooltip
+                            contentStyle={{
+                              backgroundColor: "#0A0E0C",
+                              border: "1px solid #2D5F3F",
+                              borderRadius: "8px",
+                            }}
+                            formatter={(value: number) => [`${Number(value).toFixed(1)}%`, "Relative"]}
+                            labelFormatter={(label) => label}
+                          />
+                        </RadarChart>
+                      </ResponsiveContainer>
+                    </div>
                   </div>
-                </div>
-              </section>
-            )}
+                </section>
+              );
+            })()}
 
             {geomorphonCategories.length > 0 && (
               <section className="mb-6">
