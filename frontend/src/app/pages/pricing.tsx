@@ -131,23 +131,18 @@ export function PricingPage() {
                     <span className="text-2xl text-[#9CA89F] line-through tabular-nums">
                       €{(tier.priceMonthly * 12).toFixed(2)}
                     </span>
-                    <span className="inline-flex items-baseline gap-1.5">
-                      <span className="text-5xl font-semibold text-[#4A7C5D] tabular-nums">
+                    <div className="flex items-baseline gap-1">
+                      <span className="text-5xl text-[#F5F5F0] tabular-nums">
                         €{(tier.priceMonthly * 12 * 0.9).toFixed(2)}
                       </span>
                       <span className="text-[#9CA89F]">/year</span>
-                    </span>
+                    </div>
                   </div>
                 ) : (
                   <div className="flex items-baseline gap-1">
                     <span className="text-5xl text-[#F5F5F0]">{tier.price}</span>
                     <span className="text-[#9CA89F]">{tier.period}</span>
                   </div>
-                )}
-                {yearly && tier.priceMonthly != null && (
-                  <p className="text-xs text-[#9CA89F] mt-2">
-                    €{tier.priceMonthly.toFixed(2)}/mo billed annually
-                  </p>
                 )}
                 {tier.trial && (
                   <p className="text-sm text-[#4A7C5D] mt-2">{tier.trial}</p>
