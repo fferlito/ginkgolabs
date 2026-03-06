@@ -1,5 +1,5 @@
 import React, { useState } from "react";
-import { Protect } from "@clerk/clerk-react";
+import { Protect, useUser } from "@clerk/clerk-react";
 import {
   usePlans,
   CheckoutButton,
@@ -14,8 +14,13 @@ interface RequirePlanProps {
 
 const hasClerkKey = !!(import.meta as unknown as { env?: { VITE_CLERK_PUBLISHABLE_KEY?: string } }).env?.VITE_CLERK_PUBLISHABLE_KEY;
 
-const redirectUrl =
-  typeof window !== "undefined" ? `${window.location.origin}/app/dashboard` : "/app/dashboard";
+const env = (import.meta as unknown as { env?: { VITE_APP_URL?: string } }).env;
+const appUrl = env?.VITE_APP_URL?.trim();
+const redirectUrl = appUrl
+  ? `${appUrl}/app/dashboard`
+  : typeof window !== "undefined"
+    ? `${window.location.origin}/app/dashboard`
+    : "/app/dashboard";
 
 const checkoutAppearance = {
   variables: {
@@ -152,9 +157,16 @@ function ChoosePlanFallback() {
 }
 
 export function RequirePlan({ children }: RequirePlanProps) {
+  const { user, isLoaded } = useUser();
+
   if (!hasClerkKey) {
     return <>{children}</>;
   }
+
+  if (isLoaded && user?.publicMetadata?.admin === true) {
+    return <>{children}</>;
+  }
+
   return (
     <Protect
       condition={(has) =>
