@@ -1,0 +1,89 @@
+{
+  "expo": {
+    "name": "MushroomRadar",
+    "slug": "mushroom-radar",
+    "scheme": "mushroomradar",
+    "version": "1.0.0",
+    "orientation": "portrait",
+    "icon": "./assets/icon.png",
+    "userInterfaceStyle": "dark",
+    "newArchEnabled": false,
+    "splash": {
+      "image": "./assets/splash-icon.png",
+      "resizeMode": "contain",
+      "backgroundColor": "#0A0E0C"
+    },
+    "ios": {
+      "supportsTablet": true,
+      "bundleIdentifier": "com.mushroomradar.app",
+      "infoPlist": {
+        "NSLocationWhenInUseUsageDescription": "Show your location on the mushroom map.",
+        "NSCameraUsageDescription": "Take a photo to identify a mushroom.",
+        "NSPhotoLibraryUsageDescription": "Attach a photo to your observation."
+      }
+    },
+    "android": {
+      "package": "com.mushroomradar.app",
+      "adaptiveIcon": {
+        "backgroundColor": "#0A0E0C",
+        "foregroundImage": "./assets/android-icon-foreground.png",
+        "backgroundImage": "./assets/android-icon-background.png",
+        "monochromeImage": "./assets/android-icon-monochrome.png"
+      },
+      "predictiveBackGestureEnabled": false,
+      "permissions": [
+        "ACCESS_COARSE_LOCATION",
+        "ACCESS_FINE_LOCATION",
+        "CAMERA"
+      ]
+    },
+    "web": {
+      "favicon": "./assets/favicon.png",
+      "bundler": "metro"
+    },
+    "plugins": [
+      "expo-router",
+      "expo-secure-store",
+      "expo-status-bar",
+      [
+        "@clerk/expo",
+        {
+          "appleSignIn": false
+        }
+      ],
+      [
+        "expo-location",
+        {
+          "locationWhenInUsePermission": "Show your location on the mushroom map."
+        }
+      ],
+      [
+        "@rnmapbox/maps",
+        {
+          "RNMapboxMapsVersion": "11.23.1"
+        }
+      ],
+      "expo-web-browser",
+      [
+        "expo-navigation-bar",
+        {
+          "enforceContrast": false,
+          "hidden": true,
+          "style": "light"
+        }
+      ],
+      [
+        "expo-camera",
+        {
+          "cameraPermission": "Take a photo to identify a mushroom."
+        }
+      ],
+      [
+        "expo-image-picker",
+        {
+          "photosPermission": "Attach a photo to your observation."
+        }
+      ]
+    ]
+  }
+}

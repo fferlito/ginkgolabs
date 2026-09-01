@@ -1,19 +1,26 @@
 """
-FastAPI backend for Mushroompedia: mushroom definitions and chart data from CSV.
-All routes return JSON only (lists/objects). If you get HTML, the request is
-hitting the frontend server, not this API – set the frontend's VITE_API_URL to
-this service's URL and rebuild.
+FastAPI backend for Mushroompedia plus signed-in places and observations.
+Mushroompedia GETs stay API-key gated when API_KEY is set. /api/me/* uses Clerk JWT.
 
 Security: rate limiting (per IP) and optional API key (set API_KEY in env;
 frontend sends X-API-Key from VITE_API_KEY). Configure via env:
-  API_KEY, RATE_LIMIT_REQUESTS, RATE_LIMIT_WINDOW_SEC, BLOCK_WINDOW_SEC.
+  API_KEY, RATE_LIMIT_REQUESTS, RATE_LIMIT_WINDOW_SEC, BLOCK_WINDOW_SEC,
+  DATABASE_URL, CLERK_ISSUER, GCS_USER_MEDIA_BUCKET, GCS_SERVICE_ACCOUNT_JSON.
 """
+
+from pathlib import Path
+
+from dotenv import load_dotenv
+
+load_dotenv(Path(__file__).resolve().parent / ".env")
 
 from fastapi import FastAPI, HTTPException
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi.responses import JSONResponse
 
 from config import MUSHROOM_DEFINITIONS, get_csv_path
+from database import Base, engine
+from routers.me import router as me_router
 from security import RateLimitAndAuthMiddleware
 from services.data_service import (
     load_df,
@@ -26,9 +33,11 @@ from services.data_service import (
     landcover_distribution,
 )
 
+Base.metadata.create_all(bind=engine)
+
 app = FastAPI(
     title="Mushroompedia API",
-    description="Mushroom definitions and chart data (climate, elevation, season). Returns JSON only.",
+    description="Mushroom definitions, chart data, and signed-in places/observations.",
     version="1.0.0",
     default_response_class=JSONResponse,
 )
@@ -41,11 +50,17 @@ app.add_middleware(
     allow_methods=["*"],
     allow_headers=["*"],
 )
+app.include_router(me_router)
 
 
 @app.get("/")
 def root():
     return {"service": "Mushroompedia API", "docs": "/docs"}
+
+
+@app.get("/health")
+def health():
+    return {"ok": True}
 
 
 @app.get("/api/mushrooms")
