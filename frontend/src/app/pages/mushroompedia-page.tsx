@@ -87,12 +87,21 @@ async function apiGet<T = unknown>(url: string, opts?: RequestInit): Promise<T |
   }
 }
 
+type MushroomPhoto = { url: string; credit?: string; license?: string };
+
 type MushroomEntry = {
   id: string;
   name: string;
   scientificName: string;
-  description: string;
-  statistics: { label: string; value: string }[];
+  names?: Record<string, string>;
+  edible?: boolean;
+  poisonous?: boolean;
+  seasonMonths?: number[];
+  photos?: MushroomPhoto[];
+  thumbUrl?: string;
+  hasStats?: boolean;
+  description?: string;
+  statistics?: { label: string; value: string }[];
 };
 
 type ClimateDay = {
@@ -184,6 +193,7 @@ export function MushroompediaPage() {
   const [detailLoading, setDetailLoading] = useState(false);
   const [chartsLoading, setChartsLoading] = useState(true);
   const [apiMisconfigured, setApiMisconfigured] = useState(false);
+  const [listQuery, setListQuery] = useState("");
   const selectedIdRef = useRef(selectedId);
   selectedIdRef.current = selectedId;
 
@@ -224,7 +234,14 @@ export function MushroompediaPage() {
             id: data.id,
             name: data.name,
             scientificName: data.scientificName,
-            description: data.description,
+            names: data.names,
+            edible: data.edible,
+            poisonous: data.poisonous,
+            seasonMonths: data.seasonMonths,
+            photos: data.photos,
+            thumbUrl: data.thumbUrl,
+            hasStats: data.hasStats,
+            description: data.description ?? "",
             statistics: data.statistics ?? [],
           });
         }
@@ -237,6 +254,18 @@ export function MushroompediaPage() {
   useEffect(() => {
     if (!selectedId) return;
     const id = selectedId;
+    const hasStats = mushrooms.find((m) => m.id === id)?.hasStats;
+    if (!hasStats) {
+      setChartsLoading(false);
+      setChartData([]);
+      setSeasonData([]);
+      setElevationBins([]);
+      setSlopeBins([]);
+      setAspectBins([]);
+      setGeomorphonCategories([]);
+      setLandcoverCategories([]);
+      return;
+    }
     setChartsLoading(true);
     // Avoid cached responses so plots always show fresh API data
     const noCache = { headers: { "Cache-Control": "no-cache", Pragma: "no-cache" } };
@@ -258,9 +287,9 @@ export function MushroompediaPage() {
       .then(([climate, season, elevation, slope, aspect, geomorphon, landcover]) => {
         if (id !== selectedIdRef.current) return;
         if (climate?.days?.length) setChartData(climate.days);
-        else setChartData(fallbackChartData());
+        else setChartData([]);
         if (season?.months?.length) setSeasonData(season.months);
-        else setSeasonData(fallbackSeasonData());
+        else setSeasonData([]);
         setElevationBins(elevation?.bins?.length ? elevation.bins : []);
         setSlopeBins(slope?.bins?.length ? slope.bins : []);
         setAspectBins(aspect?.bins?.length ? aspect.bins : []);
@@ -269,8 +298,8 @@ export function MushroompediaPage() {
       })
       .catch(() => {
         if (id !== selectedIdRef.current) return;
-        setChartData(fallbackChartData());
-        setSeasonData(fallbackSeasonData());
+        setChartData([]);
+        setSeasonData([]);
         setElevationBins([]);
         setSlopeBins([]);
         setAspectBins([]);
@@ -280,7 +309,7 @@ export function MushroompediaPage() {
       .finally(() => {
         if (id === selectedIdRef.current) setChartsLoading(false);
       });
-  }, [selectedId]);
+  }, [selectedId, mushrooms]);
 
   if (loading) {
     return (
@@ -313,8 +342,23 @@ export function MushroompediaPage() {
               className="rounded-xl border border-[#2D5F3F]/30 bg-[#1B3022]/40 p-2"
               aria-label="Mushroom list"
             >
-              <ul className="space-y-0.5">
-                {mushrooms.map((m) => (
+              <input
+                value={listQuery}
+                onChange={(e) => setListQuery(e.target.value)}
+                placeholder="Search by name"
+                className="mb-2 w-full rounded-lg border border-[#2D5F3F] bg-[#0A0E0C] px-3 py-2 text-sm text-[#F5F5F0] placeholder:text-[#6B7B6E]"
+              />
+              <ul className="space-y-0.5 max-h-[70vh] overflow-y-auto">
+                {mushrooms
+                  .filter((m) => {
+                    const q = listQuery.trim().toLowerCase();
+                    if (!q) return true;
+                    const hay = [m.name, m.scientificName, ...Object.values(m.names ?? {})]
+                      .join(" ")
+                      .toLowerCase();
+                    return hay.includes(q);
+                  })
+                  .map((m) => (
                   <li key={m.id}>
                     <button
                       type="button"
@@ -346,13 +390,25 @@ export function MushroompediaPage() {
                 )}
               </p>
             </header>
+            {selected.photos?.length ? (
+              <div className="mb-6 grid grid-cols-3 gap-2">
+                {selected.photos.slice(0, 3).map((photo) => (
+                  <img
+                    key={photo.url}
+                    src={photo.url}
+                    alt={selected.name}
+                    className="h-28 w-full rounded-lg object-contain bg-[#0A0E0C]"
+                  />
+                ))}
+              </div>
+            ) : null}
 
             <section className="mb-6">
               <h3 className="text-sm font-semibold uppercase tracking-wider text-[#9CA89F] mb-2">
                 Description
               </h3>
               <div className="prose prose-invert prose-sm max-w-none text-[#F5F5F0]/90 leading-relaxed space-y-2 [&_strong]:text-[#F5F5F0] [&_strong]:font-semibold">
-                {selected.description.split("\n\n").map((para, i) => (
+                {selected.description?.split("\n\n").map((para, i) => (
                   <p key={i}>
                     {para.split(/(\*\*.*?\*\*)/g).map((part, j) =>
                       part.startsWith("**") && part.endsWith("**") ? (
@@ -366,12 +422,12 @@ export function MushroompediaPage() {
               </div>
             </section>
 
-            {chartsLoading ? (
+            {selected.hasStats && chartsLoading ? (
               <section className="mb-6 flex flex-col items-center justify-center rounded-xl border border-[#2D5F3F]/30 bg-[#1B3022]/60 p-12 min-h-[280px]">
                 <Loader2 className="h-10 w-10 text-[#4A7C5D] animate-spin shrink-0 mb-3" aria-hidden />
                 <p className="text-sm text-[#9CA89F]">Loading charts and data…</p>
               </section>
-            ) : (
+            ) : selected.hasStats ? (
             <>
             <section className="mb-6">
               <h3 className="text-sm font-semibold uppercase tracking-wider text-[#9CA89F] mb-1">
@@ -868,15 +924,14 @@ export function MushroompediaPage() {
             )}
 
             </>
-
-            )}
+            ) : null}
 
             <section>
               <h3 className="text-sm font-semibold uppercase tracking-wider text-[#9CA89F] mb-3">
                 Statistics
               </h3>
               <dl className="grid gap-2 sm:grid-cols-2">
-                {selected.statistics.map((stat) => (
+                {(selected.statistics ?? []).map((stat) => (
                   <div
                     key={stat.label}
                     className="flex flex-col sm:flex-row sm:items-baseline gap-1 py-2 border-b border-[#2D5F3F]/20 last:border-0"

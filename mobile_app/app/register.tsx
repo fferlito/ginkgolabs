@@ -1,6 +1,7 @@
 import { useSignUp } from "@clerk/expo";
 import { Link, useRouter } from "expo-router";
 import { useState } from "react";
+import { useTranslation } from "react-i18next";
 import {
   ActivityIndicator,
   KeyboardAvoidingView,
@@ -13,11 +14,10 @@ import {
 import { AuthDivider, GoogleSignInButton } from "../components/google-sign-in";
 
 function MissingClerkKey() {
+  const { t } = useTranslation();
   return (
     <View className="flex-1 items-center justify-center bg-[#0A0E0C] px-6">
-      <Text className="text-center text-[#9CA89F]">
-        Add EXPO_PUBLIC_CLERK_PUBLISHABLE_KEY to mobile_app/.env to enable registration.
-      </Text>
+      <Text className="text-center text-[#9CA89F]">{t("auth.missingRegisterKey")}</Text>
     </View>
   );
 }
@@ -30,6 +30,7 @@ export default function RegisterScreen() {
 }
 
 function RegisterForm() {
+  const { t } = useTranslation();
   const router = useRouter();
   const { signUp, errors, fetchStatus } = useSignUp();
   const [emailAddress, setEmailAddress] = useState("");
@@ -43,13 +44,13 @@ function RegisterForm() {
   async function onRegister() {
     setFormError(null);
     if (!emailReady) {
-      setFormError("Enter your email to receive a login email.");
+      setFormError(t("auth.enterEmail"));
       return;
     }
     const { error } = await signUp.create({ emailAddress: emailAddress.trim() });
     if (error) {
       setFormError(
-        errors.fields.emailAddress?.message || error.message || JSON.stringify(error)
+        errors.fields.emailAddress?.message || error.message || JSON.stringify(error),
       );
       return;
     }
@@ -78,7 +79,7 @@ function RegisterForm() {
       router.replace("/map");
       return;
     }
-    setFormError(`Sign-up is not complete (status: ${signUp.status}).`);
+    setFormError(t("auth.signUpIncomplete", { status: signUp.status }));
   }
 
   async function onStartOver() {
@@ -94,18 +95,18 @@ function RegisterForm() {
       behavior={Platform.OS === "ios" ? "padding" : undefined}
     >
       <View className="flex-1 justify-center px-6">
-        <Text className="mb-1 text-3xl font-semibold text-[#F5F5F0]">Create account</Text>
+        <Text className="mb-1 text-3xl font-semibold text-[#F5F5F0]">{t("auth.createAccount")}</Text>
         <Text className="mb-8 text-base text-[#9CA89F]">
           {pendingVerify
-            ? `We sent a login email to ${emailAddress.trim()}`
-            : "Register to open the map"}
+            ? t("auth.sentCode", { email: emailAddress.trim() })
+            : t("auth.registerToOpen")}
         </Text>
 
         {!pendingVerify ? (
           <>
             <GoogleSignInButton onError={(message) => setFormError(message || null)} />
             <AuthDivider />
-            <Text className="mb-2 text-sm text-[#9CA89F]">Email</Text>
+            <Text className="mb-2 text-sm text-[#9CA89F]">{t("common.email")}</Text>
             <TextInput
               className="mb-4 rounded-xl border border-[#2D5F3F] bg-[#1B3022] px-4 py-3 text-[#F5F5F0]"
               autoCapitalize="none"
@@ -119,7 +120,7 @@ function RegisterForm() {
           </>
         ) : (
           <>
-            <Text className="mb-2 text-sm text-[#9CA89F]">Login code</Text>
+            <Text className="mb-2 text-sm text-[#9CA89F]">{t("auth.loginCode")}</Text>
             <TextInput
               className="mb-4 rounded-xl border border-[#2D5F3F] bg-[#1B3022] px-4 py-3 text-[#F5F5F0]"
               keyboardType="number-pad"
@@ -131,9 +132,7 @@ function RegisterForm() {
           </>
         )}
 
-        {formError ? (
-          <Text className="mb-4 text-sm text-[#ED8200]">{formError}</Text>
-        ) : null}
+        {formError ? <Text className="mb-4 text-sm text-[#ED8200]">{formError}</Text> : null}
 
         <Pressable
           className="mb-4 items-center rounded-xl bg-[#2D5F3F] py-3 active:bg-[#4A7C5D]"
@@ -144,7 +143,7 @@ function RegisterForm() {
             <ActivityIndicator color="#F5F5F0" />
           ) : (
             <Text className="text-base font-semibold text-[#F5F5F0]">
-              {pendingVerify ? "Verify" : "Send login email"}
+              {pendingVerify ? t("auth.verify") : t("auth.sendLoginEmail")}
             </Text>
           )}
         </Pressable>
@@ -152,17 +151,17 @@ function RegisterForm() {
         {pendingVerify ? (
           <View className="mb-6 gap-3">
             <Pressable disabled={loading} onPress={() => signUp.verifications.sendEmailCode()}>
-              <Text className="text-center text-[#4A7C5D]">Resend email</Text>
+              <Text className="text-center text-[#4A7C5D]">{t("auth.resendEmail")}</Text>
             </Pressable>
             <Pressable disabled={loading} onPress={onStartOver}>
-              <Text className="text-center text-[#9CA89F]">Use a different email</Text>
+              <Text className="text-center text-[#9CA89F]">{t("auth.differentEmail")}</Text>
             </Pressable>
           </View>
         ) : (
           <Link href="/login" asChild>
             <Pressable>
               <Text className="text-center text-[#9CA89F]">
-                Already have an account? <Text className="text-[#4A7C5D]">Sign in</Text>
+                {t("auth.haveAccount")} <Text className="text-[#4A7C5D]">{t("auth.signIn")}</Text>
               </Text>
             </Pressable>
           </Link>

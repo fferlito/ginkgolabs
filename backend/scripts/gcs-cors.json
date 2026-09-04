@@ -1,8 +1,15 @@
 [
   {
     "origin": ["*"],
-    "method": ["GET", "PUT", "HEAD"],
-    "responseHeader": ["Content-Type"],
+    "method": ["GET", "PUT", "HEAD", "OPTIONS"],
+    "responseHeader": [
+      "Content-Type",
+      "Content-Length",
+      "Content-Range",
+      "ETag",
+      "x-goog-meta-*",
+      "x-goog-content-length-range"
+    ],
     "maxAgeSeconds": 3600
   }
 ]

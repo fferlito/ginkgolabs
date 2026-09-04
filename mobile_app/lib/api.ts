@@ -65,12 +65,25 @@ export async function apiAuth<T>(
   return data as T;
 }
 
+export type MushroomPhoto = {
+  url: string;
+  credit?: string;
+  license?: string;
+};
+
 export type MushroomEntry = {
   id: string;
   name: string;
   scientificName: string;
-  description: string;
-  statistics: { label: string; value: string }[];
+  names?: Record<string, string>;
+  edible?: boolean;
+  poisonous?: boolean;
+  seasonMonths?: number[];
+  photos?: MushroomPhoto[];
+  thumbUrl?: string;
+  hasStats?: boolean;
+  description?: string;
+  statistics?: { label: string; value: string }[];
 };
 
 export type ClimateDay = {
@@ -127,6 +140,18 @@ export type Observation = {
   source: string;
   createdAt: string;
   updatedAt: string;
+};
+
+export type CommunityObservation = {
+  id: string;
+  speciesName: string;
+  scientificName: string | null;
+  observedOn: string;
+  latitude: number;
+  longitude: number;
+  photoUrl?: string | null;
+  hunterName?: string;
+  mine?: boolean;
 };
 
 export type IdentifyResult = {

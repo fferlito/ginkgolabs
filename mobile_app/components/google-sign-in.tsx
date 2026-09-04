@@ -1,6 +1,7 @@
 import { useClerk } from "@clerk/expo";
 import { useSSO } from "@clerk/expo/experimental";
 import { useEffect, useState } from "react";
+import { useTranslation } from "react-i18next";
 import { ActivityIndicator, Pressable, Text, View } from "react-native";
 import Svg, { Path } from "react-native-svg";
 import * as WebBrowser from "expo-web-browser";
@@ -39,6 +40,7 @@ export function GoogleSignInButton({
 }) {
   const { setActive } = useClerk();
   const { startSSOFlow } = useSSO();
+  const { t } = useTranslation();
   const [loading, setLoading] = useState(false);
 
   useEffect(() => {
@@ -64,15 +66,15 @@ export function GoogleSignInButton({
         return;
       }
       if (signUp?.status === "missing_requirements") {
-        onError("Google sign-in needs extra account details in Clerk before it can finish.");
+        onError(t("auth.googleExtraDetails"));
         return;
       }
-      onError("Google sign-in did not complete. Enable Google in the Clerk dashboard.");
+      onError(t("auth.googleDidNotComplete"));
     } catch (err) {
       const message =
         err && typeof err === "object" && "message" in err
           ? String((err as { message?: string }).message)
-          : "Google sign-in failed.";
+          : t("auth.googleFailed");
       if (message.toLowerCase().includes("cancel")) return;
       onError(message);
     } finally {
@@ -91,7 +93,7 @@ export function GoogleSignInButton({
       ) : (
         <>
           <GoogleMark />
-          <Text className="text-base font-semibold text-[#F5F5F0]">Continue with Google</Text>
+          <Text className="text-base font-semibold text-[#F5F5F0]">{t("auth.continueGoogle")}</Text>
         </>
       )}
     </Pressable>
@@ -99,10 +101,11 @@ export function GoogleSignInButton({
 }
 
 export function AuthDivider() {
+  const { t } = useTranslation();
   return (
     <View className="mb-6 flex-row items-center gap-3">
       <View className="h-px flex-1 bg-[#2D5F3F]/50" />
-      <Text className="text-xs uppercase tracking-wider text-[#9CA89F]">or</Text>
+      <Text className="text-xs uppercase tracking-wider text-[#9CA89F]">{t("auth.or")}</Text>
       <View className="h-px flex-1 bg-[#2D5F3F]/50" />
     </View>
   );

@@ -32,3 +32,26 @@ The backend uses **rate limiting** (per IP) and optional **API key** auth:
   - `VITE_API_KEY` – same value as backend `API_KEY`; the app sends it as `X-API-Key` on each request.
 
 Use the same strong secret for `API_KEY` and `VITE_API_KEY` so only your frontend (and anyone with the key) can access the API; bots without the key get 401.
+
+## Android app (`mobile_app/`)
+
+Copy `.env.example` → `.env` and fill the keys. Need JDK 17 and the Android SDK.
+
+```powershell
+$env:JAVA_HOME = "C:\Program Files\Microsoft\jdk-17.0.20.101-hotspot"
+$env:ANDROID_HOME = "$env:LOCALAPPDATA\Android\Sdk"
+$env:GRADLE_USER_HOME = "$env:USERPROFILE\.gradle"
+$env:Path = "$env:JAVA_HOME\bin;$env:ANDROID_HOME\platform-tools;$env:ANDROID_HOME\emulator;" + $env:Path
+```
+
+**Emulator** — start AVD `mushroom`, then install:
+
+```powershell
+emulator -avd mushroom
+cd mobile_app\android
+.\gradlew.bat assembleDebug
+Copy-Item app\build\outputs\apk\debug\app-debug.apk ..\dist\MushroomRadar-1.0.0.apk -Force
+adb install -r ..\dist\MushroomRadar-1.0.0.apk
+```
+
+**Phone** — same APK (`dist\MushroomRadar-1.0.0.apk`). Copy it onto the phone and open it, or `adb install -r` with USB debugging.

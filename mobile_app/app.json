@@ -16,14 +16,61 @@
     "ios": {
       "supportsTablet": true,
       "bundleIdentifier": "com.mushroomradar.app",
+      "buildNumber": "1",
       "infoPlist": {
+        "ITSAppUsesNonExemptEncryption": false,
         "NSLocationWhenInUseUsageDescription": "Show your location on the mushroom map.",
         "NSCameraUsageDescription": "Take a photo to identify a mushroom.",
-        "NSPhotoLibraryUsageDescription": "Attach a photo to your observation."
+        "NSPhotoLibraryUsageDescription": "Attach a photo to your observation.",
+        "CFBundleLocalizations": [
+          "be",
+          "bg",
+          "bs",
+          "ca",
+          "cs",
+          "cy",
+          "da",
+          "de",
+          "el",
+          "en",
+          "es",
+          "et",
+          "eu",
+          "fi",
+          "fo",
+          "fr",
+          "ga",
+          "gd",
+          "gl",
+          "hr",
+          "hu",
+          "is",
+          "it",
+          "lb",
+          "lt",
+          "lv",
+          "mk",
+          "mt",
+          "nb",
+          "nl",
+          "pl",
+          "pt",
+          "rm",
+          "ro",
+          "ru",
+          "sk",
+          "sl",
+          "sq",
+          "sr",
+          "sv",
+          "tr",
+          "uk"
+        ]
       }
     },
     "android": {
       "package": "com.mushroomradar.app",
+      "versionCode": 1,
       "adaptiveIcon": {
         "backgroundColor": "#0A0E0C",
         "foregroundImage": "./assets/android-icon-foreground.png",
@@ -32,9 +79,10 @@
       },
       "predictiveBackGestureEnabled": false,
       "permissions": [
-        "ACCESS_COARSE_LOCATION",
-        "ACCESS_FINE_LOCATION",
-        "CAMERA"
+        "android.permission.ACCESS_COARSE_LOCATION",
+        "android.permission.ACCESS_FINE_LOCATION",
+        "android.permission.CAMERA",
+        "android.permission.RECORD_AUDIO"
       ]
     },
     "web": {
@@ -83,7 +131,115 @@
         {
           "photosPermission": "Attach a photo to your observation."
         }
+      ],
+      "@react-native-community/datetimepicker",
+      [
+        "expo-localization",
+        {
+          "supportedLocales": {
+            "ios": [
+              "be",
+              "bg",
+              "bs",
+              "ca",
+              "cs",
+              "cy",
+              "da",
+              "de",
+              "el",
+              "en",
+              "es",
+              "et",
+              "eu",
+              "fi",
+              "fo",
+              "fr",
+              "ga",
+              "gd",
+              "gl",
+              "hr",
+              "hu",
+              "is",
+              "it",
+              "lb",
+              "lt",
+              "lv",
+              "mk",
+              "mt",
+              "nb",
+              "nl",
+              "pl",
+              "pt",
+              "rm",
+              "ro",
+              "ru",
+              "sk",
+              "sl",
+              "sq",
+              "sr",
+              "sv",
+              "tr",
+              "uk"
+            ],
+            "android": [
+              "be",
+              "bg",
+              "bs",
+              "ca",
+              "cs",
+              "cy",
+              "da",
+              "de",
+              "el",
+              "en",
+              "es",
+              "et",
+              "eu",
+              "fi",
+              "fo",
+              "fr",
+              "ga",
+              "gd",
+              "gl",
+              "hr",
+              "hu",
+              "is",
+              "it",
+              "lb",
+              "lt",
+              "lv",
+              "mk",
+              "mt",
+              "nb",
+              "nl",
+              "pl",
+              "pt",
+              "rm",
+              "ro",
+              "ru",
+              "sk",
+              "sl",
+              "sq",
+              "sr",
+              "sv",
+              "tr",
+              "uk"
+            ]
+          }
+        }
       ]
-    ]
+    ],
+    "extra": {
+      "router": {},
+      "expo-navigation-bar": {
+        "enforceContrast": false,
+        "style": "light",
+        "hidden": true
+      },
+      "eas": {
+        "projectId": "69a5b963-7adc-4586-bb5d-733d85688411"
+      }
+    },
+    "owner": "fferlito"
   }
 }

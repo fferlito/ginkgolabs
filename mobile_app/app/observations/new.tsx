@@ -12,8 +12,11 @@ import {
   TextInput,
   View,
 } from "react-native";
+import { useTranslation } from "react-i18next";
 import { MushroomIcon } from "../../components/mushroom-icon";
 import { Subpage } from "../../components/subpage";
+import { DateField, ymdFromDate } from "../../components/date-field";
+import { MiniMap } from "../../components/mini-map";
 import boletus from "../../data/mushrooms/boletus_edulis.json";
 import cantharellus from "../../data/mushrooms/Cantharellus.json";
 import morchella from "../../data/mushrooms/galletto.json";
@@ -21,18 +24,14 @@ import psilocybe from "../../data/mushrooms/Psilocybe.json";
 import type { MushroomData } from "../../data/mushrooms/types";
 import { ApiError, apiAuth } from "../../lib/api";
 import { currentCoords } from "../../lib/geo";
+import { mushroomCommonName } from "../../lib/i18n";
+import { putLocalFile } from "../../lib/local-file";
 import { takePendingScanPhoto } from "../../lib/pending-scan";
 
 const catalog = [boletus, cantharellus, morchella, psilocybe] as MushroomData[];
 
-function todayYmd() {
-  const d = new Date();
-  const m = String(d.getMonth() + 1).padStart(2, "0");
-  const day = String(d.getDate()).padStart(2, "0");
-  return `${d.getFullYear()}-${m}-${day}`;
-}
-
 export default function NewObservationScreen() {
+  const { t } = useTranslation();
   const router = useRouter();
   const { getToken } = useAuth();
   const params = useLocalSearchParams<{
@@ -51,14 +50,14 @@ export default function NewObservationScreen() {
   const [customName, setCustomName] = useState(
     matched ? "" : (params.speciesName || params.scientificName || ""),
   );
-  const [date, setDate] = useState(todayYmd());
+  const [date, setDate] = useState(ymdFromDate(new Date()));
   const [notes, setNotes] = useState("");
   const [isPublic, setIsPublic] = useState(false);
   const [photoUri, setPhotoUri] = useState<string | null>(null);
   const [photoMime, setPhotoMime] = useState("image/jpeg");
   const [latitude, setLatitude] = useState<number | null>(null);
   const [longitude, setLongitude] = useState<number | null>(null);
-  const [gpsLabel, setGpsLabel] = useState("Getting GPS…");
+  const [gpsLabel, setGpsLabel] = useState("");
   const [saving, setSaving] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
@@ -80,18 +79,18 @@ export default function NewObservationScreen() {
         setLongitude(coords.longitude);
         setGpsLabel(`${coords.latitude.toFixed(5)}, ${coords.longitude.toFixed(5)}`);
       } else {
-        setGpsLabel("Location permission denied.");
+        setGpsLabel(t("observations.gpsDenied"));
       }
     })();
     return () => {
       cancelled = true;
     };
-  }, []);
+  }, [t]);
 
   async function pickPhoto() {
     const { status } = await ImagePicker.requestMediaLibraryPermissionsAsync();
     if (status !== "granted") {
-      setError("Photo library permission is required.");
+      setError(t("observations.photoPermission"));
       return;
     }
     const result = await ImagePicker.launchImageLibraryAsync({
@@ -106,11 +105,11 @@ export default function NewObservationScreen() {
 
   async function onSave() {
     if (!photoUri) {
-      setError("A photo is required.");
+      setError(t("observations.photoRequired"));
       return;
     }
     if (latitude == null || longitude == null) {
-      setError("Coordinates are required. Enable location and try again.");
+      setError(t("observations.coordsRequired"));
       return;
     }
     const speciesName = customName.trim() || selected.name;
@@ -129,14 +128,12 @@ export default function NewObservationScreen() {
           body: JSON.stringify({ contentType: photoMime, isPublic }),
         },
       );
-      const fileRes = await fetch(photoUri);
-      const body = await fileRes.blob();
-      const put = await fetch(upload.uploadUrl, {
-        method: "PUT",
-        headers: { "Content-Type": photoMime },
-        body,
-      });
-      if (!put.ok) throw new ApiError(put.status, "Photo upload failed.");
+      const put = await putLocalFile(photoUri, upload.uploadUrl, photoMime);
+      if (put.status < 200 || put.status >= 300) {
+        const code = /<Code>([^<]+)<\/Code>/.exec(put.body)?.[1];
+        const detail = code ? `${put.status} ${code}` : String(put.status);
+        throw new ApiError(put.status, t("observations.photoUploadFailed", { status: detail }));
+      }
       await apiAuth("/api/me/observations", token, {
         method: "POST",
         body: JSON.stringify({
@@ -154,23 +151,25 @@ export default function NewObservationScreen() {
       });
       router.back();
     } catch (err) {
-      setError(err instanceof ApiError ? err.message : "Could not save observation.");
+      setError(err instanceof ApiError ? err.message : t("observations.saveError"));
     } finally {
       setSaving(false);
     }
   }
 
+  const identifiedLabel = customName || mushroomCommonName(selected);
+
   return (
-    <Subpage title="New observation">
+    <Subpage title={t("observations.newTitle")}>
       <ScrollView
         contentContainerStyle={{ paddingHorizontal: 16, paddingBottom: 32 }}
         keyboardShouldPersistTaps="handled"
       >
         {fromScan ? (
           <>
-            <Text className="mb-2 text-sm text-[#9CA89F]">Identified species</Text>
+            <Text className="mb-2 text-sm text-[#9CA89F]">{t("observations.identifiedSpecies")}</Text>
             <Text className="mb-4 text-base font-semibold text-[#F5F5F0]">
-              {customName || selected.name}
+              {identifiedLabel}
             </Text>
             {params.scientificName ? (
               <Text className="-mt-3 mb-4 text-xs italic text-[#9CA89F]">{params.scientificName}</Text>
@@ -178,7 +177,7 @@ export default function NewObservationScreen() {
           </>
         ) : (
           <>
-            <Text className="mb-2 text-sm text-[#9CA89F]">Species</Text>
+            <Text className="mb-2 text-sm text-[#9CA89F]">{t("observations.species")}</Text>
             <View className="mb-4 rounded-xl border border-[#2D5F3F]/30 bg-[#1B3022]/40 p-2">
               {catalog.map((mushroom) => {
                 const active = selected.scientificName === mushroom.scientificName && !customName;
@@ -201,7 +200,7 @@ export default function NewObservationScreen() {
                       />
                     </View>
                     <View className="flex-1">
-                      <Text className="text-sm font-medium text-[#F5F5F0]">{mushroom.name}</Text>
+                      <Text className="text-sm font-medium text-[#F5F5F0]">{mushroomCommonName(mushroom)}</Text>
                       <Text className="text-xs italic text-[#9CA89F]">{mushroom.scientificName}</Text>
                     </View>
                   </Pressable>
@@ -211,19 +210,13 @@ export default function NewObservationScreen() {
           </>
         )}
 
-        <Text className="mb-2 text-sm text-[#9CA89F]">Date</Text>
-        <TextInput
-          className="mb-4 rounded-xl border border-[#2D5F3F] bg-[#1B3022] px-4 py-3 text-[#F5F5F0]"
-          value={date}
-          onChangeText={setDate}
-          placeholder="YYYY-MM-DD"
-          placeholderTextColor="#6B7B6E"
-        />
+        <Text className="mb-2 text-sm text-[#9CA89F]">{t("common.date")}</Text>
+        <DateField value={date} onChange={setDate} />
 
-        <Text className="mb-2 text-sm text-[#9CA89F]">Notes</Text>
+        <Text className="mb-2 text-sm text-[#9CA89F]">{t("common.notes")}</Text>
         <TextInput
           className="mb-4 min-h-[96px] rounded-xl border border-[#2D5F3F] bg-[#1B3022] px-4 py-3 text-[#F5F5F0]"
-          placeholder="Habitat, quantity, weather…"
+          placeholder={t("observations.habitatPlaceholder")}
           placeholderTextColor="#6B7B6E"
           multiline
           textAlignVertical="top"
@@ -233,10 +226,8 @@ export default function NewObservationScreen() {
 
         <View className="mb-4 flex-row items-center justify-between rounded-xl border border-[#2D5F3F]/30 bg-[#1B3022]/40 px-4 py-3">
           <View className="flex-1 pr-3">
-            <Text className="text-sm font-medium text-[#F5F5F0]">Make public</Text>
-            <Text className="text-xs text-[#9CA89F]">
-              Off by default. Public entries can include this find later; coordinates stay private for now.
-            </Text>
+            <Text className="text-sm font-medium text-[#F5F5F0]">{t("observations.makePublic")}</Text>
+            <Text className="text-xs text-[#9CA89F]">{t("observations.makePublicHint")}</Text>
           </View>
           <Switch
             value={isPublic}
@@ -246,7 +237,7 @@ export default function NewObservationScreen() {
           />
         </View>
 
-        <Text className="mb-2 text-sm text-[#9CA89F]">Photo</Text>
+        <Text className="mb-2 text-sm text-[#9CA89F]">{t("observations.photo")}</Text>
         <Pressable
           onPress={pickPhoto}
           className="mb-4 items-center overflow-hidden rounded-xl border border-dashed border-[#2D5F3F] bg-[#1B3022]/40 active:bg-[#1B3022]"
@@ -254,11 +245,23 @@ export default function NewObservationScreen() {
           {photoUri ? (
             <Image source={{ uri: photoUri }} className="h-48 w-full" />
           ) : (
-            <Text className="py-10 text-sm text-[#9CA89F]">Add a photo</Text>
+            <Text className="py-10 text-sm text-[#9CA89F]">{t("observations.addPhoto")}</Text>
           )}
         </Pressable>
 
-        <Text className="mb-6 text-sm text-[#9CA89F]">GPS: {gpsLabel}</Text>
+        <Text className="mb-2 text-sm text-[#9CA89F]">{t("common.location")}</Text>
+        {latitude != null && longitude != null ? (
+          <MiniMap
+            latitude={latitude}
+            longitude={longitude}
+            onChange={({ latitude: lat, longitude: lng }) => {
+              setLatitude(lat);
+              setLongitude(lng);
+            }}
+          />
+        ) : (
+          <Text className="mb-4 text-sm text-[#9CA89F]">{gpsLabel || t("observations.gpsGetting")}</Text>
+        )}
         {error ? <Text className="mb-3 text-sm text-[#E8B86D]">{error}</Text> : null}
         <Pressable
           onPress={onSave}
@@ -268,7 +271,7 @@ export default function NewObservationScreen() {
           {saving ? (
             <ActivityIndicator color="#F5F5F0" />
           ) : (
-            <Text className="text-base font-semibold text-[#F5F5F0]">Save</Text>
+            <Text className="text-base font-semibold text-[#F5F5F0]">{t("common.save")}</Text>
           )}
         </Pressable>
       </ScrollView>

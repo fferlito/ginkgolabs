@@ -1,6 +1,18 @@
 import { useClerk, useUser } from "@clerk/expo";
 import { useRouter } from "expo-router";
+import {
+  BookOpen,
+  Camera,
+  Leaf,
+  LogOut,
+  MapPin,
+  Menu,
+  Shield,
+  User,
+  type LucideIcon,
+} from "lucide-react-native";
 import { useEffect, useRef, useState } from "react";
+import { useTranslation } from "react-i18next";
 import {
   Animated,
   BackHandler,
@@ -13,27 +25,24 @@ import { useSafeAreaInsets } from "react-native-safe-area-context";
 
 const DRAWER_WIDTH = Math.min(Dimensions.get("window").width * 0.78, 320);
 
-const MENU_ITEMS = [
-  { id: "account", label: "Account", href: "/account" },
-  { id: "locations", label: "My locations", href: "/locations" },
-  { id: "observations", label: "My observations", href: "/observations" },
-  { id: "scan", label: "Scan mode", href: "/scan" },
-  { id: "mushroompedia", label: "Mushroompedia", href: "/mushroompedia" },
-  { id: "privacy", label: "Privacy Policy & Terms of Use", href: "/privacy" },
-] as const;
+const MENU_ITEMS: { id: string; href: string; icon: LucideIcon; labelKey: string }[] = [
+  { id: "account", labelKey: "menu.account", href: "/account", icon: User },
+  { id: "locations", labelKey: "menu.locations", href: "/locations", icon: MapPin },
+  { id: "observations", labelKey: "menu.observations", href: "/observations", icon: Leaf },
+  { id: "scan", labelKey: "menu.scan", href: "/scan", icon: Camera },
+  { id: "mushroompedia", labelKey: "menu.mushroompedia", href: "/mushroompedia", icon: BookOpen },
+  { id: "privacy", labelKey: "menu.legal", href: "/privacy", icon: Shield },
+];
 
 export function MenuButton({ onPress }: { onPress: () => void }) {
+  const { t } = useTranslation();
   return (
     <Pressable
       onPress={onPress}
-      accessibilityLabel="Open menu"
-      className="h-12 w-12 items-center justify-center rounded-full border-2 border-[#2D5F3F]/50 bg-[#0A0E0C]/90"
+      accessibilityLabel={t("menu.openMenu")}
+      className="h-12 w-12 items-center justify-center rounded-full border-2 border-[#2D5F3F] bg-[#2D5F3F]"
     >
-      <View className="items-start" style={{ gap: 4.5 }}>
-        <View className="h-[2.5px] w-5 rounded-full bg-[#F5F5F0]" />
-        <View className="h-[2.5px] w-[14px] rounded-full bg-[#F5F5F0]" />
-        <View className="h-[2.5px] w-2 rounded-full bg-[#F5F5F0]" />
-      </View>
+      <Menu color="#F5F5F0" size={24} strokeWidth={2} />
     </Pressable>
   );
 }
@@ -44,10 +53,19 @@ function initialsFromName(name: string): string {
   return (parts[0]?.[0] ?? "G").toUpperCase();
 }
 
-function MenuLink({ label, onPress }: { label: string; onPress: () => void }) {
+function MenuLink({
+  label,
+  icon: Icon,
+  onPress,
+}: {
+  label: string;
+  icon: LucideIcon;
+  onPress: () => void;
+}) {
   return (
-    <Pressable onPress={onPress} className="w-full px-6 py-3 active:bg-white/5">
-      <Text className="text-left text-base text-[#F5F5F0]">{label}</Text>
+    <Pressable onPress={onPress} className="w-full flex-row items-center gap-3 px-6 py-3 active:bg-white/5">
+      <Icon color="#4A7C5D" size={18} strokeWidth={2} />
+      <Text className="flex-1 text-left text-base text-[#F5F5F0]">{label}</Text>
     </Pressable>
   );
 }
@@ -64,6 +82,7 @@ function MenuBody({
   onLogout: () => void;
 }) {
   const router = useRouter();
+  const { t } = useTranslation();
   return (
     <>
       <View className="items-center px-6 pb-4">
@@ -78,7 +97,8 @@ function MenuBody({
       {MENU_ITEMS.map((item) => (
         <MenuLink
           key={item.id}
-          label={item.label}
+          label={t(item.labelKey)}
+          icon={item.icon}
           onPress={() => {
             onClose();
             router.push(item.href);
@@ -88,7 +108,7 @@ function MenuBody({
 
       <View className="mx-6 my-2 h-px bg-white/10" />
 
-      <MenuLink label="Log out" onPress={onLogout} />
+      <MenuLink label={t("menu.logOut")} icon={LogOut} onPress={onLogout} />
     </>
   );
 }

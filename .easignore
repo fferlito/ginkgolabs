@@ -1,0 +1,15 @@
+node_modules
+.env
+backend/gcp-sa.json
+backend/local.db
+__pycache__/
+*.pyc
+
+mobile_app/android
+mobile_app/ios
+mobile_app/node_modules
+mobile_app/dist
+mobile_app/.expo
+**/.cxx/
+**/.gradle/
+**/build/

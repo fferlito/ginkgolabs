@@ -3,6 +3,8 @@ import { Modal, Pressable, ScrollView, Text, View } from "react-native";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
 import Svg, { Line, Polyline, Text as SvgText } from "react-native-svg";
 import { X } from "lucide-react-native";
+import { useTranslation } from "react-i18next";
+import { dateLocale } from "../lib/i18n";
 
 const DAYS = 14;
 const PRODUCTION_API = "https://backend-production-bc08.up.railway.app";
@@ -34,8 +36,8 @@ async function apiGet<T>(path: string): Promise<T | null> {
   }
 }
 
-function formatMd(d: Date): string {
-  return d.toLocaleDateString(undefined, { month: "short", day: "numeric" });
+function formatMd(d: Date, locale: string): string {
+  return d.toLocaleDateString(locale, { month: "short", day: "numeric" });
 }
 
 function subDays(d: Date, n: number): Date {
@@ -66,14 +68,14 @@ type ClimateDay = {
   idealRain: number;
 };
 
-function buildBaseChartData(): ChartRow[] {
+function buildBaseChartData(locale: string): ChartRow[] {
   const idealT = idealTrend(15, 2, DAYS);
   const idealH = idealTrend(80, 5, DAYS);
   const idealR = idealTrend(3, 0.8, DAYS);
   return Array.from({ length: DAYS }, (_, i) => {
     const d = subDays(new Date(), DAYS - 1 - i);
     return {
-      date: formatMd(d),
+      date: formatMd(d, locale),
       temperature: 12 + Math.sin(i * 0.5) * 6 + (Math.random() - 0.5) * 4,
       humidity: 65 + Math.sin(i * 0.3) * 15 + (Math.random() - 0.5) * 10,
       rain: Math.max(0, (Math.random() - 0.6) * 8),
@@ -218,12 +220,13 @@ function ChartBlock({
   color: string;
   unit: string;
 }) {
+  const { t } = useTranslation();
   return (
     <View className="rounded-xl border border-[#2D5F3F]/30 bg-[#1B3022]/40 p-3">
       <Text className="mb-1 text-sm font-medium text-[#F5F5F0]">{title}</Text>
       <View className="mb-1 flex-row gap-3">
-        <Text className="text-[10px] text-[#9CA89F]">— Actual</Text>
-        <Text className="text-[10px] text-[#9CA89F]">- - Ideal</Text>
+        <Text className="text-[10px] text-[#9CA89F]">{t("stats.actual")}</Text>
+        <Text className="text-[10px] text-[#9CA89F]">{t("stats.ideal")}</Text>
       </View>
       <DualLineChart
         labels={labels}
@@ -247,8 +250,9 @@ export function StatsPanel({
   point: { lat: number; lng: number; prediction: number } | null;
   mushroomId: string | null;
 }) {
+  const { t, i18n } = useTranslation();
   const insets = useSafeAreaInsets();
-  const baseData = useMemo(() => buildBaseChartData(), []);
+  const baseData = useMemo(() => buildBaseChartData(dateLocale(i18n.language)), [i18n.language]);
   const [idealFromApi, setIdealFromApi] = useState<ClimateDay[] | null>(null);
 
   useEffect(() => {
@@ -282,11 +286,11 @@ export function StatsPanel({
     <Modal visible={open} animationType="slide" onRequestClose={onClose}>
       <View className="flex-1 bg-[#0A0E0C]" style={{ paddingTop: insets.top }}>
         <View className="flex-row items-center justify-between border-b border-[#2D5F3F]/30 px-4 py-2">
-          <Text className="text-base font-semibold text-[#F5F5F0]">Location stats</Text>
+          <Text className="text-base font-semibold text-[#F5F5F0]">{t("stats.title")}</Text>
           <Pressable
             onPress={onClose}
             className="rounded-lg p-1.5"
-            accessibilityLabel="Close panel"
+            accessibilityLabel={t("stats.close")}
           >
             <X color="#9CA89F" size={20} />
           </Pressable>
@@ -301,16 +305,16 @@ export function StatsPanel({
           }}
         >
           <View className="flex-row gap-2">
-            <StatCard label="Forest type" value={FAKE_STATS.forestType} />
-            <StatCard label="Elevation" value={FAKE_STATS.elevation} />
+            <StatCard label={t("stats.forestType")} value={FAKE_STATS.forestType} />
+            <StatCard label={t("stats.elevation")} value={FAKE_STATS.elevation} />
           </View>
           <View className="flex-row gap-2">
-            <StatCard label="Slope" value={FAKE_STATS.slope} />
-            <StatCard label="Aspect" value={FAKE_STATS.aspect} />
+            <StatCard label={t("stats.slope")} value={FAKE_STATS.slope} />
+            <StatCard label={t("stats.aspect")} value={FAKE_STATS.aspect} />
           </View>
 
           <ChartBlock
-            title="Temperature"
+            title={t("stats.temperature")}
             labels={labels}
             actual={data.map((r) => r.temperature)}
             ideal={data.map((r) => r.idealTemperature)}
@@ -318,7 +322,7 @@ export function StatsPanel({
             unit="°C"
           />
           <ChartBlock
-            title="Humidity"
+            title={t("stats.humidity")}
             labels={labels}
             actual={data.map((r) => r.humidity)}
             ideal={data.map((r) => r.idealHumidity)}
@@ -326,7 +330,7 @@ export function StatsPanel({
             unit="%"
           />
           <ChartBlock
-            title="Rain"
+            title={t("stats.rain")}
             labels={labels}
             actual={data.map((r) => r.rain)}
             ideal={data.map((r) => r.idealRain)}
@@ -336,8 +340,11 @@ export function StatsPanel({
 
           {point ? (
             <Text className="pt-1 text-xs text-[#9CA89F]">
-              Point: {point.lat.toFixed(4)}, {point.lng.toFixed(4)} · Probability:{" "}
-              {(point.prediction * 100).toFixed(1)}%
+              {t("stats.point", {
+                lat: point.lat.toFixed(4),
+                lng: point.lng.toFixed(4),
+                value: (point.prediction * 100).toFixed(1),
+              })}
             </Text>
           ) : null}
         </ScrollView>

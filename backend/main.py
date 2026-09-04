@@ -19,6 +19,7 @@ from fastapi.middleware.cors import CORSMiddleware
 from fastapi.responses import JSONResponse
 
 from config import MUSHROOM_DEFINITIONS, get_csv_path
+from pedia import detail_payload, list_payload
 from database import Base, engine
 from routers.me import router as me_router
 from security import RateLimitAndAuthMiddleware
@@ -65,32 +66,16 @@ def health():
 
 @app.get("/api/mushrooms")
 def list_mushrooms():
-    """List all mushroom definitions (id, name, scientificName, no CSV data)."""
-    return [
-        {
-            "id": m["id"],
-            "name": m["name"],
-            "scientificName": m["scientificName"],
-            "description": m["description"],
-            "statistics": m["statistics"],
-        }
-        for m in MUSHROOM_DEFINITIONS
-    ]
+    """List mushroompedia entries (compact: names, photos, edibility, season)."""
+    return [list_payload(m) for m in MUSHROOM_DEFINITIONS]
 
 
 @app.get("/api/mushrooms/{mushroom_id}")
 def get_mushroom(mushroom_id: str):
-    """Get one mushroom definition by id."""
+    """Get one mushroompedia entry by id."""
     for m in MUSHROOM_DEFINITIONS:
         if m["id"] == mushroom_id:
-            return {
-                "id": m["id"],
-                "name": m["name"],
-                "scientificName": m["scientificName"],
-                "description": m["description"],
-                "statistics": m["statistics"],
-                "csv_file": m["csv_file"],
-            }
+            return detail_payload(m)
     raise HTTPException(status_code=404, detail="Mushroom not found")
 
 

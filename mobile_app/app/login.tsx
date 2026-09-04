@@ -1,6 +1,7 @@
 import { useSignIn } from "@clerk/expo";
 import { Link, useRouter } from "expo-router";
 import { useState } from "react";
+import { useTranslation } from "react-i18next";
 import {
   ActivityIndicator,
   KeyboardAvoidingView,
@@ -13,11 +14,10 @@ import {
 import { AuthDivider, GoogleSignInButton } from "../components/google-sign-in";
 
 function MissingClerkKey() {
+  const { t } = useTranslation();
   return (
     <View className="flex-1 items-center justify-center bg-[#0A0E0C] px-6">
-      <Text className="text-center text-[#9CA89F]">
-        Add EXPO_PUBLIC_CLERK_PUBLISHABLE_KEY to mobile_app/.env to enable sign-in.
-      </Text>
+      <Text className="text-center text-[#9CA89F]">{t("auth.missingLoginKey")}</Text>
     </View>
   );
 }
@@ -30,6 +30,7 @@ export default function LoginScreen() {
 }
 
 function LoginForm() {
+  const { t } = useTranslation();
   const router = useRouter();
   const { signIn, errors, fetchStatus } = useSignIn();
   const [emailAddress, setEmailAddress] = useState("");
@@ -42,7 +43,7 @@ function LoginForm() {
 
   async function finalizeIfComplete() {
     if (signIn.status !== "complete") {
-      setFormError(`Sign-in is not complete (status: ${signIn.status}).`);
+      setFormError(t("auth.signInIncomplete", { status: signIn.status }));
       return;
     }
     await signIn.finalize({
@@ -55,7 +56,7 @@ function LoginForm() {
   async function onSendEmail() {
     setFormError(null);
     if (!emailReady) {
-      setFormError("Enter your email to receive a login email.");
+      setFormError(t("auth.enterEmail"));
       return;
     }
     const { error } = await signIn.emailCode.sendCode({
@@ -66,7 +67,7 @@ function LoginForm() {
         errors.fields.identifier?.message ||
           errors.fields.emailAddress?.message ||
           error.message ||
-          JSON.stringify(error)
+          JSON.stringify(error),
       );
       return;
     }
@@ -101,15 +102,15 @@ function LoginForm() {
         </Text>
         <Text className="mb-8 text-base text-[#9CA89F]">
           {pendingVerify
-            ? `We sent a login email to ${emailAddress.trim()}`
-            : "Sign in to open the map"}
+            ? t("auth.sentCode", { email: emailAddress.trim() })
+            : t("auth.signInToOpen")}
         </Text>
 
         {!pendingVerify ? (
           <>
             <GoogleSignInButton onError={(message) => setFormError(message || null)} />
             <AuthDivider />
-            <Text className="mb-2 text-sm text-[#9CA89F]">Email</Text>
+            <Text className="mb-2 text-sm text-[#9CA89F]">{t("common.email")}</Text>
             <TextInput
               className="mb-4 rounded-xl border border-[#2D5F3F] bg-[#1B3022] px-4 py-3 text-[#F5F5F0]"
               autoCapitalize="none"
@@ -123,7 +124,7 @@ function LoginForm() {
           </>
         ) : (
           <>
-            <Text className="mb-2 text-sm text-[#9CA89F]">Login code</Text>
+            <Text className="mb-2 text-sm text-[#9CA89F]">{t("auth.loginCode")}</Text>
             <TextInput
               className="mb-4 rounded-xl border border-[#2D5F3F] bg-[#1B3022] px-4 py-3 text-[#F5F5F0]"
               keyboardType="number-pad"
@@ -135,9 +136,7 @@ function LoginForm() {
           </>
         )}
 
-        {formError ? (
-          <Text className="mb-4 text-sm text-[#ED8200]">{formError}</Text>
-        ) : null}
+        {formError ? <Text className="mb-4 text-sm text-[#ED8200]">{formError}</Text> : null}
 
         <Pressable
           className="mb-4 items-center rounded-xl bg-[#2D5F3F] py-3 active:bg-[#4A7C5D]"
@@ -148,7 +147,7 @@ function LoginForm() {
             <ActivityIndicator color="#F5F5F0" />
           ) : (
             <Text className="text-base font-semibold text-[#F5F5F0]">
-              {pendingVerify ? "Verify" : "Send login email"}
+              {pendingVerify ? t("auth.verify") : t("auth.sendLoginEmail")}
             </Text>
           )}
         </Pressable>
@@ -156,17 +155,17 @@ function LoginForm() {
         {pendingVerify ? (
           <View className="mb-6 gap-3">
             <Pressable disabled={loading} onPress={onSendEmail}>
-              <Text className="text-center text-[#4A7C5D]">Resend email</Text>
+              <Text className="text-center text-[#4A7C5D]">{t("auth.resendEmail")}</Text>
             </Pressable>
             <Pressable disabled={loading} onPress={onStartOver}>
-              <Text className="text-center text-[#9CA89F]">Use a different email</Text>
+              <Text className="text-center text-[#9CA89F]">{t("auth.differentEmail")}</Text>
             </Pressable>
           </View>
         ) : (
           <Link href="/register" asChild>
             <Pressable>
               <Text className="text-center text-[#9CA89F]">
-                No account? <Text className="text-[#4A7C5D]">Register</Text>
+                {t("auth.noAccount")} <Text className="text-[#4A7C5D]">{t("auth.register")}</Text>
               </Text>
             </Pressable>
           </Link>

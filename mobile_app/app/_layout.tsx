@@ -1,4 +1,5 @@
 import "../global.css";
+import "../lib/i18n";
 import { ClerkProvider, useAuth } from "@clerk/expo";
 import { tokenCache } from "@clerk/expo/token-cache";
 import { NavigationBar } from "expo-navigation-bar";
@@ -6,6 +7,7 @@ import { Stack, useRouter, useSegments } from "expo-router";
 import { StatusBar } from "expo-status-bar";
 import { useEffect } from "react";
 import { ActivityIndicator, AppState, Platform, View } from "react-native";
+import { hydrateLanguage } from "../lib/i18n";
 
 const publishableKey = process.env.EXPO_PUBLIC_CLERK_PUBLISHABLE_KEY ?? "";
 
@@ -58,6 +60,9 @@ function useHiddenAndroidNavBar() {
 
 export default function RootLayout() {
   useHiddenAndroidNavBar();
+  useEffect(() => {
+    void hydrateLanguage();
+  }, []);
   return (
     <>
       <StatusBar style="light" />

@@ -95,6 +95,18 @@ class ObservationOut(BaseModel):
     updatedAt: str
 
 
+class CommunityObservationOut(BaseModel):
+    id: UUID
+    speciesName: str
+    scientificName: str | None
+    observedOn: str
+    latitude: float
+    longitude: float
+    photoUrl: str | None = None
+    hunterName: str = "Hunter"
+    mine: bool = False
+
+
 def _iso(dt) -> str:
     return dt.isoformat() if dt else ""
 
@@ -148,6 +160,30 @@ def _owned_obs(db: Session, user: User, observation_id: UUID) -> Observation:
     return row
 
 
+def _hunter_name(user: User | None) -> str:
+    email = (user.email or "").strip() if user else ""
+    local = email.split("@")[0].strip() if email else ""
+    return local or "Hunter"
+
+
+def _community_out(row: Observation, hunter: User | None, *, mine: bool = False) -> CommunityObservationOut:
+    try:
+        photo_url = signed_read_url(row.photo_object)
+    except Exception:
+        photo_url = None
+    return CommunityObservationOut(
+        id=row.id,
+        speciesName=row.species_name,
+        scientificName=row.scientific_name,
+        observedOn=row.observed_on.isoformat(),
+        latitude=row.latitude,
+        longitude=row.longitude,
+        photoUrl=photo_url,
+        hunterName=_hunter_name(hunter),
+        mine=mine,
+    )
+
+
 @router.get("/places", response_model=list[PlaceOut])
 def list_places(user: User = Depends(current_clerk_user), db: Session = Depends(get_db)):
     rows = (
@@ -157,6 +193,11 @@ def list_places(user: User = Depends(current_clerk_user), db: Session = Depends(
         .all()
     )
     return [_place_out(r) for r in rows]
+
+
+@router.get("/places/{place_id}", response_model=PlaceOut)
+def get_place(place_id: UUID, user: User = Depends(current_clerk_user), db: Session = Depends(get_db)):
+    return _place_out(_owned_place(db, user, place_id))
 
 
 @router.post("/places", response_model=PlaceOut)
@@ -206,10 +247,7 @@ def delete_place(place_id: UUID, user: User = Depends(current_clerk_user), db: S
 @router.post("/observations/upload-url")
 def observation_upload_url(body: UploadUrlIn, user: User = Depends(current_clerk_user)):
     key = new_object_key(user.clerk_user_id, body.contentType, body.isPublic)
-    try:
-        url = signed_upload_url(key, body.contentType)
-    except Exception as exc:
-        raise HTTPException(status_code=503, detail="Photo storage is not configured.") from exc
+    url = signed_upload_url(key, body.contentType)
     return {"uploadUrl": url, "objectKey": key}
 
 
@@ -222,6 +260,59 @@ def list_observations(user: User = Depends(current_clerk_user), db: Session = De
         .all()
     )
     return [_obs_out(r) for r in rows]
+
+
+@router.get("/observations/community", response_model=list[CommunityObservationOut])
+def list_community_observations(
+    user: User = Depends(current_clerk_user),
+    db: Session = Depends(get_db),
+):
+    rows = (
+        db.query(Observation)
+        .filter(Observation.is_public.is_(True))
+        .order_by(Observation.observed_on.desc(), Observation.created_at.desc())
+        .limit(500)
+        .all()
+    )
+    hunter_ids = {row.clerk_user_id for row in rows}
+    hunters = (
+        {
+            hunter.clerk_user_id: hunter
+            for hunter in db.query(User).filter(User.clerk_user_id.in_(hunter_ids)).all()
+        }
+        if hunter_ids
+        else {}
+    )
+    return [
+        _community_out(
+            row,
+            hunters.get(row.clerk_user_id),
+            mine=row.clerk_user_id == user.clerk_user_id,
+        )
+        for row in rows
+    ]
+
+
+@router.get("/observations/community/{observation_id}", response_model=CommunityObservationOut)
+def get_community_observation(
+    observation_id: UUID,
+    _user: User = Depends(current_clerk_user),
+    db: Session = Depends(get_db),
+):
+    row = db.get(Observation, observation_id)
+    if row is None or not row.is_public:
+        raise HTTPException(status_code=404, detail="Observation not found.")
+    hunter = db.get(User, row.clerk_user_id)
+    return _community_out(row, hunter, mine=row.clerk_user_id == _user.clerk_user_id)
+
+
+@router.get("/observations/{observation_id}", response_model=ObservationOut)
+def get_observation(
+    observation_id: UUID,
+    user: User = Depends(current_clerk_user),
+    db: Session = Depends(get_db),
+):
+    return _obs_out(_owned_obs(db, user, observation_id))
 
 
 @router.post("/observations", response_model=ObservationOut)
@@ -315,7 +406,8 @@ async def identify_photo(
     if len(data) > IDENTIFY_MAX_BYTES:
         raise HTTPException(status_code=413, detail="Image is too large (max 8 MB).")
     identify_url = os.environ.get("IDENTIFY_URL", "").strip()
-    if identify_url:
+    local_token = os.environ.get("INATURALIST_API_TOKEN", "").strip()
+    if identify_url and not local_token:
         import httpx
 
         secret = os.environ.get("IDENTIFY_SERVICE_SECRET", "").strip()
@@ -332,7 +424,14 @@ async def identify_photo(
         except httpx.HTTPError as exc:
             raise HTTPException(status_code=502, detail="Identification service is unreachable.") from exc
         if res.status_code >= 400:
-            raise HTTPException(status_code=502, detail="Identification service failed.")
+            detail = "Identification service failed."
+            try:
+                body = res.json()
+                if isinstance(body, dict) and isinstance(body.get("detail"), str):
+                    detail = body["detail"]
+            except ValueError:
+                pass
+            raise HTTPException(status_code=502, detail=detail)
         return res.json()
     try:
         results = score_image(

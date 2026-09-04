@@ -29,6 +29,13 @@ if (-not (Invoke-Gcloud storage buckets describe "gs://$bucket" --project=$Proje
   if ($LASTEXITCODE -ne 0) { throw "Failed to create bucket" }
 }
 
+$pediaBucket = "mushroom-radar-pedia"
+Write-Host "Ensuring public pedia bucket gs://$pediaBucket ..."
+if (-not (Invoke-Gcloud storage buckets describe "gs://$pediaBucket" --project=$Project)) {
+  gcloud storage buckets create "gs://$pediaBucket" --project=$Project --location=europe-west1 --uniform-bucket-level-access --no-public-access-prevention
+  if ($LASTEXITCODE -ne 0) { throw "Failed to create pedia bucket" }
+}
+
 $saId = "mushroomradar-api"
 $saEmail = "$saId@$Project.iam.gserviceaccount.com"
 Write-Host "Ensuring service account $saEmail ..."
@@ -37,6 +44,8 @@ if (-not (Invoke-Gcloud iam service-accounts describe $saEmail --project=$Projec
   if ($LASTEXITCODE -ne 0) { throw "Failed to create service account" }
 }
 gcloud storage buckets add-iam-policy-binding "gs://$bucket" --member="serviceAccount:$saEmail" --role="roles/storage.objectAdmin" --project=$Project --quiet | Out-Null
+gcloud storage buckets add-iam-policy-binding "gs://$pediaBucket" --member="serviceAccount:$saEmail" --role="roles/storage.objectAdmin" --project=$Project --quiet | Out-Null
+gcloud storage buckets add-iam-policy-binding "gs://$pediaBucket" --member="allUsers" --role="roles/storage.objectViewer" --project=$Project --quiet | Out-Null
 
 if (-not (Test-Path $KeyFile)) {
   Write-Host "Creating signing key file (not printed)..."
@@ -88,6 +97,7 @@ $lines = @(
   "CLERK_ISSUER=https://wondrous-puma-85.clerk.accounts.dev",
   "CLERK_JWKS_URL=https://wondrous-puma-85.clerk.accounts.dev/.well-known/jwks.json",
   "GCS_USER_MEDIA_BUCKET=$bucket",
+  "GCS_PEDIA_BUCKET=$pediaBucket",
   "GOOGLE_APPLICATION_CREDENTIALS=./gcp-sa.json",
   "IDENTIFY_SERVICE_SECRET=$identifySecret",
   "INATURALIST_API_TOKEN=",

@@ -1,0 +1,39 @@
+{
+  "cli": {
+    "version": ">= 16.0.0",
+    "appVersionSource": "local"
+  },
+  "build": {
+    "ios-simulator": {
+      "distribution": "internal",
+      "environment": "preview",
+      "env": {
+        "EXPO_PUBLIC_API_URL": "https://backend-production-bc08.up.railway.app"
+      },
+      "ios": {
+        "simulator": true,
+        "withoutCredentials": true
+      }
+    },
+    "preview": {
+      "distribution": "internal",
+      "environment": "preview",
+      "env": {
+        "EXPO_PUBLIC_API_URL": "https://backend-production-bc08.up.railway.app"
+      }
+    },
+    "production": {
+      "environment": "preview",
+      "env": {
+        "EXPO_PUBLIC_API_URL": "https://backend-production-bc08.up.railway.app"
+      }
+    }
+  },
+  "submit": {
+    "production": {
+      "android": {
+        "track": "internal"
+      }
+    }
+  }
+}

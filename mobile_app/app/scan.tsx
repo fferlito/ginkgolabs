@@ -10,12 +10,16 @@ import {
   Text,
   View,
 } from "react-native";
+import { useTranslation } from "react-i18next";
 import { Subpage } from "../components/subpage";
 import { ApiError, apiAuth, type IdentifyResult } from "../lib/api";
 import { currentCoords } from "../lib/geo";
+import { mushroomCommonName } from "../lib/i18n";
+import { localImageFile } from "../lib/local-file";
 import { setPendingScanPhoto } from "../lib/pending-scan";
 
 export default function ScanScreen() {
+  const { t } = useTranslation();
   const router = useRouter();
   const { getToken } = useAuth();
   const cameraRef = useRef<CameraView>(null);
@@ -38,14 +42,18 @@ export default function ScanScreen() {
     setBusy(true);
     setError(null);
     try {
-      const coords = await currentCoords();
+      let coords: { latitude: number; longitude: number } | null = null;
+      try {
+        coords = await Promise.race([
+          currentCoords(),
+          new Promise<null>((resolve) => setTimeout(() => resolve(null), 5000)),
+        ]);
+      } catch {
+        coords = null;
+      }
       const token = await getToken();
       const form = new FormData();
-      form.append("image", {
-        uri: photoUri,
-        name: "scan.jpg",
-        type: "image/jpeg",
-      } as unknown as Blob);
+      form.append("image", localImageFile(photoUri) as unknown as Blob);
       if (coords) {
         form.append("latitude", String(coords.latitude));
         form.append("longitude", String(coords.longitude));
@@ -56,7 +64,13 @@ export default function ScanScreen() {
       });
       setResults(data.results ?? []);
     } catch (err) {
-      setError(err instanceof ApiError ? err.message : "Could not identify this photo.");
+      const message =
+        err instanceof ApiError
+          ? err.message
+          : err instanceof Error
+            ? err.message
+            : t("scan.identifyError");
+      setError(message);
     } finally {
       setBusy(false);
     }
@@ -78,7 +92,7 @@ export default function ScanScreen() {
 
   if (!permission) {
     return (
-      <Subpage title="Scan mode">
+      <Subpage title={t("scan.title")}>
         <View className="flex-1 items-center justify-center">
           <ActivityIndicator color="#4A7C5D" />
         </View>
@@ -88,16 +102,14 @@ export default function ScanScreen() {
 
   if (!permission.granted) {
     return (
-      <Subpage title="Scan mode">
+      <Subpage title={t("scan.title")}>
         <View className="px-4">
-          <Text className="mb-4 text-sm text-[#9CA89F]">
-            Camera access is needed to photograph a mushroom for identification.
-          </Text>
+          <Text className="mb-4 text-sm text-[#9CA89F]">{t("scan.cameraNeeded")}</Text>
           <Pressable
             onPress={requestPermission}
             className="items-center rounded-xl bg-[#2D5F3F] py-3"
           >
-            <Text className="font-semibold text-[#F5F5F0]">Allow camera</Text>
+            <Text className="font-semibold text-[#F5F5F0]">{t("scan.allowCamera")}</Text>
           </Pressable>
         </View>
       </Subpage>
@@ -105,7 +117,7 @@ export default function ScanScreen() {
   }
 
   return (
-    <Subpage title="Scan mode">
+    <Subpage title={t("scan.title")}>
       <ScrollView contentContainerStyle={{ paddingHorizontal: 16, paddingBottom: 32 }}>
         <View className="mb-4 overflow-hidden rounded-xl border border-[#2D5F3F]/30" style={{ height: 320 }}>
           {photoUri ? (
@@ -123,11 +135,11 @@ export default function ScanScreen() {
               }}
               className="flex-1 items-center rounded-xl border border-[#2D5F3F] py-3"
             >
-              <Text className="font-semibold text-[#F5F5F0]">Retake</Text>
+              <Text className="font-semibold text-[#F5F5F0]">{t("scan.retake")}</Text>
             </Pressable>
           ) : (
             <Pressable onPress={snap} className="flex-1 items-center rounded-xl bg-[#2D5F3F] py-3">
-              <Text className="font-semibold text-[#F5F5F0]">Capture</Text>
+              <Text className="font-semibold text-[#F5F5F0]">{t("scan.capture")}</Text>
             </Pressable>
           )}
           <Pressable
@@ -140,16 +152,14 @@ export default function ScanScreen() {
             {busy ? (
               <ActivityIndicator color="#F5F5F0" />
             ) : (
-              <Text className="font-semibold text-[#F5F5F0]">Identify</Text>
+              <Text className="font-semibold text-[#F5F5F0]">{t("scan.identify")}</Text>
             )}
           </Pressable>
         </View>
-        <Text className="mb-4 text-xs text-[#9CA89F]">
-          Predictions are not foraging advice. Never eat a mushroom based on this scan.
-        </Text>
+        <Text className="mb-4 text-xs text-[#9CA89F]">{t("scan.disclaimer")}</Text>
         {error ? <Text className="mb-3 text-sm text-[#E8B86D]">{error}</Text> : null}
         {results && results.length === 0 ? (
-          <Text className="text-sm text-[#9CA89F]">No matches. Try a closer, well-lit photo.</Text>
+          <Text className="text-sm text-[#9CA89F]">{t("scan.noMatches")}</Text>
         ) : null}
         {results?.map((row) => (
           <Pressable
@@ -158,13 +168,18 @@ export default function ScanScreen() {
             className="mb-2 rounded-xl border border-[#2D5F3F]/30 bg-[#1B3022]/40 px-4 py-3"
           >
             <Text className="text-base font-semibold text-[#F5F5F0]">
-              {row.commonName || row.scientificName}
+              {mushroomCommonName({
+                name: row.commonName,
+                scientificName: row.scientificName,
+              }) || row.scientificName}
             </Text>
             {row.commonName && row.scientificName ? (
               <Text className="text-xs italic text-[#9CA89F]">{row.scientificName}</Text>
             ) : null}
             <Text className="mt-1 text-xs text-[#4A7C5D]">
-              {Math.round(row.score <= 1 ? row.score * 100 : row.score)}% · tap to save as observation
+              {t("scan.tapToSave", {
+                percent: Math.round(row.score <= 1 ? row.score * 100 : row.score),
+              })}
             </Text>
           </Pressable>
         ))}

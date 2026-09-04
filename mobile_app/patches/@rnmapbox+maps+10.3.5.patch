@@ -1,0 +1,29 @@
+diff --git a/node_modules/@rnmapbox/maps/android/src/main/java/com/rnmapbox/rnmbx/components/mapview/RNMBXMapView.kt b/node_modules/@rnmapbox/maps/android/src/main/java/com/rnmapbox/rnmbx/components/mapview/RNMBXMapView.kt
+index 1111111..2222222 100644
+--- a/node_modules/@rnmapbox/maps/android/src/main/java/com/rnmapbox/rnmbx/components/mapview/RNMBXMapView.kt
++++ b/node_modules/@rnmapbox/maps/android/src/main/java/com/rnmapbox/rnmbx/components/mapview/RNMBXMapView.kt
+@@ -226,7 +226,6 @@ class RNMBXMapView(context: Context, manager: RNMBXMapViewManager, _mapboxMapOpt
+     private fun styleLoaded(style: Style) {
+         savedStyle = style
+         styleLoaded = true
+-        setUpImage(style)
+         addFeaturesToMap(true)
+         applyLocalizeLabels()
+         style.setProjection(Projection(mProjection))
+@@ -909,12 +908,9 @@ class RNMBXMapView(context: Context, manager: RNMBXMapViewManager, _mapboxMapOpt
+ 
+     // endregion
+ 
+-    /**
+-     * Adds the marker image to the map for use as a SymbolLayer icon
+-     */
+-    private fun setUpImage(loadedStyle: Style) {
+-        loadedStyle.addImage("MARKER_IMAGE_ID", BitmapFactory.decodeResource(
+-                this.resources, R.drawable.red_marker)
+-        )
++    private fun setUpImage(_loadedStyle: Style) {
++        // Intentionally empty: BitmapFactory.decodeResource(R.drawable.red_marker)
++        // crashes on this emulator when the bitmap cannot be decoded.
+     }
+ 
+     val locationComponentManager: LocationComponentManager

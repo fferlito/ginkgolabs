@@ -5,13 +5,19 @@ $Backend = Split-Path -Parent $PSScriptRoot
 $Identify = Join-Path (Split-Path -Parent $Backend) "identify"
 $EnvFile = Join-Path $Backend ".env"
 
-$secret = ""
-foreach ($line in Get-Content $EnvFile) {
-  if ($line -like "IDENTIFY_SERVICE_SECRET=*") {
-    $secret = $line.Substring("IDENTIFY_SERVICE_SECRET=".Length).Trim()
+function Get-DotEnvValue([string]$Path, [string]$Key) {
+  foreach ($line in Get-Content $Path) {
+    if ($line.StartsWith("$Key=")) {
+      return $line.Substring($Key.Length + 1).Trim()
+    }
   }
+  return ""
 }
+
+$secret = Get-DotEnvValue $EnvFile "IDENTIFY_SERVICE_SECRET"
+$inatToken = Get-DotEnvValue $EnvFile "INATURALIST_API_TOKEN"
 if (-not $secret) { throw "IDENTIFY_SERVICE_SECRET missing from backend/.env" }
+if (-not $inatToken) { throw "INATURALIST_API_TOKEN missing from backend/.env" }
 
 gcloud storage buckets update gs://mushroom-radar-user-media --cors-file=(Join-Path $PSScriptRoot "gcs-cors.json") --project=$Project
 
@@ -21,7 +27,7 @@ gcloud run deploy mushroomradar-identify `
   --region europe-west1 `
   --project $Project `
   --allow-unauthenticated `
-  --set-env-vars "IDENTIFY_SERVICE_SECRET=$secret" `
+  --update-env-vars "IDENTIFY_SERVICE_SECRET=$secret,INATURALIST_API_TOKEN=$inatToken" `
   --quiet
 
 $url = gcloud run services describe mushroomradar-identify --region europe-west1 --project $Project --format="value(status.url)"
